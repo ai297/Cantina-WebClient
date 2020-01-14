@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import SignalR from 'signalr'
+//import SignalR from 'signalr'
 import App from './App.vue'
 
 Vue.config.productionTip = false
