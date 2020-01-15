@@ -7,13 +7,11 @@
 <script>
 // import axios from 'axios';
 import ModalContainer from './components/ModalContainer.vue';
-import RegisterForm from './components/Register.vue'
 
 export default {
   name: 'app',
   components: {
-    ModalContainer,
-    RegisterForm
+    ModalContainer
   },
   data: function(){
     return {
@@ -30,7 +28,7 @@ export default {
     }
   },
   mounted: function(){
-    this.ShowModal(RegisterForm);
+    //this.ShowModal("login-form");
   }
 }
 
@@ -52,10 +50,6 @@ body {
     font-size: @base-fontsize;
 }
 div#app {
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
 }
 </style>

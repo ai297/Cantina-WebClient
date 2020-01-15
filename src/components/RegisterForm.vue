@@ -16,18 +16,12 @@
 </template>
 
 <script>
-import EmailField from './EmailField.vue';
-import PasswordField from './PasswordField.vue';
-import NameField from './NameField.vue';
 import GenderField from './GenderField.vue';
 import LocationField from './LocationField.vue';
 
 export default {
-    name: "registerForm",
+    name: "RegisterForm",
     components: {
-        EmailField,
-        PasswordField,
-        NameField,
         GenderField,
         LocationField
     },
