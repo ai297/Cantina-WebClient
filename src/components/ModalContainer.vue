@@ -1,20 +1,16 @@
 <template>
-    <div id="modalContainer" v-show="display">
+    <div id="modalContainer">
         <slot></slot>
     </div>
 </template>
 
 <script>
 export default {
-    name: "ModalContaner",
-    props: {
-        display: Boolean
-    }
+    name: "ModalContaner"
 }
 </script>
 
 <style lang="less" scoped>
-    /* глобальные переменные */
     @import "../less/vars.less";
 
     div#modalContainer {
@@ -38,7 +34,6 @@ export default {
 </style>
 
 <style lang="less">
-    /* глобальные переменные */
     @import "../less/vars.less";
     .modalWindow {
         display: inline-block;

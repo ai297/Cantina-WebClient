@@ -1,4 +1,5 @@
 <template>
+<modal-container>
     <div id="registerForm" class="modalWindow">
         <h2>Регистрация:</h2>
         <form @submit.prevent="submitForm">
@@ -13,17 +14,20 @@
             <input type="submit" value="Зарегистрироваться" :disabled="!isAllValid" />
         </form>
     </div>
+</modal-container>
 </template>
 
 <script>
-import GenderField from './GenderField.vue';
-import LocationField from './LocationField.vue';
+import GenderField from './fields/GenderField.vue';
+import LocationField from './fields/LocationField.vue';
+import ModalContainer from './ModalContainer.vue';
 
 export default {
     name: "RegisterForm",
     components: {
         GenderField,
-        LocationField
+        LocationField,
+        ModalContainer
     },
     data: function(){
         return {
@@ -64,9 +68,8 @@ export default {
 </script>
 
 <style lang="less">
-/* глобальные переменные */
     @import "../less/vars.less";
-
+    
     div#registerForm {
         background-color: @blue;
         color: @dark-grey;

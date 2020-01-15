@@ -1,16 +1,20 @@
 <template>
+<modal-container>
     <div id="loginForm" class="modalWindow">
         <h2>Вход в Кантину:</h2>
         <form @submit.prevent="submitForm">
             <email-field name="email" label="Ваш e-mail:" v-model="request.email" @validation="checkRequest"></email-field>
-            <password-field name="password" label="Пароль:" v-model="request.password"></password-field>
+            <password-field name="password" label="Пароль:" v-model="request.password" @validation="checkRequest"></password-field>
 
             <input type="submit" value="Войти" :disabled="!isAllValid" />
+            <router-link to="/register">Зарегистрироваться</router-link>
         </form>
     </div>
+</modal-container>
 </template>
 
 <script>
+import ModalContainer from './ModalContainer.vue';
 export default {
     name: "LoginForm",
     data: function(){
@@ -19,12 +23,25 @@ export default {
                 email: '',
                 password: ''
             },
+            validation: {},
             isAllValid: false
         }
     },
+    components: {
+        ModalContainer
+    },
     methods: {
         checkRequest: function(obj) {
-            this.isAllValid = obj.status;
+            this.validation[obj.sender] = obj.status;
+            this.isAllValid = this.validationStatus();
+        },
+        validationStatus: function(){
+            if(!this.validation) return false;
+            var valid = true;
+            for(let key in this.validation){
+                valid = valid && this.validation[key];
+            }
+            return valid;
         },
         submitForm: function(){
             
@@ -34,7 +51,6 @@ export default {
 </script>
 
 <style lang="less">
-/* глобальные переменные */
     @import "../less/vars.less";
 
     div#loginForm {
@@ -65,7 +81,7 @@ export default {
             }
             input[type="submit"] {
                 background-color: @red;
-                color: @dark-grey;
+                color: #ffffff;
                 padding: round(@base-fontsize * 0.6) round(@base-fontsize * 1.5);
                 border: none;
                 margin-top: @base-fontsize;
@@ -74,7 +90,7 @@ export default {
                     color: #ffffff;
                 }
                 &:disabled {
-                    background-color: @grey;
+                    color: @dark-grey;
                     cursor: auto;
                 }
             }
@@ -87,6 +103,16 @@ export default {
                     display: inline-block;
                     width: 100%;
                 }
+            }
+        }
+        a {
+            color: @red;
+            text-decoration: none;
+            font-family: @headers-font;
+            font-weight: bold;
+            &:hover {
+                color: @dark-grey;
+                text-decoration: underline;
             }
         }
     }

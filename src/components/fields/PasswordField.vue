@@ -25,7 +25,8 @@ export default {
             return this.isValid;
         },
         check: function(){
-            if(this.errorMessage) this.showError = !this.checkStatus();
+            this.checkStatus();
+            if(this.errorMessage) this.showError = !this.isValid;
         }
     },
     props: {
