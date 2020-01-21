@@ -1,8 +1,8 @@
 <template>
     <div>
         <label :for="name">{{label}}</label>
-        <p v-show="showError">Некорректное значение</p>
-        <input type="text" :name="name" maxlength="32" :value="value" v-bind="$attr" v-on="inputListener" />
+        <p v-show="showError" class="error">Некорректное значение</p>
+        <input type="text" :name="name" maxlength="32" :value="value" v-on="inputListener" @change="check" />
     </div>
 </template>
 
@@ -16,7 +16,7 @@ export default {
     },
     methods: {
         checkStatus: function() {
-            var pattern = /^\w{4,32}$/i;
+            var pattern = /^[а-я\w\s]{4,32}$/i;
             this.isValid = (pattern.test(this.value) || !this.value);
             this.$emit('validation', {status: this.isValid, sender: this.name});
             return this.isValid;
@@ -32,7 +32,8 @@ export default {
     },
     watch: {
         value: function(){
-            this.check();
+            this.checkStatus();
+            if(this.isValid) this.showError = false;
         }
     },
     computed: {

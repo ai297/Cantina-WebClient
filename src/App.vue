@@ -5,17 +5,10 @@
 </template>
 
 <script>
+
 export default {
   name: 'app',
-  components: {
 
-  },
-  data: function(){
-    return {
-    }
-  },
-  methods: {
-  },
 }
 
 </script>
@@ -28,8 +21,8 @@ export default {
     font-family: @main-font;
 }
 body {
-    background-color: #000;
-    color: @grey;
+    background-color: @body-background-color;
+    color: @base-font-color;
     font-size: @base-fontsize;
 }
 div#app {

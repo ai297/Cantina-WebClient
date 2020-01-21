@@ -1,8 +1,8 @@
 <template>
     <div>
         <label :for="name">{{label}}</label>
-        <p v-show="showError">{{ errorMessage }}</p>
-        <input type="text" :name="name" maxlength="18" v-bind:value="value" v-bind="$attr" v-on="inputListener" />
+        <p v-show="showError" class="error">{{ errorMessage }}</p>
+        <input type="text" :name="name" maxlength="18" v-bind:value="value" v-on="inputListener" @change="check" />
     </div>
 </template>
 
@@ -11,7 +11,7 @@ export default {
     data: function() {
         return {
             showError: false,
-            errorMessage: '',
+            errorMessage: 'Некорректный никнейм',
             isValid: true
         }
     },
@@ -23,12 +23,7 @@ export default {
             return this.isValid;
         },
         check: function(){
-            if(!this.checkStatus()){
-                this.errorMessage = "Некорректный никнейм";
-                this.showError = true;
-            } else {
-                this.showError = false;
-            }
+            this.showError = !this.checkStatus();
         }
     },
     props: {
@@ -38,7 +33,8 @@ export default {
     },
     watch:{
         value: function(){
-            this.check();
+            this.checkStatus();
+            if(this.isValid) this.showError = false;
         }
     },
     computed: {

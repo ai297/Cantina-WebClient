@@ -5,7 +5,7 @@
         <form @submit.prevent="submitForm">
             <email-field name="email" label="Ваш e-mail:" v-model="request.email" @validation="checkRequest"></email-field>
             <password-field name="password" label="Пароль:" v-model="request.password" @validation="checkRequest"></password-field>
-
+            <p class="error" v-show="err.show">{{err.message}}</p>
             <input type="submit" value="Войти" :disabled="!isAllValid" />
             <router-link to="/register">Зарегистрироваться</router-link>
         </form>
@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import ModalContainer from './ModalContainer.vue';
 export default {
     name: "LoginForm",
     data: function(){
@@ -24,11 +23,20 @@ export default {
                 password: ''
             },
             validation: {},
-            isAllValid: false
+            isAllValid: false,
+            err: {
+                show: false,
+                message: ''
+            },
         }
     },
-    components: {
-        ModalContainer
+    computed: {
+        isAuth: function() {
+            return this.$store.getters['auth/isAuth'];
+        },
+        authError: function() {
+            return this.$store.state.auth.err;
+        }
     },
     methods: {
         checkRequest: function(obj) {
@@ -44,7 +52,21 @@ export default {
             return valid;
         },
         submitForm: function(){
-            
+            // отправка запроса на авторизащию на сервер
+            this.err.show = false;
+            if(!this.isAllValid) return false;
+            this.isAllValid = false;
+            this.$store.dispatch('auth/login', this.request)
+            .then(() => {
+                if(this.isAuth) {
+                    this.$router.replace({name: 'main'});
+                } else {
+                    this.request.email = '';
+                    this.request.password = '';
+                    this.err.message = this.authError.message;
+                    this.err.show = true;
+                }
+            });
         }
     }
 }
@@ -91,18 +113,13 @@ export default {
                 }
                 &:disabled {
                     color: @dark-grey;
+                    background-color: @grey;
                     cursor: auto;
                 }
             }
             div{
                 display: inline-block;
                 width: 100%;
-                p {
-                    color: @red;
-                    font-weight: bold;
-                    display: inline-block;
-                    width: 100%;
-                }
             }
         }
         a {
@@ -114,6 +131,12 @@ export default {
                 color: @dark-grey;
                 text-decoration: underline;
             }
+        }
+        .error {
+            color: @red;
+            font-weight: bold;
+            display: inline-block;
+            width: 100%;
         }
     }
 </style>

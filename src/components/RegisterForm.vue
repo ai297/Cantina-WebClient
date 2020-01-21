@@ -4,12 +4,12 @@
         <h2>Регистрация:</h2>
         <form @submit.prevent="submitForm">
             <email-field name="email" label="* Ваш действующий e-mail:" v-model="request.email" @validation="checkRequest"></email-field>
-            <password-field name="password" label="* Придумайте пароль:" errorMessage="Пароль слишком короткий" v-model="request.password" @validation="checkRequest"></password-field>
-            <password-field name="repeatPassword" label="* Повторите пароль ещё раз:" errorMessage="Пароли не совпадают" :checkValue="confirmPassword" v-model="repeatPassword" @validation="checkRequest"></password-field>
+            <password-field name="password" label="* Придумайте пароль:" errorMessage="Пароль слишком короткий" v-model.trim="request.password" @validation="checkRequest"></password-field>
+            <password-field name="repeatPassword" label="* Повторите пароль ещё раз:" errorMessage="Пароли не совпадают" :checkValue="confirmPassword" v-model.trim="repeatPassword" @validation="checkRequest"></password-field>
             <name-field name="name" label="* Никнейм (отображается в чате):" v-model="request.name" @validation="checkRequest"></name-field>
 
-            <gender-field name="gender" label="Ваш пол:" value="0" v-model="request.gender"></gender-field>
-            <location-field name="location" label="Откуда вы:" v-model="request.location" @validation="checkRequest"></location-field>
+            <gender-field name="gender" label="Ваш пол:" value="0" v-model.number="request.gender"></gender-field>
+            <location-field name="location" label="Откуда вы:" v-model.trim="request.location" @validation="checkRequest"></location-field>
 
             <input type="submit" value="Зарегистрироваться" :disabled="!isAllValid" />
         </form>
@@ -20,14 +20,12 @@
 <script>
 import GenderField from './fields/GenderField.vue';
 import LocationField from './fields/LocationField.vue';
-import ModalContainer from './ModalContainer.vue';
 
 export default {
     name: "RegisterForm",
     components: {
         GenderField,
         LocationField,
-        ModalContainer
     },
     data: function(){
         return {
@@ -61,7 +59,20 @@ export default {
             return valid;
         },
         submitForm: function(){
-            
+            if(!this.isAllValid) return false;
+            // var apiUrl = "api/register";
+            // HTTP.post(apiUrl, this.request).then(() => {
+            //     // если регистрация прошла удачно
+            //     // TODO: Заменить алерт на приличное окошко с кнопочкой OK или полем для подтверждения e-mail
+            //     alert("Успешная регистрация! (TODO: Заменить алерт на приличное окошко)");
+            //     this.$router.push({name: 'login', replace: true});
+            // }).catch(error => {
+            //     // если регистрация не удалась
+            //     var message = '';
+            //     if(error.response.data.message) message = error.response.status + ": " + error.response.data.message;
+            //     else message = error;
+            //     alert(message);
+            // });
         }
     }
 }

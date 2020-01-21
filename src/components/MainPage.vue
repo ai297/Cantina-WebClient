@@ -8,7 +8,7 @@
 
         <main>
             <div id="profileSection">
-                <h3>{{ login }}</h3>
+                <h3>user@gmail.com</h3>
                 <p>какие-нибудь настройки профиля</p>
             </div>
             <div id="donatSection">
@@ -43,7 +43,6 @@ export default {
     name: "MainPage",
     data: function(){
         return {
-            login: 'user@gmail.com',
         }
     }
 }
@@ -56,13 +55,13 @@ export default {
         max-width: 1170px;
         min-height: 100vh;
         padding: 0 20px;
-        background-color: @dark-grey;
+        background-color: @content-background-color;
         display: grid;
         grid-template-rows: auto 1fr auto;
         header {
             text-align: center;
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: @header1-size;
             display: block;
             p {
                 font-style: italic;
@@ -100,9 +99,6 @@ export default {
                 align-items: center;
                 align-content: center;
                 justify-content: center;
-                strong {
-                    color: @blue;
-                }
                 a {
                     color: @gold;
                     font-weight: bold;
@@ -138,7 +134,7 @@ export default {
         h3 {
             font-size: @header3-size;
             color: @blue;
-            margin-bottom: round(@base-fontsize * 0.8);
+            margin-bottom: round(@header3-size * 0.6);
         }
     }
     div#header {
@@ -149,7 +145,7 @@ export default {
         align-items: center;
         align-content: center;
         justify-content: center;
-        margin-bottom: 30px;
+        margin-bottom: round(@header1-size * 0.6);
         img {
             display: block;
             width: 100%;

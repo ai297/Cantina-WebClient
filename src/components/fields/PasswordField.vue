@@ -2,7 +2,7 @@
     <div>
         <label :for="name">{{label}}</label>
         <p class="error" v-show="showError">{{errorMessage}}</p>
-        <input type="password" :name="name" maxlength="18" v-bind:value="value" v-bind="$attr" v-on="inputListener" />
+        <input type="password" :name="name" maxlength="18" v-bind:value="value" v-on="inputListener" @change="check" />
     </div>
 </template>
 
@@ -26,7 +26,7 @@ export default {
         },
         check: function(){
             this.checkStatus();
-            if(this.errorMessage) this.showError = !this.isValid;
+            this.showError = !this.isValid;
         }
     },
     props: {
@@ -38,7 +38,8 @@ export default {
     },
     watch: {
         value: function(){
-            this.check();
+            this.checkStatus();
+            if(this.isValid) this.showError = false;
         }
     },
     computed: {
