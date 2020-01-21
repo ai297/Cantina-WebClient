@@ -20,7 +20,6 @@ export default {
                 state.token.accessExpires > Date.now()) return true;
             else return false;
         },
-
         canRefresh: () => {
             if(localStorage.getItem('ref') !== null &&
             localStorage.getItem('exp') !== null &&
@@ -58,7 +57,7 @@ export default {
             }
         },
         failReport: (state, report) => {
-            if(typeof report.response != 'undefined') {
+            if(typeof report.response != 'undefined' && typeof report.response.data != 'undefined') {
                 state.err = {
                     status: report.response.status,
                     message: report.response.data.message
@@ -69,6 +68,8 @@ export default {
                     message: report
                 };
             }
+            localStorage.removeItem('ref');
+            localStorage.removeItem('exp');
         }
     },
     actions: {

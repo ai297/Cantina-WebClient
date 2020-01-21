@@ -10,7 +10,7 @@
 
             <gender-field name="gender" label="Ваш пол:" value="0" v-model.number="request.gender"></gender-field>
             <location-field name="location" label="Откуда вы:" v-model.trim="request.location" @validation="checkRequest"></location-field>
-
+            <p class="error" v-show="err.show">{{err.message}}</p>
             <input type="submit" value="Зарегистрироваться" :disabled="!isAllValid" />
         </form>
     </div>
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import {HTTP} from '../http-common.js';
 import GenderField from './fields/GenderField.vue';
 import LocationField from './fields/LocationField.vue';
 
@@ -38,7 +39,11 @@ export default {
             },
             repeatPassword: '',
             validation: {},
-            isAllValid: false
+            isAllValid: false,
+            err: {
+                show: false,
+                message: ''
+            }
         }
     },
     methods: {
@@ -60,19 +65,21 @@ export default {
         },
         submitForm: function(){
             if(!this.isAllValid) return false;
-            // var apiUrl = "api/register";
-            // HTTP.post(apiUrl, this.request).then(() => {
-            //     // если регистрация прошла удачно
-            //     // TODO: Заменить алерт на приличное окошко с кнопочкой OK или полем для подтверждения e-mail
-            //     alert("Успешная регистрация! (TODO: Заменить алерт на приличное окошко)");
-            //     this.$router.push({name: 'login', replace: true});
-            // }).catch(error => {
-            //     // если регистрация не удалась
-            //     var message = '';
-            //     if(error.response.data.message) message = error.response.status + ": " + error.response.data.message;
-            //     else message = error;
-            //     alert(message);
-            // });
+            this.isAllValid = false;
+            var apiUrl = "api/register";
+            HTTP.post(apiUrl, this.request).then(() => {
+                // если регистрация прошла удачно
+                // TODO: Заменить алерт на приличное окошко с кнопочкой OK или полем для подтверждения e-mail
+                alert("Успешная регистрация! (TODO: Заменить алерт на приличное окошко)");
+                this.$router.push({name: 'login', replace: true});
+            }).catch(error => {
+                // если регистрация не удалась
+                if(typeof error.response != "undefined" && typeof error.response.data != "undefined")
+                    this.err.message = error.response.data.message;
+                else this.err.message = "Не удалось подключиться к серверу";
+                this.err.show = true;
+                this.isAllValid = this.validationStatus();
+            });
         }
     }
 }
@@ -136,6 +143,12 @@ export default {
                     width: 100%;
                 }
             }
+        }
+        .error {
+            color: @red;
+            font-weight: bold;
+            display: inline-block;
+            width: 100%;
         }
     }
 </style>
