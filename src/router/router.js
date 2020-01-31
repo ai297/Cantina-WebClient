@@ -9,9 +9,10 @@ import onlyGuests from './middleware/guestOnly.js';
 Vue.use(VueRouter); // подключаем плагин маршрутизации
 
 // Базовые компоненты приложения (вьюшки), представляющие отдельные "страницы"
-const loginForm = () => import('../components/LoginForm.vue');       // форма входа
-const registerForm = () => import('../components/RegisterForm.vue'); // форма регистрации
-const mainPage = () => import('../components/MainPage.vue');         // стартовая страница
+const loginPage = () => import('../components/LoginPage.vue');          // форма входа
+const registerPage = () => import('../components/RegisterPage.vue');    // форма регистрации
+const mainPage = () => import('../components/MainPage.vue');            // стартовая страница
+const chatPage = () => import('../components/ChatPage/ChatPage.vue');   // основная страница чата
 
 // Настройка маршрутов  //
 const router = new VueRouter({
@@ -19,9 +20,9 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes: [
     { 
-      name: 'register',
+      name: 'register',         // страница регистрации
       path: '/register',
-      component: registerForm,
+      component: registerPage,
       meta: {
         middlware: [
           onlyGuests
@@ -29,9 +30,9 @@ const router = new VueRouter({
       }
     },
     {
-      name: 'login',
+      name: 'login',            // страница логина
       path: '/login',
-      component: loginForm,
+      component: loginPage,
       meta: {
         middlware: [
           onlyGuests
@@ -39,7 +40,7 @@ const router = new VueRouter({
       }
     },
     {
-      name: 'main',
+      name: 'main',             // стартовая страница
       path: '/main',
       component: mainPage,
       alias: '/',
@@ -49,6 +50,16 @@ const router = new VueRouter({
         ]
       }
     },
+    {
+      name: 'chat',             // основная страница чата
+      path: '/chat',
+      component: chatPage,
+      meta: {
+        // middlware: [
+        //   autorization
+        // ]
+      }
+    }
   ]
 });
 

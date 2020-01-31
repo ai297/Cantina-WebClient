@@ -15,7 +15,7 @@
 
 <script>
 export default {
-    name: "LoginForm",
+    name: "LoginPage",
     data: function(){
         return {
             request: {
@@ -86,6 +86,9 @@ export default {
                 text-align: center;
                 margin-bottom: round(@base-fontsize * 0.5);
                 padding: 5px;
+                &:focus {
+                    outline: none;
+                }
             }
             label {
                 display: inline-block;

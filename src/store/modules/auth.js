@@ -29,7 +29,10 @@ export default {
                 localStorage.removeItem('ref');
                 return false;
             }
-        }
+        },
+        getToken: (state) => {
+            return state.token.accessToken;
+        },
     },
     mutations: {
         setTokens: (state, response) => {

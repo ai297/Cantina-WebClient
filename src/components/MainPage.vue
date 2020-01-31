@@ -6,7 +6,7 @@
             <p>Скройся от суеты на перекрётске миров.</p>
         </header>
 
-        <main>
+        <article>
             <div id="profileSection">
                 <h3>user@gmail.com</h3>
                 <p>какие-нибудь настройки профиля</p>
@@ -17,7 +17,7 @@
             <div id="enterSection">
                 <div>
                     <p>Сейчас в чате <strong>0</strong> человек</p>
-                    <a href="#" @click.prevent="false">Войти</a>
+                    <router-link to="chat">Войти</router-link>
                 </div>
             </div>
             <div class="module" id="newsSection">
@@ -29,7 +29,7 @@
             <div class="module">
                 <p>Какой-то ещё модуль</p>
             </div>
-        </main>
+        </article>
         <footer>
             <div>
                 <p>Список контактов, разработчиков, всякая информация мелким шрифтом</p>
@@ -69,7 +69,7 @@ export default {
                 color: @red;
             }
         }
-        main {
+        article {
             width: 100%;
             height: auto;
             display: grid;
@@ -127,12 +127,9 @@ export default {
         }
         h1 {
             color: @gold;
-            font-family: @headers-font;
-            font-size: @header1-size;
             text-shadow: 2px 2px 3px #000;
         }
         h3 {
-            font-size: @header3-size;
             color: @blue;
             margin-bottom: round(@header3-size * 0.6);
         }

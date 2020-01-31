@@ -10,8 +10,9 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-    @import "../less/vars.less";
+
+<style lang="less">
+    @import "../../less/vars.less";
 
     div#modalContainer {
         position: absolute;
@@ -31,10 +32,7 @@ export default {
             content: '';
         }
     }
-</style>
 
-<style lang="less">
-    @import "../less/vars.less";
     .modalWindow {
         display: inline-block;
         white-space: normal;

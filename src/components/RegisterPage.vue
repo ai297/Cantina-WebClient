@@ -23,7 +23,7 @@ import GenderField from './fields/GenderField.vue';
 import LocationField from './fields/LocationField.vue';
 
 export default {
-    name: "RegisterForm",
+    name: "RegisterPage",
     components: {
         GenderField,
         LocationField,
@@ -99,6 +99,9 @@ export default {
                 text-align: center;
                 margin-bottom: round(@base-fontsize * 0.5);
                 padding: 5px;
+                &:focus {
+                    outline: none;
+                }
             }
             label {
                 display: inline-block;

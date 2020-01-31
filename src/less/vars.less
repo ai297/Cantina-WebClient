@@ -1,15 +1,20 @@
 @dark-grey: #121212;
 @blue: #2d7fb3;
 @gold: #e6bb00;
+@dark-gold: #a84c00;
 @red: #be0000;
 @grey: #757575;
 
 @body-background-color: black;
-@content-background-color: @dark-grey;
+@content-background-color: black;
 @base-font-color: @grey;
+@system-font-color: @gold;
+@messages-background-color: black;
+@btn-base-bgcolor: black;
 
 @main-font: 'Play', sans-serif;
 @headers-font: 'Roboto Condensed', sans-serif;
+@button-font: 'Roboto Condensed', sans-serif;
 
 /* 
     Интересные шрифты на Google fonts:
@@ -18,9 +23,15 @@
     Yanone Kaffeesatz
 */
 
-@base-fontsize: 20px;
+@base-fontsize: 19px;
 @header1-size: round(@base-fontsize * 2.2);
 @header2-size: round(@base-fontsize * 1.6);
 @header3-size: round(@base-fontsize * 1.2);
 @input-fontsize: round(@base-fontsize * 1.2);
 @label-fontsize: round(@base-fontsize * 0.85);
+@system-fontsize: round(@base-fontsize * 0.8);
+@small-fontsize: round(@base-fontsize * 0.75);
+
+@base-padding: 5px;
+@message-input-height: round(@input-fontsize * 1.5);
+@system-message-font: bold @system-fontsize @headers-font;
