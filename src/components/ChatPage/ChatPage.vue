@@ -1,10 +1,9 @@
 <template>
-    <div id="chat" :class="{ limitedWidth: isLimWidth }">
-        <modal-container id="modal"></modal-container>
+    <div id="chat" :class="{ limitedWidth: isLimitedWidth }">
         <!-- Основной блок //-->
         <chat-main id="chatMain" />
         <!-- Боковой блок //-->
-        <chat-aside id="chatAside" />
+        <chat-aside id="chatAside" :class="{minimize: !isShowSidebar}" />
         <!-- форма отправки сообщения //-->
         <send-message-form id="sendingForm" />
         <!-- Менюшка навигации //-->
@@ -15,6 +14,9 @@
 </template>
 
 <script>
+
+import { mapGetters, mapActions } from 'vuex';
+// блоки
 import sendMessageForm from './SendMessageForm.vue';
 import chatAside from './ChatAsideView.vue';
 import chatNavMenu from './ChatNavMenu.vue';
@@ -30,63 +32,46 @@ export default {
         "chat-footer": chatFooter,
         "chat-main": chatMain
     },
-    data: function() {
-        return {
-            isLimWidth: true,
-        }
+    computed: {
+        ...mapGetters({
+            isShowSidebar: 'chat/isShowSidebar',
+            isLimitedWidth: 'chat/isLimitedChatWidth',
+        }),
     },
-    created: function() {
-        //this.$store.dispatch('messages/connect', this.$store.getters["auth/getToken"]);
+    methods: {
+        ...mapActions({
+            clearMessagesList: 'messages/clearMessagesList',
+        }),
     },
-    
+    beforeDestroy: function() {
+        this.clearMessagesList();
+    }
 }
 </script>
 
 <style lang="less">
     @import "../../less/vars.less";
 
-    ::-webkit-scrollbar {
-        width: 10px;
-    }
-    ::-webkit-scrollbar-track {
-        background: none;
-    }
-    ::-webkit-scrollbar-thumb {
-        background-color: @grey;
-        border-radius: 5px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background-color: @gold;
-    }
-
-    body {
-        background-image: url("/images/milkyway.jpg");
-        background-attachment: fixed;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-    }
-
     #modal {
         display: none;
     }
 
-    div#chat {
+    #chat {
         display: grid;
         left: 0;
         top: 0;
-        width: 100%;
+        width: calc(100% - 50px);
+        max-width: 100%;
         height: calc(100vh - 2px);
         overflow: hidden;
         padding: 0 10px;
         padding-bottom: 0;
         cursor: default;
-
         grid-template-columns: 1fr auto;
         grid-template-rows: 1fr auto auto auto;
-        
+        transition: max-width .5s;
         &.limitedWidth {
-            max-width: 1600px;
+            max-width: 85rem;
         }
 
         #chatMain {
@@ -101,9 +86,14 @@ export default {
         #chatAside {
             grid-row: 1;
             grid-column: 2;
-            width: 20vw;
-            min-width: 300px;
-            max-width: 400px;
+            width: 22vw;
+            min-width: 16.5rem;
+            max-width: 20rem;
+            transition: all .5s;
+            &.minimize {
+                min-width: 0rem;
+                width: 0vw;
+            }
         }
         #chatNavMenu {
             grid-row: 3;

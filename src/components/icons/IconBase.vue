@@ -10,6 +10,11 @@
 import iconSmile from './IconSmile.vue';
 import iconLogout from './IconLogout.vue';
 import iconChat from './IconChat.vue';
+import iconGear from './IconGear.vue';
+import iconPeople from './IconPeople.vue';
+import iconIgnore from './IconIgnore.vue';
+import iconClaim from './IconClaim.vue';
+import iconPiramid from './IconPiramid.vue';
 
 export default {
     name: "IconBase",
@@ -17,6 +22,11 @@ export default {
         iconSmile,
         iconLogout,
         iconChat,
+        iconGear,
+        iconPeople,
+        iconIgnore,
+        iconClaim,
+        iconPiramid,
     },
     data: function() {
         return {
@@ -24,6 +34,11 @@ export default {
                 "smile": iconSmile,
                 "logOut": iconLogout,
                 "chat": iconChat,
+                "gear": iconGear,
+                "people": iconPeople,
+                "ignore": iconIgnore,
+                "claim": iconClaim,
+                "piramid": iconPiramid,
             }
         }
     },

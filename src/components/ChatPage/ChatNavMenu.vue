@@ -1,24 +1,15 @@
 <template>
     <div class="chatNavMenu">
-        <volume-button>Архив</volume-button>
-        <volume-button>Визиты</volume-button>
-        <volume-button>Настройки</volume-button>
-        <volume-button id="btnExit" class="bright" @click="exit">ВЫХОД<cantina-icons iconName="logOut" /></volume-button>
-        <volume-button>Отойти</volume-button>
+        <a id="btnExit" @click.prevent="exit">Выйти</a>
     </div>
 </template>
 
 <script>
-import cantinaIcons from '../icons/IconBase.vue';
-
 export default {
     name: "ChatNavMenu",
-    components: {
-        cantinaIcons
-    },
     methods: {
         exit: function() {
-            this.$router.push('main');
+            this.$router.push('/');
         }
     }
 }
@@ -30,12 +21,31 @@ export default {
     div.chatNavMenu {
         text-align: center;
         padding: @base-padding;
+        line-height: @base-fontsize;
+        white-space: nowrap;
+
+        a {
+            font-family: @main-font;
+            display: inline-block;
+            padding: 0 @base-padding;
+            text-decoration: none;
+            color: @base-font-color;
+            &:hover, &:active {
+                color: @gold;
+                text-decoration: underline;
+            }
+            &:focus {
+                outline: none;
+                color: @blue;
+            }
+        }
 
         svg {
             display: inline-block;
+            color: @blue;
             width: @base-fontsize;
             height: @base-fontsize;
-            vertical-align: top;
+            vertical-align: bottom;
             margin-left: @base-padding;
         }
     }

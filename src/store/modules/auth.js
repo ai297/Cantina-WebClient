@@ -83,10 +83,12 @@ export default {
             .then((response) => {
                 context.commit('setTokens', response);  // сохраняем токены
                 context.dispatch('refresh');            // запускаем автообновление
+                return true;
             })
             .catch((err) => {
                 // если ответ отрицательный (401, 500)
                 context.commit('failReport', err);
+                return false;
             });
         },
         // запрос нового токена при помощи refresh

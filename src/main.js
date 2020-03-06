@@ -1,23 +1,28 @@
 import Vue from 'vue';
-//import Axios from 'axios';
 
 import Router from './router/router.js';            // <-- в этом файле настраивается маршрутизация
 import Store from './store/store.js';               // <-- глобальная стейт-машина
-import App from './App.vue';                        // <-- родительский компонент, в него загружаются все остальные компоненты
-
 Vue.config.productionTip = false
 
+Store.commit('showLoader', 'Загрузка...');
+
 // глобальные компоненты
-import ModalContainer from './components/ui/ModalContainer.vue';
-import EmailField from './components/fields/EmailField.vue';        // поле для ввода email с автоматической валидацией
-import PasswordField from './components/fields/PasswordField.vue';  // поле для ввода пароля
-import NameField from './components/fields/NameField.vue';          // поле для ввода никнейма с автоматической валидацией
-import volumeButton from './components/ui/VolumeButton.vue';             // красивая кнопочка
-Vue.component("modal-container", ModalContainer);
-Vue.component("email-field", EmailField);
-Vue.component("password-field", PasswordField);
-Vue.component("name-field", NameField);
+import App from './App.vue';                                        // <-- родительский компонент, в него загружаются все остальные компоненты
+import animatedLogo from './components/ui/AnimatedLogo.vue';        // SVG логотип
+import flatField from './components/ui/FlatField.vue';              // плоское текстовое поле
+import flatSelection from './components/ui/FlatSelection.vue';      // плоский выпадающий список
+import volumeButton from './components/ui/VolumeButton.vue';        // объемная кнопочка
+import flatButton from './components/ui/FlatButton.vue';            // плосская кнопочка
+import kotorBorder from './components/ui/KotorStyleBorder.vue';     // рамка а-ля kotor
+import cantinaIcons from './components/icons/IconBase.vue';         // svg - иконки
+Vue.component("animated-logo", animatedLogo);
+Vue.component("flat-field", flatField);
+Vue.component("flat-selection", flatSelection);
 Vue.component("volume-button", volumeButton);
+Vue.component("flat-button", flatButton);
+Vue.component("kotor-border", kotorBorder);
+Vue.component("cantina-icons", cantinaIcons);
+
 
 /////-> Поехали! (точка входа)
 new Vue({

@@ -15,7 +15,8 @@ export default {
 
     div.chatFooter {
         text-align: center;
+        font-family: @label-font;
         font-size: @small-fontsize;
-        color: mix(@base-font-color, @body-background-color, 30%);
+        color: mix(@base-font-color, @body-background-color, 50%);
     }
 </style>

@@ -1,16 +1,12 @@
 <template>
-    <div class="volumeButton"><button :id="id" @click="clickMethod">
-        <slot />
+    <div class="volumeButton"><button @click="clickMethod">
+        <div><slot /></div>
     </button></div>
 </template>
 
 <script>
 export default {
     name: "volumeButton",
-    props: {
-        id: String,
-        click: Function
-    },
     methods: {
         clickMethod: function(){
             this.$emit('click');
@@ -19,50 +15,36 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
     @import "../../less/vars.less";
     
     div.volumeButton {
         display: inline-block;
-        border-radius: @system-fontsize;
         background: linear-gradient(to bottom, @grey, mix(grey,@btn-base-bgcolor, 50%));
-        padding: 2px;
+        padding: @ui-border-width * 2;
         text-align: center;
-        font-family: @button-font;
-        font-weight: bold;
-        font-size: @system-fontsize;
         color: @blue;
-        margin: 3px 5px;
-        
+        font-size: @label-fontsize;
+        font-weight: bold;
+        margin: @base-padding / 2 @base-padding;
+        box-shadow: 0 1px 3px @btn-base-bgcolor;
+        border-radius: @label-fontsize;
 
         button {
             background: radial-gradient(mix(@blue, @btn-base-bgcolor, 30%), @btn-base-bgcolor);
             border: solid 2px @btn-base-bgcolor;
             border-radius: inherit;
-            padding: 2px 10px;
-            font-family: inherit;
+            padding: @base-padding / 2 @base-padding * 2;
             font-weight: inherit;
             font-size: inherit;
             color: inherit;
-            cursor: pointer;
             text-shadow: 1px 2px 2px @btn-base-bgcolor;
             transition: .3s;
             svg {
-                color: @gold;
-            }
-
-            &:before, &:after {
-                content: '';
-                display: block;
-                width: 100%;
-                height: 1px;
-                overflow: hidden;
-            }
-            &:before {
-                display: none;
-            }
-            &:focus {
-                outline: none;
+                color: @grey;
+                display: inline-block;
+                width: @label-fontsize * 1.1;
+                vertical-align: bottom;
             }
         }
         &:hover {
@@ -71,7 +53,7 @@ export default {
             button {
                 background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
                 svg {
-                    color: white;
+                    color: inherit;
                 }
             }
         }
@@ -94,6 +76,9 @@ export default {
                 background: @gold;
                 color: white;
             }
+            svg {
+                color: @gold;
+            }
         }
 
         &.actv {
@@ -101,6 +86,9 @@ export default {
             color: @gold;
             button {
                 background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
+                svg {
+                    color: @blue;
+                }
             }
         }
     }
