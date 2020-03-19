@@ -6,10 +6,10 @@ export const VALIDATION_PATTERNS = {
 }
 
 export const MESSAGE_TYPES = {
-    base: {name: 'base', command: '', shortCommand: ''},
-    system: {name: 'system', command: 'system', shortCommand: '~'},
-    privat: {name: 'privat', command: 'pm', shortCommand: '@'},
-    thirdPerson: {name: 'thirdPerson', command: 'me', shortCommand: '*'},
+    Base: {name: 'Base', command: '', shortCommand: ''},
+    System: {name: 'System', command: 'system', shortCommand: '~'},
+    Privat: {name: 'Privat', command: 'pm', shortCommand: '@'},
+    ThirdPerson: {name: 'ThirdPerson', command: 'me', shortCommand: '*'},
 }
 
 export const GENDER = {
@@ -19,3 +19,19 @@ export const GENDER = {
 }
 
 export const MAIN_PAGE = '/chat';
+
+export const API_URL = {
+    root: 'http://localhost:5000/',
+    ping: 'ping',
+    login: 'auth',
+    register: 'register',
+    activation: 'activation',
+    userinfo: 'userinfo',
+    hub: 'hub',
+};
+
+export const ROLES = {
+    property: "ut",
+    ADMIN: "Admin",
+    USER: "User",
+}

@@ -1,7 +1,6 @@
 <template>
     <div class="chatMain">
-        <div id="interactive">
-        </div>
+        <component id="interactive" :is="interactiveComponent" />
         <div id="messages-list" ref="messagesList">
             <chat-message v-for="(item, index) in messagesQueue" :key="index" :message="item" />
             <p v-show="isNotMessages">Ошибка загрузки сообщений?</p>
@@ -22,6 +21,7 @@ export default {
         ...mapGetters({
             messagesQueue: 'messages/getMessages',
             messagesCount: 'messages/count',
+            interactiveComponent: 'chat/interactiveComponent'
         }),
         isNotMessages: function() {
             return this.messagesCount <= 0;
@@ -45,7 +45,6 @@ export default {
         #interactive {
             display: block;
             overflow: hidden;
-            padding: .2rem;
         }
         #messages-list {
             display: block;

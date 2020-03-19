@@ -1,129 +1,108 @@
-import {HTTP} from '../../http-common';
+import {HTTP} from '../../http-common.js';
+import {API_URL, ROLES} from '../../constants.js';
 
 export default {
     namespaced: true,
     state: {
-        token: {
-            accessToken: '',
-            accessExpires: 0
+        token: sessionStorage.getItem('auth-token') || '',
+        auth: {
+            isAuth: false,
+            type: '',
+            text: '',
         },
-        err: {
-            status: 0,
-            message: ''
-        },
-        refreshTimer: null
+        currentUser: {},
     },
     getters: {
-        // геттер состояния авторизации
-        isAuth: (state) => {
-            if(state.token.accessToken && state.token.accessExpires &&
-                state.token.accessExpires > Date.now()) return true;
+        isAuth: state => state.auth.isAuth,
+        token: (state, getters) => {
+            if(state.token != '' && getters.tokenExpire > Date.now()) return state.token;
             else return false;
         },
-        canRefresh: () => {
-            if(localStorage.getItem('ref') !== null &&
-            localStorage.getItem('exp') !== null &&
-            localStorage.getItem('exp') > Date.now()) return true;
+        tokenExpire: state => {
+            if(state.token != '') return JSON.parse(atob(state.token.split('.',3)[1])).exp * 1000;
+            else return 0;
+        },
+        role: (state, getters) => {
+            if(!getters.token) return ROLES.USER;
             else {
-                localStorage.removeItem('exp');
-                localStorage.removeItem('ref');
-                return false;
+                let role = JSON.parse(atob(state.token.split('.',3)[1]))[ROLES.property];
+                return role ? role : ROLES.USER;
             }
         },
-        getToken: (state) => {
-            return state.token.accessToken;
-        },
+        currentUserInfo: state => state.currentUser,
     },
     mutations: {
-        setTokens: (state, response) => {
-            if(typeof response.data.accessToken != 'undefined' && typeof response.data.refreshToken != 'undefined') {
-                // если токены получены
-                var tokens = response.data;
-                var accessExpires = new Date(tokens.accessExpires).getTime();      // срок действия токена по локальному времени
-                var refreshExpires = new Date(tokens.refreshExpires).getTime();    // срок действия рефреш-токена по локальному времени
-                // сохраняем access токен в стейт
-                state.token = {
-                    accessToken: tokens.accessToken,
-                    accessExpires: accessExpires
-                };
-                // сохраняем refresh токен в локальном хранилище браузера
-                localStorage.setItem('ref', tokens.refreshToken);
-                localStorage.setItem('exp', refreshExpires);
-            } else {
-                // если запрос удачный, но токенов нет
-                state.err = {
-                    status: 0,
-                    message: "No data in response :-("
-                };
-                localStorage.removeItem('ref');
-                localStorage.removeItem('exp');
-            }
+        setToken: (state, token) => {
+            state.token = token;
+            sessionStorage.setItem('auth-token', token);
+            HTTP.defaults.headers.common['Authorization'] = 'Bearer ' + token;
         },
-        failReport: (state, report) => {
-            if(typeof report.response != 'undefined' && typeof report.response.data != 'undefined') {
-                state.err = {
-                    status: report.response.status,
-                    message: report.response.data.message
-                };
-            } else {
-                state.err = {
-                    status: 0,
-                    message: report
-                };
-            }
-            localStorage.removeItem('ref');
-            localStorage.removeItem('exp');
-        }
+        removeToken: state => {
+            state.token = '';
+            sessionStorage.removeItem('auth-token');
+            delete HTTP.defaults.headers.common['Authorization'];
+        },
+        authResult: (state, payload) => {
+            state.auth = payload;
+        },
+        updateCurrentUser: (state, userData) => state.currentUser = userData,
     },
     actions: {
-        // запрос токена (в request поля email и password)
-        login: async (context, request) => {
-            var loginUrl = "api/auth/login";
-            await HTTP.post(loginUrl, request)
-            .then((response) => {
-                context.commit('setTokens', response);  // сохраняем токены
-                context.dispatch('refresh');            // запускаем автообновление
-                return true;
-            })
-            .catch((err) => {
-                // если ответ отрицательный (401, 500)
-                context.commit('failReport', err);
-                return false;
-            });
-        },
-        // запрос нового токена при помощи refresh
-        update: async (context) => {
-            var refreshUrl = "api/auth/refresh";
-            var ref = {
-                token: localStorage.getItem('ref'),
-                expires: localStorage.getItem('exp')
-            };
-            // проверяем наличие рефреш-токена и срок действия
-            if(!ref.token || !ref.expires || ref.expires <= Date.now()) {
-                context.commit('failReport', "No valid token");
-                return;
-            }
-            // запрашиваем авторизацию
-            await HTTP.get(refreshUrl, {
-                // в заголовке авторизации - рефреш токен
+        auth: (context, data) => {
+            let token = context.getters.token ? "Bearer " + context.getters.token : '';
+            return HTTP({
+                method: data.method,
+                url: API_URL.login,
+                data: data.payload,
                 headers: {
-                    "Authorization": "Bearer " + ref.token
+                    "Authorization": token
                 }
-            }).then((response) => {
-                context.commit('setTokens', response);  // сохраняем токены
-                context.dispatch('refresh');            // запускаем автообновление
             })
-            .catch((err) => {
-                context.commit('failReport', err);
+            .then(response => {
+                let res = response.data;
+                if(res.success) {
+                    context.commit("setToken", res.token);
+                    context.commit("authResult", {isAuth: true});
+                }
+                else {
+                    if(res.type == "activation") context.commit("authResult", {isAuth: false, type: "activation"});
+                    else context.commit("authResult", {isAuth: false, type: 'error', text: 'Что-то сломалось'});
+                    context.commit("removeToken");
+                }
+            })
+            .catch(error => {
+                let errorMessage = '';
+                if(error.response !== undefined) {
+                    switch(error.response.status){
+                        case 403:
+                            errorMessage = "Доступ запрещён";
+                            break;
+                        default:
+                            errorMessage = error.response.data;
+                    }
+                } else errorMessage = 'Не удалось подключиться к серверу';
+                context.commit("authResult", {isAuth: false, type: 'error', text: errorMessage});
+                context.commit("removeToken");
+            })
+            .finally(() => {
+                context.dispatch("loadUserInfo");
             });
         },
-        // автообновление токена
-        refresh: async (context) => {
-            var timeout = context.state.token.accessExpires - Date.now() - 10 * 1000;   // задержка до следующего обновления токенов (на 10 сек меньше скрока действия)
-            if(context.state.refreshTimer) clearTimeout(context.state.refreshTimer);    // если уже есть запущенный таймер - отменяем его
-            context.state.refreshTimer = setTimeout(async function tm(ctx) {
-                await ctx.dispatch('update');   // запускаем обновление токенов
-            }, timeout, context);
+        login: async (context, payload) => {
+            await context.dispatch('auth', {method: 'post', payload: payload});
+        },
+        relogin: async context => {
+            await context.dispatch('auth', {method: 'get', payload: {}});
+        },
+        serverIsAvalible: () => {
+            return HTTP.get(API_URL.ping);
+        },
+        loadUserInfo: context => {
+            if(!context.getters.isAuth) return;
+            // обновляем информацию о юзере
+            HTTP.get(API_URL.userinfo).then( response => {
+                context.commit('updateCurrentUser', response.data);
+            });
         }
     }
 

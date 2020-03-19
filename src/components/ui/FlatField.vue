@@ -1,8 +1,8 @@
 <template>
-    <div class="flat-field">
-        <input :type="type" :maxlength="maxlength" :value="value" v-on="inputListener" />
+    <div class="flat-field" :class="{withvalue:(value != '')}">
+        <input :type="type" :maxlength="maxlength" :value="value" v-on="inputListener" @focus="hidePlaceholder = true" @blur="hidePlaceholder = false" />
         <div class="extender"><slot /></div>
-        <div class="placeholder" v-show="isShowBlaceholder" v-html="placeholder"></div>
+        <div class="placeholder" v-show="isShowPlaceholder" v-html="placeholder"></div>
     </div>
 </template>
 
@@ -27,6 +27,11 @@ export default {
             default: '',
         },
     },
+    data: function() {
+        return {
+            hidePlaceholder: false,
+        }
+    },
     computed: {
         inputListener: function(){
             var vm = this;
@@ -39,8 +44,8 @@ export default {
                 }
             )
         },
-        isShowBlaceholder: function() {
-            return this.value == '';
+        isShowPlaceholder: function() {
+            return this.value == '' && !this.hidePlaceholder;
         }
     }
 }
@@ -60,6 +65,7 @@ export default {
         border: @ui-border-width solid @gold;
         border-radius: .4em;
         transition: all .5s;
+        color: inherit;
         input {
             display: block;
             z-index: 1;
@@ -84,7 +90,8 @@ export default {
             margin: 0;
             pointer-events: none;
             border: none;
-            line-height: calc(@doublePadding + 1em)
+            line-height: calc(@doublePadding + 1em);
+            color: inherit;
         }
         .extender {
             width: auto;
@@ -96,6 +103,16 @@ export default {
             font-family: inherit;
             color: inherit;
             line-height: 1em;
+        }
+        &.withvalue {
+            color: @blue;
+        }
+        &.errorField {
+            border-left-width: @base-padding*2;
+            border-color: @red;
+            border-radius: 0;
+            padding-left: @base-padding;
+            background-color: @dark-red;
         }
     }
 </style>

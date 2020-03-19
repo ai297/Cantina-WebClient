@@ -19,14 +19,15 @@ export default {
     },
     methods: {
         isItCurrentUser: function(id) {
-            return this.currentUserId == id;
+            if(this.currentUserInfo.id !== undefined) return this.currentUserInfo.id == id;
+            else return false;
         }
     },
     computed: {
         ...mapGetters({
-            usersInOnline: 'users/getUsersInOinline',
-            countUsersInOnline: 'users/getCountUsersInOnline',
-            currentUserId: 'users/getCurrentUserId',
+            usersInOnline: 'users/usersInOinline',
+            countUsersInOnline: 'users/countUsersInOnline',
+            currentUserInfo: 'auth/currentUserInfo',
         }),
     }
 }

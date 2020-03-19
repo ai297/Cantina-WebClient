@@ -1,13 +1,41 @@
 <template>
-    <div class="chatNavMenu">
-        <a id="btnExit" @click.prevent="exit">Выйти</a>
-    </div>
+    <ul class="chatNavMenu">
+        <li v-if="isAdmin"><a @click.prevent="showConsole">Cmd</a></li>
+        <li><a @click.prevent="exit">Выйти</a></li>
+    </ul>
 </template>
 
 <script>
+import {ROLES} from '../../constants.js';
+
+const adminConsole = () => ({
+  // Загружаемый компонент. Значение должно быть Promise
+  component: import("../Interactive/AdminConsole.vue"),
+  // Компонент загрузки, используемый пока загружается асинхронный компонент
+  //loading: LoadingComponent,
+  // Компонент ошибки, используемый при неудачной загрузке
+  error: "div",
+  // Задержка перед показом компонента загрузки. По умолчанию: 200 мс.
+  //delay: 200,
+  // Компонент ошибки будет отображаться, если таймаут
+  // был указан и время ожидания превышено. По умолчанию: Infinity.
+  timeout: 3000
+});
+
 export default {
     name: "ChatNavMenu",
+    computed: {
+        isAdmin: function(){
+            let role = this.$store.getters['auth/role'];
+            return role == ROLES.ADMIN;
+        },
+    },
     methods: {
+        showConsole: function() {
+            if(this.isAdmin) {
+                this.$store.commit('chat/showInteractive', adminConsole);
+            }
+        },
         exit: function() {
             this.$router.push('/');
         }
@@ -18,13 +46,24 @@ export default {
 <style lang="less" scoped>
     @import "../../less/vars.less";
 
-    div.chatNavMenu {
+    ul.chatNavMenu {
+        display: block;
         text-align: center;
         padding: @base-padding;
         line-height: @base-fontsize;
         white-space: nowrap;
-
-        a {
+        list-style: disc;
+        & > li {
+            display: inline-block;
+            &::before {
+                content: '•';
+                color: @blue;
+            }
+        }
+        & > li:first-child::before {
+            content: '';
+        }
+        li > a {
             font-family: @main-font;
             display: inline-block;
             padding: 0 @base-padding;
@@ -38,15 +77,6 @@ export default {
                 outline: none;
                 color: @blue;
             }
-        }
-
-        svg {
-            display: inline-block;
-            color: @blue;
-            width: @base-fontsize;
-            height: @base-fontsize;
-            vertical-align: bottom;
-            margin-left: @base-padding;
         }
     }
 </style>

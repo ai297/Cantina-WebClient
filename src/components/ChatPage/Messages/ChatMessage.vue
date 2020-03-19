@@ -1,6 +1,6 @@
 <template>
     <div class="message-in-list" :class="messageTypeClass">
-        <span class="timespan">{{message.datetime | timeFilter}}</span>
+        <span class="timespan">{{message.dateTime | timeFilter}}</span>
         <span class="nickname"><message-to-user-link :nickname="message.authorName" :messageType="linkMessageType" /></span>
         <message-text class="message-text" :message="message" />
     </div>
@@ -23,28 +23,32 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentUserId: 'users/getCurrentUserId',
+            currentUser: 'auth/currentUserInfo',
         }),
+        currentUserId: function() {
+            if(this.currentUser.id !== undefined) return this.currentUser.id;
+            else return -1;
+        },
         isPersonal: function() {
             // если поле "получатель" - массив, то ищем в массиве id текущего юзера
-            if(Array.isArray(this.message.recipient)) {
-                return this.message.recipient.includes(this.currentUserId);
+            if(Array.isArray(this.message.recipients)) {
+                return this.message.recipients.includes(this.currentUserId);
             }
             // если не массив, но поле задано, то просто сравниваем его с id текущего юзера
-            else if(this.message.hasOwnProperty('recipient')) {
-                if(this.message.recipient == this.currentUserId) return true;
+            else if(this.message.hasOwnProperty('recipients')) {
+                if(this.message.recipients == this.currentUserId) return true;
             }
             return false;
         },
         messageType: function() {
             if(this.message.hasOwnProperty('type') && MESSAGE_TYPES.hasOwnProperty(this.message.type)) {
                 return MESSAGE_TYPES[this.message.type].name;
-            } else return MESSAGE_TYPES.base.name;
+            } else return MESSAGE_TYPES.Base.name;
         },
         linkMessageType: function() {
-            if(this.messageType == MESSAGE_TYPES.privat.name ||
-            this.messageType == MESSAGE_TYPES.base.name) return this.messageType;
-            else return MESSAGE_TYPES.base.name;
+            if(this.messageType == MESSAGE_TYPES.Privat.name ||
+            this.messageType == MESSAGE_TYPES.Base.name) return this.messageType;
+            else return MESSAGE_TYPES.Base.name;
         },
         messageTypeClass: function() {
             let msgClass = this.messageType + '-message';
@@ -111,7 +115,7 @@ export default {
                 display: inline-block;
             }
         }
-        &.base-message {
+        &.Base-message {
             .timespan {
                 display: none;
             }
@@ -120,7 +124,7 @@ export default {
                 display: inline;
             }
         }
-        &.privat-message {
+        &.Privat-message {
             .timespan {
                 display: none;
             }
@@ -133,12 +137,12 @@ export default {
                 display: inline-block;
             }
         }
-        &.thirdPerson-message {
+        &.ThirdPerson-message {
             .nickname, .message-text {
                 font-style: italic;
             }
         }
-        &.system-message {
+        &.System-message {
             .message-text {
                 color: @system-font-color;
                 font-size: @label-fontsize;

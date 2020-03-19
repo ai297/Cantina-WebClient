@@ -1,14 +1,16 @@
-<template><div>
-    <div class="msgField">
-        <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
-            @keypress.enter.prevent="submit" @keydown="checkLength" @keyup="getCursorPosition"
-            @paste.prevent="pasteFilter" @input="fieldInput"></div>
-        <button id="smileIcon" @click="showSmiles" title="Смайлики"><div><cantina-icons iconName="smile" /></div></button>
-        <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
-            <div><cantina-icons iconName="chat" class="submitIcon" /></div>
-        </button>
+<template>
+    <div>
+        <div class="msgField">
+            <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
+                @keypress.enter.prevent="submit" @keydown="checkLength" @keyup="getCursorPosition"
+                @paste.prevent="pasteFilter" @input="fieldInput"></div>
+            <button id="smileIcon" @click="showSmiles" title="Смайлики"><div><cantina-icons iconName="smile" /></div></button>
+            <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
+                <div><cantina-icons iconName="chat" class="submitIcon" /></div>
+            </button>
+        </div>
     </div>
-</div></template>
+</template>
 
 <script>
 import { mapGetters, mapActions, mapMutations } from 'vuex';
@@ -134,25 +136,15 @@ export default {
                 this.focus();
                 return;
             }
-            // this.onlineUsers.forEach(user => {
-            //     var pattern = new RegExp('(?:^|[^a-zA-Zа-яА-Я0-9]+)(?:' + user.name + ')(?:[^a-zA-Zа-яА-Я0-9]+)');
-            //     var matchUser = this.messageFieldHTML.match(pattern);
-            //     if(matchUser != null) this.recipients.push(user.id);
-            // });
-            
             this.sendMessage();
         },
-        testEnter: function() {
-            this.updateMessageString('~В кантину заходит <0>.');
-            this.sendMessage();
-        }
     },
     mounted: function(){
         this.focus();
-        this.testEnter();
     },
 }
 </script>
+
 <style lang="less">
     @import "../../less/vars.less";
     @msgInput-height: @input-fontsize * 1.4;
@@ -163,7 +155,7 @@ export default {
         position: relative;
         height: @msgInput-height;
         overflow: hidden;
-        background-color: @content-bgcolor;
+        background-color: @dark-grey;
         border-radius: round(@msgInput-height / 4, 2);
         border: @base-border-width solid @grey;
         &:focus-within {
@@ -217,7 +209,7 @@ export default {
             width: @msgInput-height * 2;
             height: @msgInput-height;
             color: @gold;
-            background-color: @dark-grey;
+            background-color: inherit;
             font-family: @button-font;
             font-weight: bold;
             &:hover, &:focus, &.msgFieldFocused:hover {

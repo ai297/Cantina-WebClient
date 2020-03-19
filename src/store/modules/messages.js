@@ -5,7 +5,7 @@ export default {
     namespaced: true,
     state: {
         newMessageString: '',
-        newMessageType: MESSAGE_TYPES.base.name,
+        newMessageType: MESSAGE_TYPES.Base.name,
         messageFieldCursorPosition: 0,
 
         messages: new Queue(),
@@ -39,7 +39,7 @@ export default {
             newString = newString.replace(/(&nbsp;)+(?!$)/g, "");       // удаляем сущности &nbsp; кроме одной в конце строки
             newString = newString.replace(/\s+/g, " ");                 // удаляем повторяющиеся пробелы
             // авто распознавание типов сообщений
-            state.newMessageType = MESSAGE_TYPES.base.name;
+            state.newMessageType = MESSAGE_TYPES.Base.name;
             for(let type in MESSAGE_TYPES){
                 if(type != 'base') {
                     let commandPattern = new RegExp('^['+MESSAGE_TYPES[type].shortCommand+']|(\\/'+MESSAGE_TYPES[type].command+'\\s+)', 'i');
@@ -62,11 +62,12 @@ export default {
             }
             // добавляем сообщение в очередь
             state.messages.enqueue(message);
+        },
+        clearMessageString: state => {
             state.newMessageString = '';
             state.messageFieldCursorPosition = 0;
-            state.newMessageType = MESSAGE_TYPES.base.name;
+            state.newMessageType = MESSAGE_TYPES.Base.name;
         },
-
         clearMessages: state => {
             state.messages = new Queue();
         }
@@ -80,10 +81,10 @@ export default {
             if(oldMessageString.length > 0) insert+=', ';
             else insert+=',&nbsp;';
             
-            if(!payload.hasOwnProperty('messageType')) payload.messageType = MESSAGE_TYPES.base.name;
+            if(!payload.hasOwnProperty('messageType')) payload.messageType = MESSAGE_TYPES.Base.name;
             let newCursorPositionOffset = MESSAGE_TYPES[payload.messageType].shortCommand.length + payload.userName.length + 2;
             // удаляем из строки сообщения команду-указатель на тип сообщения
-            if(context.getters.getNewMessageType != MESSAGE_TYPES.base.name) {
+            if(context.getters.getNewMessageType != MESSAGE_TYPES.Base.name) {
                 newCursorPositionOffset -= oldMessageString.length;
                 let commandPattern = new RegExp('^[' + MESSAGE_TYPES[context.getters.getNewMessageType].shortCommand +
                     ']|(\\/' + MESSAGE_TYPES[context.getters.getNewMessageType].command+'\\s+)', 'i');
@@ -96,14 +97,15 @@ export default {
             context.commit('updateCursorPosition', context.getters.getMessageFieldCursorPosition + newCursorPositionOffset);
         },
         
-        sendMessage: async (context) => {
+        sendMessage: (context) => {
+            if(!context.rootGetters['auth/isAuth']) return;
             let message = {};
             message.text = context.getters.getNewMessageString;
             message.type = context.getters.getNewMessageType;
             // обработка сообщения
             message.text = message.text.replace(/(&nbsp;)/ig, '').trim();
             // удаляем из текста указатель на тип сообщения
-            if(message.type != MESSAGE_TYPES.base.name) {
+            if(message.type != MESSAGE_TYPES.Base.name) {
                 let commandsPattern;
                 for(let messageType in MESSAGE_TYPES) {
                     if(MESSAGE_TYPES[messageType].name != 'base') {
@@ -121,18 +123,19 @@ export default {
                 if(context.getters.isMessageStringContainsUsername(user.name)) recipients.push(user.id);
             });
             let request = {
-                authorName: context.rootGetters['users/getCurrentUserName'],
-                authorId: context.rootGetters['users/getCurrentUserId'],
+                authorName: context.rootGetters['auth/сurrentUserInfo'].name,
+                authorId: context.rootGetters['auth/сurrentUserInfo'].id,
                 datetime: Date.now(),
                 type: message.type,
                 text: message.text,
-                recipient: recipients,
+                recipients: recipients,
             };
-            await context.commit('addMessage', request);
+            context.commit('addMessage', request);
+            context.commit('clearMessageString');
         },
 
-        clearMessagesList: async (context) => {
-            await context.commit('clearMessages');
+        clearMessagesList: (context) => {
+            context.commit('clearMessages');
         },
     }
 }

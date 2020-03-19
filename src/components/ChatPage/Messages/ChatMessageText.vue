@@ -17,10 +17,10 @@ export default {
                 VNodes.push(text.substring(0, match.index));
                 // Переменную <0> - меняем на имя автора сообщения
                 let linkMessageType;
-                if(this.message.type == MESSAGE_TYPES.base.name ||
-                this.message.type == MESSAGE_TYPES.privat.name) {
+                if(this.message.type == MESSAGE_TYPES.Base.name ||
+                this.message.type == MESSAGE_TYPES.Privat.name) {
                     linkMessageType = this.message.type;
-                } else linkMessageType = MESSAGE_TYPES.base.name;
+                } else linkMessageType = MESSAGE_TYPES.Base.name;
                 
                 if(match[1] == 0) VNodes.push(createElement(messageToUserLink, {
                     props: {

@@ -1,8 +1,10 @@
 import axios from 'axios';
+import {API_URL} from './constants.js';
 
 export const HTTP = axios.create({
-    baseURL: 'http://localhost:5000/',  // адрес апи-сервера кантины. Слэш в конце обязательно
+    baseURL: API_URL.root,
     headers: {
         'Content-Type': "application/json"
-    }
+    },
+    //withCredentials: true
 })

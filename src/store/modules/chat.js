@@ -7,14 +7,16 @@ export default {
         currentAsideComponent: usersOnlineList,
         showSidebar: true,
         showExtendPanel: false,
-        extendPanelComponent: {},
+        extendPanelComponent: "div",
+        interactiveComponent: "div",
     },
     getters: {
-        isShowSidebar: state => { return state.showSidebar },
-        isLimitedChatWidth: state => { return state.limitedChatWidth },
-        isShowExtendPanel: state => { return state.showExtendPanel },
-        getCurrentAsideComponent: state => { return state.currentAsideComponent },
-        getExtendPanelComponent: state => { return state.extendPanelComponent },
+        isShowSidebar: state => state.showSidebar,
+        isLimitedChatWidth: state => state.limitedChatWidth,
+        isShowExtendPanel: state => state.showExtendPanel,
+        getCurrentAsideComponent: state => state.currentAsideComponent,
+        getExtendPanelComponent: state => state.extendPanelComponent,
+        interactiveComponent: state => state.interactiveComponent,
     },
     mutations: {
         changeAsideBlock: (state, component) => {
@@ -26,6 +28,10 @@ export default {
                 state.showExtendPanel = true;
             } else state.showExtendPanel = !state.showExtendPanel;
         },
+        showInteractive: (state, component) => {
+            if(!state.interactiveComponent.name || state.interactiveComponent.name != component.name) state.interactiveComponent = component;
+            else state.interactiveComponent = "div";
+        }
     },
     actions: {
         

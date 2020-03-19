@@ -1,5 +1,5 @@
 <template>
-    <div class="flat-selection" :tabindex="tabindex" @blur="isOpen = false" @click="showOptions">
+    <div class="flat-selection" :tabindex="tabindex" @blur="isOpen = false" @click.prevent="showOptions" @keypress.enter="showOptions" ref="fs">
         <div class="arrow-icon"><svg version="1.1" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg" :class="{'open-up': openUp}">
             <path d="m9 8c-0.28 0.47-7.7 0.47-8 0-0.28-0.47 3.4-6.7 4-6.7 0.56 0 4.3 6.2 4 6.7z" fill="currentColor" />
         </svg></div>
@@ -60,10 +60,10 @@ export default {
             this.selectedIndex = index;
             this.$emit('select', index);
         },
-        showOptions: function(e) {
-            this.openUp = window.innerHeight * 2 / 3 < e.clientY;
+        showOptions: function() {
+            this.openUp = window.innerHeight * 2 / 3 < this.$refs.fs.getBoundingClientRect().top;
             this.isOpen = !this.isOpen;
-        }
+        },
     }
 }
 </script>

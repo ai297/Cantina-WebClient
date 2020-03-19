@@ -1,6 +1,6 @@
 <template>
     <div class="sndMForm">
-        <div id="nameBlock"><p>{{userName}}:</p></div>
+        <div id="nameBlock"><p>{{currentUserName}}:</p></div>
         <message-field id="messageField" @showSmiles="showSmiles" />
         <div id="extendButtons">
             <button @click="showSettings"><div><cantina-icons iconName="gear" /></div></button>
@@ -20,10 +20,14 @@ export default {
     },
     computed: {
         ...mapGetters({
-            userName: 'users/getCurrentUserName',
+            currentUserInfo: 'auth/currentUserInfo',
             isShowExtendPanel: 'chat/isShowExtendPanel',
             extendPanelComponent: 'chat/getExtendPanelComponent',
         }),
+        currentUserName: function() {
+            if(this.currentUserInfo.name !== undefined) return this.currentUserInfo.name;
+            else return '...';
+        },
     },
     methods: {
         ...mapMutations({

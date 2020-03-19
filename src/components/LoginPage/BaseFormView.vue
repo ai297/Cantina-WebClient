@@ -33,7 +33,7 @@
                     display: inline-block;
                     width: 70%;
                 }
-                a {
+                div > a {
                     font-family: @label-font;
                     font-size: @label-fontsize;
                     color: @blue;
@@ -49,15 +49,12 @@
                     height: @base-padding;
                     content: '';
                 }
-                .errorField {
-                    border-left: @base-padding*2 solid @red;
-                    padding-left: @base-padding;
-                    background-color: @dark-red;
+                p {
+                    padding: @base-padding 0;
                 }
                 .errorMessage {
                     font-weight: bold;
                     color: @red;
-                    padding: @base-padding 0;
                 }
                 .label {
                     font-size: @label-fontsize;

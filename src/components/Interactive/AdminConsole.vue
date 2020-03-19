@@ -1,0 +1,139 @@
+<template>
+    <div class="console" ref="adminConsole">
+        <div class="output" >
+            <p v-for="(line, index) in output" :key="index" :class="line.style">{{line.data}}</p>
+        </div>
+        <div class="input"><input type="text" ref="consoleInput" v-model.trim="input" @keypress.enter.prevent="send" @keydown.up="getLast" /></div>
+    </div>
+</template>
+
+<script>
+import { HTTP } from '../../http-common.js';
+
+function ConsoleLine(data, style = 'response') {
+    this.data = data;
+    this.style = style;
+}
+
+export default {
+    name: "AdminConsole",
+    data: function() {
+        return {
+            output: [],
+            input: '',
+            history: [],
+        }
+    },
+    methods: {
+        focus: function() {
+            this.$refs['consoleInput'].focus();
+        },
+        getLast: function() {
+            this.input = this.history.pop();
+        },
+        send: function() {
+            if(!this.input.length) return;
+            this.output.push(new ConsoleLine(this.input, 'request'));
+            let words = this.input.match(/^(\w+)\s+([^{\s]+)\s?({.+})?$/i);
+            this.history.push(this.input);
+            this.input='';
+            if(!words) return;
+            
+            let methods = ["get", "post", "put", "delete"];
+            
+            if(words[1] === undefined || methods.indexOf(words[1].toLowerCase()) < 0) {
+                this.output.push(new ConsoleLine("Неизвестный запрос", "error"));
+                return;
+            }
+            
+            if(words[2] === undefined || words[2].length < 3) {
+                this.output.push(new ConsoleLine("Не указан путь запроса", "error"));
+                return;
+            }
+            
+            let dt = {};
+            if(words[3] !== undefined) try {
+                dt = JSON.parse(words[3]);
+            } catch {
+               this.output.push(new ConsoleLine("Не удалось распознать JSON", "error"));
+                return; 
+            }
+
+            this.input = '...';
+            HTTP({
+                method: words[1],
+                url: words[2],
+                data: dt,
+            }).then(response => {
+                this.output.push(new ConsoleLine('> '+response.data, "response"));
+            })
+            .catch(error => {
+                if(error.response !== undefined) {
+                    this.output.push(new ConsoleLine(error.response.status + ": " + error.response.data, "error"));
+                } else this.output.push(new ConsoleLine(error, "error"));
+            })
+            .finally(() => {
+                this.input = '';
+                this.focus();
+            });
+        },
+    },
+    mounted: function() {
+        this.focus();
+    },
+    updated: function() {
+        this.$refs['adminConsole'].scrollTop = this.$refs['adminConsole'].scrollHeight - this.$refs['adminConsole'].clientHeight;
+    }
+}
+</script>
+
+<style lang="less" scoped>
+    @import "../../less/vars.less";
+    div.console {
+        overflow-y: scroll !important;
+        overflow-x: hidden;
+        max-height: calc(100% - 1rem);
+        border: @base-border-width solid mix(@grey, @body-background-color, 70%);
+        padding: .5rem;
+        & > .output {
+            color: @blue;
+            & > p {
+                margin-bottom: @base-padding;
+                word-break: break-all;
+                &.request {
+                    color: @green;
+                }
+                &.response {
+                    color: @blue;
+                }
+                &.error {
+                    color: @red;
+                }
+                &::before {
+                    content: '>';
+                    display: inline-block;
+                    color: inherit;
+                    padding-right: @base-padding;
+                }
+            }
+        }
+        & > .input {
+            color: @green;
+            display: flex;
+            font-size: 1rem;
+            & > input {
+                border: none;
+                background: none;
+                display: block;
+                font-size: 1rem;
+                padding-left: @base-padding;
+                width: 100%;
+                color: inherit;
+            }
+            &::before {
+                content: '>';
+                display: inline-block;
+            }
+        }
+    }
+</style>

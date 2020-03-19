@@ -14,7 +14,7 @@ export default {
         },
         messageType: {
             type: String,
-            default: MESSAGE_TYPES.base.name,
+            default: MESSAGE_TYPES.Base.name,
         },
     },
     methods: {

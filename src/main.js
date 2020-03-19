@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import Router from './router/router.js';            // <-- в этом файле настраивается маршрутизация
+import Router from './router.js';                   // <-- в этом файле настраивается маршрутизация
 import Store from './store/store.js';               // <-- глобальная стейт-машина
 Vue.config.productionTip = false
 

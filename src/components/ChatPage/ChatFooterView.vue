@@ -1,12 +1,18 @@
-<template>
-    <div class="chatFooter">
+<template functional>
+    <div class="chatFooter" :id="props.id">
         <p>Cantina chat v.0.1.0 (pre-alpha), 2020г.</p>
     </div>
 </template>
 
 <script>
 export default {
-    name: "ChatFooter"
+    name: "ChatFooter",
+    props: {
+        id: {
+            type: String,
+            default: ''
+        }
+    }
 }
 </script>
 

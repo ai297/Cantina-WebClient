@@ -2,19 +2,17 @@
     <base-enter-form>
         <form @submit.prevent="loginFormSubmit"><div>
             <h3>Вход в Кантину:</h3>
+            <p class="errorMessage" v-show="isError">{{errorMessage}}</p>
             <div>
                 <flat-field :class="{errorField:isEmailError ? validation('email') : isEmailError }" type="email" placeholder="E-MAIL" v-model.trim="request.email" />
                 <flat-field :class="{errorField:isPasswordEmpty ? validation('password') : isPasswordEmpty }" type="password" placeholder="ПАРОЛЬ" maxlength="30" v-model.trim="request.password" />
             </div>
             <div>
-                <p class="errorMessage" v-show="isError">{{errorMessage}}</p>
-            </div>
-            <div>
-                <flat-button @click="loginFormSubmit">Войти</flat-button>
+                <flat-button>Войти</flat-button>
             </div>
         </div>
             <div>
-                <a href="#">Забыли пароль?</a> • <router-link to="/register">Регистрация</router-link>
+                <!--• <a href="#">Забыли пароль?</a> -->• <router-link to="/register">Регистрация</router-link> •
             </div>
         </form>
     </base-enter-form>
@@ -22,7 +20,7 @@
 
 <script>
 import baseEnterForm from './BaseFormView.vue';
-import {VALIDATION_PATTERNS, MAIN_PAGE} from '../../constants.js';
+import {VALIDATION_PATTERNS} from '../../constants.js';
 
 export default {
     name: "LoginForm",
@@ -53,21 +51,26 @@ export default {
             // проверка пароля
             this.isPasswordEmpty = this.validation('password');
             if(this.isEmailError || this.isPasswordEmpty) return false;
-            // загрузчик
-            this.$store.commit('showLoader', 'Авторизация...');
+            
             // отправка данных
-            this.$store.dispatch('auth/login', this.request).then((isAuth) => {
-                if(!isAuth) {
-                    this.errorMessage = this.$store.state.auth.err.message;
-                    this.isError = true;
-                } else {
-                    this.isError = false;
-                    this.$router.push(MAIN_PAGE);
+            this.$store.commit('showLoader', 'Авторизация...');
+            this.$store.dispatch("auth/login", this.request)
+            .then(() => {
+                let result = this.$store.state.auth.auth;
+                if(result.isAuth) this.$router.push("/chat");
+                else {
+                    switch(result.type) {
+                        case "activation":
+                            this.$router.push("/activation?email="+this.request.email);
+                            break;
+                        case "error":
+                            this.errorMessage = result.text;
+                            this.isError = true;
+                            break;
+                    }
                 }
-            }).catch(()=>{
-                this.errorMessage = 'Что-то сломалось';
-                this.isError = true;
-            }).finally(() => {
+            })
+            .finally(() => {
                 this.$store.commit('hideLoader');
             });
         }

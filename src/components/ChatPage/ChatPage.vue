@@ -1,11 +1,13 @@
 <template>
     <div id="chat" :class="{ limitedWidth: isLimitedWidth }">
+        <p v-if="!isConnected">Потеряна связь со вселенной...</p>
+        
         <!-- Основной блок //-->
-        <chat-main id="chatMain" />
+        <chat-main id="chatMain" v-if="isConnected" />
         <!-- Боковой блок //-->
-        <chat-aside id="chatAside" :class="{minimize: !isShowSidebar}" />
+        <chat-aside id="chatAside" :class="{minimize: !isShowSidebar}" v-if="isConnected" />
         <!-- форма отправки сообщения //-->
-        <send-message-form id="sendingForm" />
+        <send-message-form id="sendingForm" v-if="isConnected" />
         <!-- Менюшка навигации //-->
         <chat-nav-menu id="chatNavMenu" />
         <!-- Подвал //-->
@@ -16,6 +18,10 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex';
+import chatModule from '../../store/modules/chat.js';
+import usersModule from '../../store/modules/users.js';
+import messagesModule from '../../store/modules/messages.js';
+import connectionModule from '../../store/modules/connection.js';
 // блоки
 import sendMessageForm from './SendMessageForm.vue';
 import chatAside from './ChatAsideView.vue';
@@ -36,25 +42,46 @@ export default {
         ...mapGetters({
             isShowSidebar: 'chat/isShowSidebar',
             isLimitedWidth: 'chat/isLimitedChatWidth',
+            isConnected: 'connection/isConnected'
         }),
     },
     methods: {
         ...mapActions({
             clearMessagesList: 'messages/clearMessagesList',
+            connectToHub: 'connection/connect',
+            connectionClose: 'connection/disconnect',
         }),
+        changeConnectionState: function(isConnected) {
+            if(!isConnected) alert('Потеряна связь с сервером');
+        }
+    },
+    mounted: function() {
+        this.$store.commit('showLoader', 'Подключение к серверу');
+        this.connectToHub()
+        .finally(() => {
+            this.$store.commit('hideLoader');
+        });
+        this.$watch('isConnected', this.changeConnectionState);
+    },
+    beforeMount: function() {
+        this.$store.registerModule('chat', chatModule);
+        this.$store.registerModule('users', usersModule);
+        this.$store.registerModule('messages', messagesModule);
+        this.$store.registerModule('connection', connectionModule);
     },
     beforeDestroy: function() {
-        this.clearMessagesList();
+        //this.clearMessagesList();
+        this.connectionClose();
+        this.$store.unregisterModule('chat');
+        this.$store.unregisterModule('users');
+        this.$store.unregisterModule('messages');
+        this.$store.unregisterModule('connection');
     }
 }
 </script>
 
 <style lang="less">
     @import "../../less/vars.less";
-
-    #modal {
-        display: none;
-    }
 
     #chat {
         display: grid;
