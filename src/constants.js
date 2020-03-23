@@ -6,10 +6,10 @@ export const VALIDATION_PATTERNS = {
 }
 
 export const MESSAGE_TYPES = {
-    Base: {name: 'Base', command: '', shortCommand: ''},
-    System: {name: 'System', command: 'system', shortCommand: '~'},
-    Privat: {name: 'Privat', command: 'pm', shortCommand: '@'},
-    ThirdPerson: {name: 'ThirdPerson', command: 'me', shortCommand: '*'},
+    Base: {num: 10, name: 'Base', command: '', shortCommand: ''},
+    System: {num: 0, name: 'System', command: 'system', shortCommand: '~'},
+    Privat: {num: 30, name: 'Privat', command: 'pm', shortCommand: '@'},
+    ThirdPerson: {num: 20, name: 'ThirdPerson', command: 'me', shortCommand: '*'},
 }
 
 export const GENDER = {
@@ -18,20 +18,45 @@ export const GENDER = {
     Female: 2
 }
 
-export const MAIN_PAGE = '/chat';
+export const ONLINE_STATUS = {
+    HIDDEN: 0,      // невидим
+    ONLINE: 1,      // в сети
+    ABSENTEE: 2,    // отошёл
+}
+
+export const ROUTING = {
+    IN_PAGE: '/chat',
+    OUT_PAGE: '/'
+} 
 
 export const API_URL = {
-    root: 'http://localhost:5000/',
-    ping: 'ping',
-    login: 'auth',
-    register: 'register',
-    activation: 'activation',
+    ROOT: 'http://localhost:5000/',
+    PING: 'ping',
+    LOGIN: 'auth',
+    REGISTER: 'register',
+    ACTIVATION: 'activation',
     userinfo: 'userinfo',
-    hub: 'hub',
+    HUB: 'hub',
+    ONLINE_USERS: 'onlineusers',
 };
 
 export const ROLES = {
-    property: "ut",
     ADMIN: "Admin",
     USER: "User",
+}
+
+export const CLAIMS = {
+    ID: "uid",
+    EMAIL: "eml",
+    ROLE: "ut",
+}
+
+export const CHAT_COMMANDS = {
+    // методы клиента
+    RECEIVE_MESSAGE: 'ReceiveMessage',
+    RUN_CONNAND: 'RunCommand',
+    USER_ENTER: 'AddUserToOnlineList',
+    USER_EXIT: 'RemoveUserFromOnlineList',
+    // методы сервера
+    SEND_MESSAGE: 'SendMessage',
 }

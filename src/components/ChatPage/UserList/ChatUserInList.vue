@@ -1,8 +1,8 @@
 <template>
-    <div class="userInAsideBlock" :class="[user.role, isCurrentUser ? 'currentUser' : ' ']">
+    <div class="userInAsideBlock" :class="[isCurrentUser ? 'currentUser' : ' ']">
         <div class="userAvatarInAsideBlock" title="Посмотреть профиль"><div><cantina-icons iconName="piramid" /></div></div>
         <div class="userNameInAsideBlock"><message-to-user-link :nickname="user.name" title="Написать сообщение" /></div>
-        <span class="pmLink"><message-to-user-link title="Написать личное сообщение" :nickname="user.name" :messageType="messageTypes.privat.name">ЛС</message-to-user-link></span>
+        <span class="pmLink"><message-to-user-link title="Написать личное сообщение" :nickname="user.name" :messageType="messageTypes.Privat.name">ЛС</message-to-user-link></span>
         <div class="userActionInAsideBlock">
             <a title="Пожаловаться"><cantina-icons iconName="claim" /></a>
             <a title="Игнорировать"><cantina-icons iconName="ignore" /></a>
@@ -71,10 +71,10 @@ export default {
             grid-row-end: 3;
             border: @base-border-width solid @body-background-color;
             border-radius: inherit;
-            background: linear-gradient(to right bottom, @grey, @dark-grey);
+            background: linear-gradient(to right bottom, @blue, @dark-blue);
             cursor: pointer;
             &:hover {
-                background: @grey;
+                background: @blue;
             }
             div {
                 display: flex;
@@ -139,25 +139,7 @@ export default {
             line-height: 1em;
             color: @dark-gold;
         }
-        &.admin {
-            .userAvatarInAsideBlock {
-                background: linear-gradient(to right bottom, @gold, @dark-gold);
-                &:hover {
-                    background: @gold;
-                }
-            }
-            .userActionInAsideBlock {
-                display: none;
-            }
-        }
-        &.user {
-            .userAvatarInAsideBlock {
-                background: linear-gradient(to right bottom, @blue, @dark-blue);
-                &:hover {
-                    background: @blue;
-                }
-            }
-        }
+
         &.currentUser {
             background-color: @dark-blue;
             .userActionInAsideBlock, .pmLink {

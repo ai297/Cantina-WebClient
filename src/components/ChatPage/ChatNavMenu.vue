@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import {ROLES} from '../../constants.js';
+import {ROLES, ROUTING} from '../../constants.js';
 
 const adminConsole = () => ({
   // Загружаемый компонент. Значение должно быть Promise
@@ -37,7 +37,7 @@ export default {
             }
         },
         exit: function() {
-            this.$router.push('/');
+            this.$router.push(ROUTING.OUT_PAGE);
         }
     }
 }

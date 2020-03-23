@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from './store/store.js';
-import {MAIN_PAGE} from './constants.js';
+import {ROUTING} from './constants.js';
 
 Vue.use(VueRouter); // подключаем плагин маршрутизации
 
@@ -128,7 +128,7 @@ router.beforeEach((to, from, next) => {
     // если страница только для не авторизованных юзеров - отправляем авторизованных на главную страницу
     else if(!!meta.onlyGuests && store.getters['auth/isAuth']) {
       next({
-        path: MAIN_PAGE,
+        path: ROUTING.OUT_PAGE,
         replace: true
       });
     }

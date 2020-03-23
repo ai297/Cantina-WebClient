@@ -58,7 +58,7 @@ export default {
 
             this.$store.commit('showLoader', 'Активация аккаунта');
 
-            HTTP.put(API_URL.activation, this.request)
+            HTTP.put(API_URL.ACTIVATION, this.request)
             .then(response => {
                 this.responseMessage = response.data;
                 this.isActivationSuccess = true;

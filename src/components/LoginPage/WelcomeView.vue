@@ -7,12 +7,12 @@
 </template>
 
 <script>
-import {MAIN_PAGE} from '../../constants.js';
+import {ROUTING} from '../../constants.js';
 export default {
     name: "LoginWelcome",
     methods: {
         enterPress: function(){
-            this.$router.push(MAIN_PAGE);
+            this.$router.push(ROUTING.IN_PAGE);
         },
     }
 }

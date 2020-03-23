@@ -1,7 +1,7 @@
 <template>
     <div class="asideMainMenu">
-        <volume-button @click="showOnlineList" :class="{actv: isUsersOnlineList}"><cantina-icons iconName="people" /> Онлайн</volume-button>
-        <volume-button @click="showEnotherBlock" :class="{actv: isEnotherBlock}">Другой блок</volume-button>
+        <volume-button @click="changeAsideBlock(usersOnlineList)" :class="{actv: isCurrentComponent(usersOnlineList)}"><cantina-icons iconName="people" /> Онлайн</volume-button>
+        <volume-button @click="changeAsideBlock(enotherBlock)" :class="{actv: isCurrentComponent(enotherBlock)}">Другой блок</volume-button>
     </div>
 </template>
 
@@ -12,27 +12,28 @@ import enotherBlock from './EnotherBlock.vue';
 
 export default {
     name: "ChatAsideMainMenu",
+    data: function() {
+        return {
+            usersOnlineList,
+            enotherBlock,
+        }
+    },
     computed: {
         ...mapGetters({
             asideBlock: 'chat/getCurrentAsideComponent',
         }),
-        isUsersOnlineList: function() {
-            return this.asideBlock.name == usersOnlineList.name;
-        },
-        isEnotherBlock: function() {
-            return this.asideBlock.name == enotherBlock.name;
-        },
     },
     methods: {
         ...mapMutations({
             changeAsideBlock: 'chat/changeAsideBlock',
         }),
-        showOnlineList: function() {
-            this.changeAsideBlock(usersOnlineList);
+        isCurrentComponent: function(component) {
+            if(this.asideBlock !== undefined) return this.asideBlock.name == component.name;
+            else return false;
         },
-        showEnotherBlock: function() {
-            this.changeAsideBlock(enotherBlock);
-        }
+    },
+    mounted: function(){
+        this.changeAsideBlock(this.usersOnlineList);
     },
 }
 </script>

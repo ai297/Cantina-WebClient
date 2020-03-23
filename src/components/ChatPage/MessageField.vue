@@ -2,18 +2,20 @@
     <div>
         <div class="msgField">
             <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
-                @keypress.enter.prevent="submit" @keydown="checkLength" @keyup="getCursorPosition"
+                @keypress.enter.prevent="submit" @keydown="checkLength" @keyup="updateCursorPosition"
                 @paste.prevent="pasteFilter" @input="fieldInput"></div>
             <button id="smileIcon" @click="showSmiles" title="Смайлики"><div><cantina-icons iconName="smile" /></div></button>
             <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
                 <div><cantina-icons iconName="chat" class="submitIcon" /></div>
             </button>
         </div>
+        <p>Message Type: {{messageType}} / Message Text: {{messageString}} (cp: {{cursorPosition}} / {{messageTextLength}})</p>
     </div>
 </template>
 
 <script>
 import { mapGetters, mapActions, mapMutations } from 'vuex';
+import {MESSAGE_TYPES, CHAT_COMMANDS} from '../../constants.js';
 
 const MAX_MESSAGE_LENGTH = 384;
 const ENTER_CODE = 13;
@@ -34,43 +36,67 @@ export default {
     },
     data: function() {
         return {
+            messageString: '',
             messageTextLength: 0,
+            messageType: MESSAGE_TYPES.Base.name,
+            cursorPosition: 0,
+            disable: false,
         }
     },
     computed: {
         ...mapGetters({
-            messageFieldContent: 'messages/getNewMessageString',
-            cursorPosition: 'messages/getMessageFieldCursorPosition',
-            messageType: 'messages/getNewMessageType',
+            usersInOnline: 'users/usersInOinline',
         }),
-    },
-    watch: {
-        messageFieldContent: function() {
-            this.fieldUpdate();
-        },
     },
     methods: {
         ...mapActions({
-            sendMessage: 'messages/sendMessage',
+            sendToServer: 'connection/send',
         }),
-        ...mapMutations ({
-            updateMessageString: 'messages/updateMessageString',
-            updateCursorPosition: 'messages/updateCursorPosition',
+        ...mapMutations({
+            registerAddNameAction: 'messages/registerAddNameAction',
         }),
+        // событие onInput на поле ввода
         fieldInput: function() {
             this.updateMessageString(this.$refs['m-field'].innerHTML);
-            this.getCursorPosition();
+            this.updateCursorPosition();
             this.fieldUpdate();
         },
+        // обновление html в поле ввода
         fieldUpdate: function() {
-            let field = this.$refs['m-field'];
-            field.innerHTML = this.messageFieldContent;
-            field.focus();
+            this.$refs['m-field'].innerHTML = this.messageString;
+            this.$refs['m-field'].focus();
             this.setCursorPosition(this.cursorPosition);
-            this.messageTextLength = field.innerText.length;
+            this.messageTextLength = this.$refs['m-field'].innerText.length;
+        },
+        // обновление содержимого строки сообщения
+        updateMessageString: function(newString) {
+            newString = newString.replace(/<br>/g, " ");                // удаляем тег <br> (автоматом вставляется в edge например)
+            //newString = newString.replace(/(&nbsp;)+(?!$)/g, "");       // удаляем сущности &nbsp; кроме одной в конце строки
+            newString = newString.replace(/\s+/g, " ");                 // удаляем повторяющиеся пробелы
+            // авто распознавание типов сообщений
+            this.messageType = MESSAGE_TYPES.Base.name;
+            for(let type in MESSAGE_TYPES){
+                if(type != MESSAGE_TYPES.Base.name) {
+                    let commandPattern = new RegExp('^['+MESSAGE_TYPES[type].shortCommand+']|(\\/'+MESSAGE_TYPES[type].command+'\\s+)', 'i');
+                    if(newString.match(commandPattern) !== null) {
+                        this.messageType = MESSAGE_TYPES[type].name;
+                        break;
+                    }
+                }
+            }
+            this.messageString = newString;
+        },
+        clearMessageString: function() {
+            this.messageString = "";
+            this.cursorPosition = 0;
+            this.fieldUpdate();
         },
         // проверяем максимальную длину сообщения и если превышена - игнорируем нажатия любых клавиш, кроме указанных
         checkLength: function(e) {
+            if(this.disable) {
+                e.preventDefault();
+                return;
+            }
             if(this.messageTextLength >= MAX_MESSAGE_LENGTH
             && e.which != BACKSPACE_CODE && e.which != DELETE_CODE
             && e.which != END_CODE && e.which != HOME_CODE
@@ -79,16 +105,18 @@ export default {
             }
         },
         // позиция курсора в поле ввода
-        getCursorPosition: function() {
+        updateCursorPosition: function() {
             var field = this.$refs['m-field'];
             let selection = document.getSelection();
             let range = new Range;
             range.setStart(field, 0);
-            range.setEnd((selection.anchorNode < selection.focusNode)?selection.anchorNode:selection.focusNode, (selection.anchorNode < selection.focusNode)?selection.anchorOffset:selection.focusOffset);
+            range.setEnd((selection.anchorNode < selection.focusNode)?selection.anchorNode:selection.focusNode, 
+            (selection.anchorNode < selection.focusNode)?selection.anchorOffset:selection.focusOffset);
             let result = range.toString().length;
             result = (result < field.innerText.length)?result:field.innerText.length;
-            if(result != this.cursorPosition) this.updateCursorPosition(result);
+            this.cursorPosition = result;
         },
+        //установка новой позиции курсора
         setCursorPosition: function(position) {
             this.$refs['m-field'].focus();
             let child = this.$refs['m-field'].firstChild;
@@ -104,7 +132,37 @@ export default {
                 }
             }
         },
-        // метод для фокуссировке на поле ввода (переводит курсор в конец поля)
+        // // упоминается ли юзернейм в строке ввода сообщения
+        isMessageStringContainsUsername: function(userName) {
+            let userNameRegex = new RegExp('(?:^|[^a-zA-Zа-яА-Я0-9]+)(?:' + userName + ')(?:[^a-zA-Zа-яА-Я0-9]+|$)');
+            return this.messageString.match(userNameRegex) !== null;
+        },
+        // добавить юзернейм в строку ввода сообщения
+        addNicknameToMessageString: function(payload) {
+            if(!payload.hasOwnProperty('userName')) return false;
+            if(this.isMessageStringContainsUsername(payload.userName)) {
+                this.focus();
+                return;
+            }
+            let insert = payload.userName;
+            let oldMessageString = this.messageString;
+            if(this.messageTextLength > 0) insert+=', ';
+            else insert+=',&nbsp;';
+            
+            if(!payload.messageType) payload.messageType = MESSAGE_TYPES.Base.name;
+            // удаляем из строки сообщения команду-указатель на тип сообщения
+            if(this.messageType != MESSAGE_TYPES.Base.name) {
+                let commandPattern = new RegExp('^[' + MESSAGE_TYPES[this.messageType].shortCommand +
+                    ']|(\\/' + MESSAGE_TYPES[this.messageType].command+'\\s+)', 'i');
+                oldMessageString = oldMessageString.replace(commandPattern, '');
+            }
+            // формируем новую строку сообщения с включенным новым указателем на тип сообщения
+            insert = MESSAGE_TYPES[payload.messageType].shortCommand + insert + oldMessageString;
+            this.updateMessageString(insert);
+            this.fieldUpdate();
+            this.focus();
+        },
+        // метод для фокуссировки на поле ввода (переводит курсор в конец)
         focus: function() {
             this.setCursorPosition(this.messageTextLength);
         },
@@ -125,21 +183,56 @@ export default {
                 document.execCommand('paste', false, text);
             }
         },
+
         // кнопка смайлика
         showSmiles: function() {
             this.$emit('showSmiles');
             this.focus();
         },
-        // Отправка сообщения
+        // кнопка отправки сообщения
         submit: function(){
             if(this.messageTextLength < 3) {
                 this.focus();
                 return;
             }
-            this.sendMessage();
+            // составляем список получателей
+            let recipients = [];
+            for(let ui in this.usersInOnline) {
+                if(this.isMessageStringContainsUsername(this.usersInOnline[ui].name)) recipients.push(this.usersInOnline[ui].id);
+            }
+
+            let messageRequest = {
+                text: this.messageString.replace(/(&nbsp;)/ig, '').trim(),
+                messageType: MESSAGE_TYPES[this.messageType].num,
+                recipients: recipients
+            }
+
+            // удаляем из текста указатель на тип сообщения
+            if(this.messageType != MESSAGE_TYPES.Base.name) {
+                let commandsPattern;
+                for(let messageType in MESSAGE_TYPES) {
+                    if(MESSAGE_TYPES[messageType].name != MESSAGE_TYPES.Base.name) {
+                        if(!commandsPattern) commandsPattern = '^';
+                        else commandsPattern += '|';
+                        commandsPattern += '(['+MESSAGE_TYPES[messageType].shortCommand+']|(\\/'+MESSAGE_TYPES[messageType].command+'\\s+))';
+                    }
+                }
+                messageRequest.text = messageRequest.text.replace(new RegExp(commandsPattern, 'ig'), '');
+            }
+
+            // отправка на сервер
+            this.messageString="Отправка...";
+            this.fieldUpdate();
+            this.disable = true;
+            this.sendToServer({command: CHAT_COMMANDS.SEND_MESSAGE, data: messageRequest}).then(() => {
+                this.clearMessageString();
+                this.disable = false;
+                this.focus();
+            })
         },
     },
     mounted: function(){
+        this.registerAddNameAction((data) => this.addNicknameToMessageString(data));
         this.focus();
     },
 }

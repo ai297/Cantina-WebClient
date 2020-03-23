@@ -76,7 +76,7 @@ export default {
             
             // Запрос на регистрацию
             this.$store.commit('showLoader', 'Регистрация...');
-            HTTP.post(API_URL.register, this.request)
+            HTTP.post(API_URL.REGISTER, this.request)
             .then(() => {
                 // успешная регистрация
                 this.$router.push("/activation?email=" + this.request.email);

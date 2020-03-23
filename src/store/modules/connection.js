@@ -1,12 +1,11 @@
-import { HubConnectionBuilder, LogLevel, HubConnectionState } from '@microsoft/signalr';
-import {API_URL} from '../../constants.js'
-
+import { HubConnectionState } from '@microsoft/signalr';
 export default {
     namespaced: true,
     state: {
         hubConnection: undefined,
     },
     getters: {
+        connection: state => state.hubConnection,
         isConnected: state => {
             if(state.hubConnection !== undefined) return state.hubConnection.state === HubConnectionState.Connected;
             else return false;
@@ -14,36 +13,37 @@ export default {
     },
     mutations: {
         // создаём экземпляр signalR
-        setConnection: (state, token) => {
-            state.hubConnection = new HubConnectionBuilder()
-                .withUrl(API_URL.root+API_URL.hub, { accessTokenFactory: () => token})
-                .configureLogging(LogLevel.Information)
-                .build();
-            state.hubConnection.serverTimeoutInMilliseconds = 20 * 60000;       // время таймаута 10 минут
-            state.hubConnection.keepAliveIntervalInMilliseconds = 10 * 60000;   // время жизни соединения
-        }
+        setConnection: (state, connection) => {
+            if(state.hubConnection === undefined) state.hubConnection = connection;
+        },
+        registerAction: (state, action) => {
+            if(state.hubConnection !== undefined) state.hubConnection.on(action.name, action.command);
+        },
+        removeAction: (state, action) => {
+            if(state.hubConnection !== undefined) state.hubConnection.off(action.name, action.command);
+        },
     },
     actions: {
-        connect: ({state, commit, rootGetters}) => {
+        connect: ({state, rootGetters}) => {
             if(!rootGetters['auth/isAuth']) return;
-            if(!state.hubConnection) {
-                commit('setConnection', rootGetters['auth/token']);
-                // регистрируем метод для получения новых сообщений
-                state.hubConnection.on('ReceiveMessage', function(data) {
-                    commit('messages/addMessage', data, {root: true});
-                    console.log(data);
-                });
-            } 
-            if(!state.hubConnection.connectionStarted) return state.hubConnection.start();
+            if(state.hubConnection !== undefined && !state.hubConnection.connectionStarted) return state.hubConnection.start();
             else return false;
         },
         disconnect: ({state, getters}) => {
             if(getters.isConnected) state.hubConnection.stop();
         },
+        // invoke - ждёт ответа от сервера
+        // send - просто отправляет сообщение, не ожидая ответа
         invoke: ({state, getters}, payload) => {
-            if(payload === undefined || !payload.command) return false;
-            if(!payload.data) payload.data = {};
-            if(getters.isConnected) state.hubConnection.invoke(payload.command, payload.data)
+            if(payload === undefined || !payload.command || !getters.isConnected) return false;
+            if(!payload.data) return state.hubConnection.invoke(payload.command);
+            else return state.hubConnection.invoke(payload.command, payload.data);
+        },
+        send: ({state, getters}, payload) => {
+            if(payload === undefined || !payload.command || !getters.isConnected) return false;
+            if(!payload.data) state.hubConnection.send(payload.command);
+            else state.hubConnection.send(payload.command, payload.data);
+            return true;
         }
     }
 }

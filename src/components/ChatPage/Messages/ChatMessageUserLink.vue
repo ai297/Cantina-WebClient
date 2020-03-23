@@ -19,7 +19,7 @@ export default {
     },
     methods: {
         messageTo: function() {
-            this.$store.dispatch('messages/addNicknameToMessageString', {userName: this.nickname, messageType: this.messageType});
+            this.$store.commit('messages/addNameToMessage', {userName: this.nickname, messageType: this.messageType});
         }
     }
 }

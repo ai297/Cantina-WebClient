@@ -1,10 +1,8 @@
-import usersOnlineList from '../../components/ChatPage/UserList/ChatUsersOnlineList.vue';
-
 export default {
     namespaced: true,
     state: {
         limitedChatWidth: true,
-        currentAsideComponent: usersOnlineList,
+        currentAsideComponent: undefined,
         showSidebar: true,
         showExtendPanel: false,
         extendPanelComponent: "div",

@@ -20,7 +20,7 @@
 
 <script>
 import baseEnterForm from './BaseFormView.vue';
-import {VALIDATION_PATTERNS} from '../../constants.js';
+import {VALIDATION_PATTERNS, ROUTING} from '../../constants.js';
 
 export default {
     name: "LoginForm",
@@ -57,7 +57,7 @@ export default {
             this.$store.dispatch("auth/login", this.request)
             .then(() => {
                 let result = this.$store.state.auth.auth;
-                if(result.isAuth) this.$router.push("/chat");
+                if(result.isAuth) this.$router.push(ROUTING.IN_PAGE);
                 else {
                     switch(result.type) {
                         case "activation":

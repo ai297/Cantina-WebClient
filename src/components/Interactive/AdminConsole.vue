@@ -1,7 +1,7 @@
 <template>
     <div class="console" ref="adminConsole">
         <div class="output" >
-            <p v-for="(line, index) in output" :key="index" :class="line.style">{{line.data}}</p>
+            <pre v-for="(line, index) in output" :key="index" :class="line.style">{{line.data}}</pre>
         </div>
         <div class="input"><input type="text" ref="consoleInput" v-model.trim="input" @keypress.enter.prevent="send" @keydown.up="getLast" /></div>
     </div>
@@ -65,7 +65,7 @@ export default {
                 url: words[2],
                 data: dt,
             }).then(response => {
-                this.output.push(new ConsoleLine('> '+response.data, "response"));
+                this.output.push(new ConsoleLine('> ' + JSON.stringify(response.data, null, 4), "response"));
             })
             .catch(error => {
                 if(error.response !== undefined) {
@@ -97,7 +97,7 @@ export default {
         padding: .5rem;
         & > .output {
             color: @blue;
-            & > p {
+            & > pre {
                 margin-bottom: @base-padding;
                 word-break: break-all;
                 &.request {

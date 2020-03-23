@@ -1,5 +1,5 @@
 <template>
-    <aside-base :caption="'Сейчас в чате <span>' + countUsersInOnline + '</span> чел.'">
+    <aside-base :caption="'Сейчас в чате <span>' + countUsers + '</span> чел.'">
             <div id="usersOnlineList">
                 <user-in-list v-for="user in usersInOnline" :key="user.id" :user="user" :isCurrentUser="isItCurrentUser(user.id)" />
             </div>
@@ -19,17 +19,18 @@ export default {
     },
     methods: {
         isItCurrentUser: function(id) {
-            if(this.currentUserInfo.id !== undefined) return this.currentUserInfo.id == id;
-            else return false;
+            return this.currentUserId == id;
         }
     },
     computed: {
         ...mapGetters({
             usersInOnline: 'users/usersInOinline',
-            countUsersInOnline: 'users/countUsersInOnline',
-            currentUserInfo: 'auth/currentUserInfo',
+            currentUserId: 'auth/userId',
         }),
-    }
+        countUsers: function() {
+            return Object.keys(this.usersInOnline).length
+        },
+    },
 }
 </script>
 

@@ -1,7 +1,5 @@
 <template>
     <div id="chat" :class="{ limitedWidth: isLimitedWidth }">
-        <p v-if="!isConnected">Потеряна связь со вселенной...</p>
-        
         <!-- Основной блок //-->
         <chat-main id="chatMain" v-if="isConnected" />
         <!-- Боковой блок //-->
@@ -16,18 +14,17 @@
 </template>
 
 <script>
+import { mapGetters, mapActions, mapMutations } from 'vuex';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
-import { mapGetters, mapActions } from 'vuex';
-import chatModule from '../../store/modules/chat.js';
-import usersModule from '../../store/modules/users.js';
-import messagesModule from '../../store/modules/messages.js';
-import connectionModule from '../../store/modules/connection.js';
-// блоки
+// компоненты
 import sendMessageForm from './SendMessageForm.vue';
 import chatAside from './ChatAsideView.vue';
 import chatNavMenu from './ChatNavMenu.vue';
 import chatFooter from './ChatFooterView.vue';
 import chatMain from './ChatMainView.vue';
+// константы
+import {API_URL, CHAT_COMMANDS} from '../../constants.js';
 
 export default {
     name: "ChatPage",
@@ -42,40 +39,57 @@ export default {
         ...mapGetters({
             isShowSidebar: 'chat/isShowSidebar',
             isLimitedWidth: 'chat/isLimitedChatWidth',
+            accessToken: 'auth/token',
+            hubConnection: 'connection/connection',
             isConnected: 'connection/isConnected'
         }),
     },
     methods: {
         ...mapActions({
-            clearMessagesList: 'messages/clearMessagesList',
             connectToHub: 'connection/connect',
-            connectionClose: 'connection/disconnect',
+            closeConnection: 'connection/disconnect',
+            loadOnlineUsers: 'users/loadOnlineUsers',
+        }),
+        ...mapMutations({
+            showLoader: 'showLoader',
+            hideLoader: 'hideLoader',
+            setConnection: 'connection/setConnection',
+            registerAction: 'connection/registerAction',
+            removeAction: 'connection/removeAction',
+            addMessage: 'messages/addMessage',
         }),
         changeConnectionState: function(isConnected) {
             if(!isConnected) alert('Потеряна связь с сервером');
+        },
+        createConnection: function() {
+            const hubConnection = new HubConnectionBuilder()
+                .withUrl(API_URL.ROOT + API_URL.HUB, { accessTokenFactory: () => this.accessToken })
+                .configureLogging(LogLevel.Information)
+                .build();
+            hubConnection.serverTimeoutInMilliseconds = 20 * 60000;       // время таймаута (минут) 
+            hubConnection.keepAliveIntervalInMilliseconds = 10 * 60000;   // время жизни соединения
+            return hubConnection;
         }
     },
     mounted: function() {
-        this.$store.commit('showLoader', 'Подключение к серверу');
+        this.showLoader('Подключение к серверу');
+        if(this.hubConnection === undefined) {
+            // создаём подключение
+            this.setConnection(this.createConnection());
+            // регистрируем команды
+            this.registerAction({ name: CHAT_COMMANDS.RECEIVE_MESSAGE, command: (data) => this.addMessage(data)});    // вывод сообщения
+        }
+        // подключаемся к серверу
         this.connectToHub()
         .finally(() => {
-            this.$store.commit('hideLoader');
+            // список юзеров онлайн
+            this.loadOnlineUsers();
+            this.hideLoader();
+            this.$watch('isConnected', this.changeConnectionState);
         });
-        this.$watch('isConnected', this.changeConnectionState);
-    },
-    beforeMount: function() {
-        this.$store.registerModule('chat', chatModule);
-        this.$store.registerModule('users', usersModule);
-        this.$store.registerModule('messages', messagesModule);
-        this.$store.registerModule('connection', connectionModule);
     },
     beforeDestroy: function() {
-        //this.clearMessagesList();
-        this.connectionClose();
-        this.$store.unregisterModule('chat');
-        this.$store.unregisterModule('users');
-        this.$store.unregisterModule('messages');
-        this.$store.unregisterModule('connection');
+        this.closeConnection();
     }
 }
 </script>

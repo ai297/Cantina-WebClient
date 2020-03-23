@@ -1,5 +1,5 @@
 import {HTTP} from '../../http-common.js';
-import {API_URL, ROLES} from '../../constants.js';
+import {API_URL, ROLES, CLAIMS} from '../../constants.js';
 
 export default {
     namespaced: true,
@@ -10,7 +10,7 @@ export default {
             type: '',
             text: '',
         },
-        currentUser: {},
+        currentUserName: '',
     },
     getters: {
         isAuth: state => state.auth.isAuth,
@@ -18,18 +18,28 @@ export default {
             if(state.token != '' && getters.tokenExpire > Date.now()) return state.token;
             else return false;
         },
-        tokenExpire: state => {
-            if(state.token != '') return JSON.parse(atob(state.token.split('.',3)[1])).exp * 1000;
+        tokenInfo: state => {
+            return JSON.parse(atob(state.token.split('.',3)[1]));
+        },
+        tokenExpire: (state, getters) => {
+            if(state.token != '') return getters.tokenInfo.exp * 1000;
             else return 0;
         },
         role: (state, getters) => {
             if(!getters.token) return ROLES.USER;
             else {
-                let role = JSON.parse(atob(state.token.split('.',3)[1]))[ROLES.property];
+                let role = getters.tokenInfo[CLAIMS.ROLE];
                 return role ? role : ROLES.USER;
             }
         },
-        currentUserInfo: state => state.currentUser,
+        userName: (state) => {
+            if(state.currentUserName == '') return 'Unathorized';
+            else return state.currentUserName;
+        },
+        userId: (state, getters) => {
+            if(!getters.token) return -1;
+            else return getters.tokenInfo[CLAIMS.ID] * 1;
+        },
     },
     mutations: {
         setToken: (state, token) => {
@@ -46,22 +56,23 @@ export default {
             state.auth = payload;
         },
         updateCurrentUser: (state, userData) => state.currentUser = userData,
+        updateUserName: (state, name) => state.currentUserName = name,
     },
     actions: {
         auth: (context, data) => {
-            let token = context.getters.token ? "Bearer " + context.getters.token : '';
             return HTTP({
                 method: data.method,
-                url: API_URL.login,
+                url: API_URL.LOGIN,
                 data: data.payload,
                 headers: {
-                    "Authorization": token
+                    "Authorization": context.getters.token ? "Bearer " + context.getters.token : '',
                 }
             })
             .then(response => {
                 let res = response.data;
                 if(res.success) {
                     context.commit("setToken", res.token);
+                    context.commit("updateUserName", res.userName);
                     context.commit("authResult", {isAuth: true});
                 }
                 else {
@@ -83,9 +94,6 @@ export default {
                 } else errorMessage = 'Не удалось подключиться к серверу';
                 context.commit("authResult", {isAuth: false, type: 'error', text: errorMessage});
                 context.commit("removeToken");
-            })
-            .finally(() => {
-                context.dispatch("loadUserInfo");
             });
         },
         login: async (context, payload) => {
@@ -95,15 +103,8 @@ export default {
             await context.dispatch('auth', {method: 'get', payload: {}});
         },
         serverIsAvalible: () => {
-            return HTTP.get(API_URL.ping);
+            return HTTP.get(API_URL.PING);
         },
-        loadUserInfo: context => {
-            if(!context.getters.isAuth) return;
-            // обновляем информацию о юзере
-            HTTP.get(API_URL.userinfo).then( response => {
-                context.commit('updateCurrentUser', response.data);
-            });
-        }
     }
 
 }

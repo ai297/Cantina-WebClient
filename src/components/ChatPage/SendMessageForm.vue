@@ -5,7 +5,7 @@
         <div id="extendButtons">
             <button @click="showSettings"><div><cantina-icons iconName="gear" /></div></button>
         </div>
-        <div id="extendPanel" v-show="isShowExtendPanel"><flat-selection :options="['Раз', 'ДВА ДВА', 'Три']" class="selection" /></div>
+        <div id="extendPanel" v-show="isShowExtendPanel"></div>
     </div>
 </template>
 
@@ -20,14 +20,10 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentUserInfo: 'auth/currentUserInfo',
+            currentUserName: 'auth/userName',
             isShowExtendPanel: 'chat/isShowExtendPanel',
             extendPanelComponent: 'chat/getExtendPanelComponent',
         }),
-        currentUserName: function() {
-            if(this.currentUserInfo.name !== undefined) return this.currentUserInfo.name;
-            else return '...';
-        },
     },
     methods: {
         ...mapMutations({

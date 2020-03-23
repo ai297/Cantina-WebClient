@@ -9,7 +9,9 @@
 </template>
 
 <script>
+
 import { mapGetters } from 'vuex';
+
 import chatMessage from './Messages/ChatMessage.vue';
 
 export default {
@@ -29,7 +31,7 @@ export default {
     },
     updated: function() {
         this.$refs['messagesList'].scrollTop = this.$refs['messagesList'].scrollHeight - this.$refs['messagesList'].clientHeight;
-    }
+    },
 }
 </script>
 

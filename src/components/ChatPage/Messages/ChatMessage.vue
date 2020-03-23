@@ -23,21 +23,15 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentUser: 'auth/currentUserInfo',
+            currentUserId: 'auth/userId',
         }),
-        currentUserId: function() {
-            if(this.currentUser.id !== undefined) return this.currentUser.id;
-            else return -1;
-        },
         isPersonal: function() {
             // если поле "получатель" - массив, то ищем в массиве id текущего юзера
             if(Array.isArray(this.message.recipients)) {
                 return this.message.recipients.includes(this.currentUserId);
             }
             // если не массив, но поле задано, то просто сравниваем его с id текущего юзера
-            else if(this.message.hasOwnProperty('recipients')) {
-                if(this.message.recipients == this.currentUserId) return true;
-            }
+            else if(this.message.recipients == this.currentUserId) return true;
             return false;
         },
         messageType: function() {
