@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { MESSAGE_TYPES } from '../../../constants.js'
+import { MESSAGE_TYPES, CHAT_COMMANDS } from '../../../constants.js'
 
 export default {
     name: "MessageToUserLink",
@@ -19,7 +19,7 @@ export default {
     },
     methods: {
         messageTo: function() {
-            this.$store.commit('messages/addNameToMessage', {userName: this.nickname, messageType: this.messageType});
+            this.$store.dispatch('commands/run', {commandName: CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE, payload: {userName: this.nickname, messageType: this.messageType}});
         }
     }
 }

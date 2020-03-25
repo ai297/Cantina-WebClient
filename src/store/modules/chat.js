@@ -29,9 +29,7 @@ export default {
         showInteractive: (state, component) => {
             if(!state.interactiveComponent.name || state.interactiveComponent.name != component.name) state.interactiveComponent = component;
             else state.interactiveComponent = "div";
-        }
+        },
+        changeWidth: state => state.limitedChatWidth = !state.limitedChatWidth,
     },
-    actions: {
-        
-    }
 }

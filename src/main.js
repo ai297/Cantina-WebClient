@@ -25,8 +25,10 @@ Vue.component("cantina-icons", cantinaIcons);
 
 
 /////-> Поехали! (точка входа)
-new Vue({
+var vm = new Vue({
   router: Router,
   store: Store,
   render: h => h(App),
-}).$mount('#app');
+});
+
+vm.$mount('#app');

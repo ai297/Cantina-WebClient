@@ -5,6 +5,7 @@ import chat from './modules/chat.js';
 import connection from './modules/connection.js';
 import messages from './modules/messages.js';
 import users from './modules/users.js';
+import commands from './modules/commands.js';
 
 Vue.use(Vuex);
 
@@ -38,5 +39,6 @@ export default new Vuex.Store({
         connection,
         messages,
         users,
+        commands,
     },
 })

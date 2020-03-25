@@ -3,15 +3,15 @@
         <component id="interactive" :is="interactiveComponent" />
         <div id="messages-list" ref="messagesList">
             <chat-message v-for="(item, index) in messagesQueue" :key="index" :message="item" />
-            <p v-show="isNotMessages">Ошибка загрузки сообщений?</p>
+            <p v-show="isNotMessages">Нет сообщений</p>
         </div>
     </div>
 </template>
 
 <script>
 
-import { mapGetters } from 'vuex';
-
+import { mapGetters, mapMutations } from 'vuex';
+import {CHAT_COMMANDS} from '../../constants.js';
 import chatMessage from './Messages/ChatMessage.vue';
 
 export default {
@@ -29,9 +29,24 @@ export default {
             return this.messagesCount <= 0;
         }
     },
+    methods: {
+        ...mapMutations({
+            addMessage: 'messages/addMessage',
+            clearMessages: 'messages/clearMessages',
+            registerCommand: 'commands/registerCommand',
+            deleteCommand: 'commands/deleteCommand',
+        })
+    },
     updated: function() {
         this.$refs['messagesList'].scrollTop = this.$refs['messagesList'].scrollHeight - this.$refs['messagesList'].clientHeight;
     },
+    mounted: function() {
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, command: (messageData) => this.addMessage(messageData)});
+    },
+    beforeDestroy: function() {
+        this.deleteCommand(CHAT_COMMANDS.ACTION_ADD_MESSAGE);
+        this.clearMessages();
+    }
 }
 </script>
 

@@ -53,7 +53,8 @@ export default {
             sendToServer: 'connection/send',
         }),
         ...mapMutations({
-            registerAddNameAction: 'messages/registerAddNameAction',
+            registerCommand: 'commands/registerCommand',
+            deleteCommand: 'commands/deleteCommand',
         }),
         // событие onInput на поле ввода
         fieldInput: function() {
@@ -190,7 +191,7 @@ export default {
             this.focus();
         },
         // кнопка отправки сообщения
-        submit: function(){
+        submit: async function(){
             if(this.messageTextLength < 3) {
                 this.focus();
                 return;
@@ -221,20 +222,23 @@ export default {
             }
 
             // отправка на сервер
-            this.messageString="Отправка...";
+            this.$refs['m-field'].innerHTML="Отправка...";
             this.fieldUpdate();
             this.disable = true;
-            this.sendToServer({command: CHAT_COMMANDS.SEND_MESSAGE, data: messageRequest}).then(() => {
-                this.clearMessageString();
-                this.disable = false;
-                this.focus();
-            })
+            await this.sendToServer({command: CHAT_COMMANDS.SEND_MESSAGE, data: messageRequest});
+            this.clearMessageString();
+            this.disable = false;
+            this.focus();
         },
     },
     mounted: function(){
-        this.registerAddNameAction((data) => this.addNicknameToMessageString(data));
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE, command: (data) => this.addNicknameToMessageString(data)});
         this.focus();
     },
+    beforeDestroy: function() {
+        this.deleteCommand(CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE);
+    }
+
 }
 </script>
 

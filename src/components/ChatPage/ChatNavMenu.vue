@@ -6,7 +6,8 @@
 </template>
 
 <script>
-import {ROLES, ROUTING} from '../../constants.js';
+import {mapActions} from 'vuex';
+import {ROLES, CHAT_COMMANDS} from '../../constants.js';
 
 const adminConsole = () => ({
   // Загружаемый компонент. Значение должно быть Promise
@@ -31,15 +32,18 @@ export default {
         },
     },
     methods: {
+        ...mapActions({
+            runCommand: 'commands/run',
+        }),
         showConsole: function() {
             if(this.isAdmin) {
                 this.$store.commit('chat/showInteractive', adminConsole);
             }
         },
         exit: function() {
-            this.$router.push(ROUTING.OUT_PAGE);
+            this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
         }
-    }
+    },
 }
 </script>
 

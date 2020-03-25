@@ -57,6 +57,10 @@ export const CHAT_COMMANDS = {
     RUN_CONNAND: 'RunCommand',
     USER_ENTER: 'AddUserToOnlineList',
     USER_EXIT: 'RemoveUserFromOnlineList',
+    // управление клиентом
+    ACTION_ADD_NAME_TO_MESSAGE: 'AddNameToMessage',
+    ACTION_ADD_MESSAGE: 'AddMessage',
+    ACTION_EXIT: 'Exit',
     // методы сервера
     SEND_MESSAGE: 'SendMessage',
 }

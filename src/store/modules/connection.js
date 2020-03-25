@@ -6,7 +6,7 @@ export default {
     },
     getters: {
         connection: state => state.hubConnection,
-        isConnected: state => {
+        isConnected: state => () => {
             if(state.hubConnection !== undefined) return state.hubConnection.state === HubConnectionState.Connected;
             else return false;
         },

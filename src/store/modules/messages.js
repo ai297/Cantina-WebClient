@@ -5,7 +5,6 @@ export default {
     state: {
         messages: new Queue(),
         maxCount: 100,
-        addNameAction: null,
     },
     getters: {
         getMessages: state => {
@@ -26,14 +25,6 @@ export default {
         },
         clearMessages: state => {
             state.messages = new Queue();
-        },
-        // регистрируем функцию вставки ника в поле ввода сообщения
-        registerAddNameAction: (state, func) => {
-            state.addNameAction = func;
-        },
-        // вызов функции вставки ника в поле ввода сообщения
-        addNameToMessage: (state, data) => {
-            state.addNameAction(data);
         },
     },
     actions: {

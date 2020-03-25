@@ -15,19 +15,10 @@ import iconPeople from './IconPeople.vue';
 import iconIgnore from './IconIgnore.vue';
 import iconClaim from './IconClaim.vue';
 import iconPiramid from './IconPiramid.vue';
+import iconMaximize from './IconMaximize.vue';
 
 export default {
     name: "IconBase",
-    components: {
-        iconSmile,
-        iconLogout,
-        iconChat,
-        iconGear,
-        iconPeople,
-        iconIgnore,
-        iconClaim,
-        iconPiramid,
-    },
     data: function() {
         return {
             icons: {
@@ -39,6 +30,7 @@ export default {
                 "ignore": iconIgnore,
                 "claim": iconClaim,
                 "piramid": iconPiramid,
+                "maximize": iconMaximize,
             }
         }
     },

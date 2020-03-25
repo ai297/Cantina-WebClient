@@ -24,7 +24,7 @@ import chatNavMenu from './ChatNavMenu.vue';
 import chatFooter from './ChatFooterView.vue';
 import chatMain from './ChatMainView.vue';
 // константы
-import {API_URL, CHAT_COMMANDS} from '../../constants.js';
+import {API_URL, CHAT_COMMANDS, ROUTING} from '../../constants.js';
 
 export default {
     name: "ChatPage",
@@ -49,6 +49,7 @@ export default {
             connectToHub: 'connection/connect',
             closeConnection: 'connection/disconnect',
             loadOnlineUsers: 'users/loadOnlineUsers',
+            runCommand: 'commands/run',
         }),
         ...mapMutations({
             showLoader: 'showLoader',
@@ -56,7 +57,10 @@ export default {
             setConnection: 'connection/setConnection',
             registerAction: 'connection/registerAction',
             removeAction: 'connection/removeAction',
-            addMessage: 'messages/addMessage',
+            addUser: 'users/addUserToOnlineList',
+            removeUser: 'users/removeUserFromOnlineList',
+            registerCommand: 'commands/registerCommand',
+            deleteCommand: 'commands/deleteCommand',
         }),
         changeConnectionState: function(isConnected) {
             if(!isConnected) alert('Потеряна связь с сервером');
@@ -69,27 +73,46 @@ export default {
             hubConnection.serverTimeoutInMilliseconds = 20 * 60000;       // время таймаута (минут) 
             hubConnection.keepAliveIntervalInMilliseconds = 10 * 60000;   // время жизни соединения
             return hubConnection;
-        }
+        },
+        startLoadingUsers: function() {
+            this.showLoader('Получение списка онлайна...');
+            setTimeout(async () => {
+                let isLoadUsers = await this.loadOnlineUsers();
+                if(isLoadUsers) this.hideLoader();
+                else this.startLoadingUsers();
+            }, 200);
+        },
     },
-    mounted: function() {
+    mounted: async function() {
         this.showLoader('Подключение к серверу');
+        // команда выхода из чата
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_EXIT, command: () => {
+            this.$router.push(ROUTING.OUT_PAGE);
+        }});
+        // добавление и удаление юзера из списка онлайн
+        // this.registerCommand({commandName: CHAT_COMMANDS.USER_ENTER, command: (data) => this.addUser(data)});
+        // this.registerCommand({commandName: CHAT_COMMANDS.USER_EXIT, command: (id) => this.removeUser(id)});
+
         if(this.hubConnection === undefined) {
             // создаём подключение
             this.setConnection(this.createConnection());
             // регистрируем команды
-            this.registerAction({ name: CHAT_COMMANDS.RECEIVE_MESSAGE, command: (data) => this.addMessage(data)});    // вывод сообщения
+            this.registerAction({ name: CHAT_COMMANDS.RECEIVE_MESSAGE, command: (data) => 
+            this.runCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, payload: data}) });                         // вывод сообщения
+            this.registerAction({ name: CHAT_COMMANDS.USER_ENTER, command: (data) => this.addUser(data) });             // добавление юзера в список онлайна
+            this.registerAction({ name: CHAT_COMMANDS.USER_EXIT, command: (id) => this.removeUser(id) });               // удаление юзера из списка онлайн
         }
         // подключаемся к серверу
-        this.connectToHub()
-        .finally(() => {
-            // список юзеров онлайн
-            this.loadOnlineUsers();
-            this.hideLoader();
-            this.$watch('isConnected', this.changeConnectionState);
-        });
+        await this.connectToHub();
+        this.hideLoader();
+        this.$watch('isConnected', this.changeConnectionState);
+        this.startLoadingUsers();
     },
     beforeDestroy: function() {
         this.closeConnection();
+        this.deleteCommand(CHAT_COMMANDS.ACTION_EXIT);
+        // this.deleteCommand(CHAT_COMMANDS.USER_ENTER);
+        // this.deleteCommand(CHAT_COMMANDS.USER_EXIT);
     }
 }
 </script>

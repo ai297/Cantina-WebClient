@@ -1,21 +1,18 @@
 <template>
     <div class="asideMainMenu">
         <volume-button @click="changeAsideBlock(usersOnlineList)" :class="{actv: isCurrentComponent(usersOnlineList)}"><cantina-icons iconName="people" /> Онлайн</volume-button>
-        <volume-button @click="changeAsideBlock(enotherBlock)" :class="{actv: isCurrentComponent(enotherBlock)}">Другой блок</volume-button>
     </div>
 </template>
 
 <script>
 import { mapMutations, mapGetters } from 'vuex';
 import usersOnlineList from './UserList/ChatUsersOnlineList.vue';
-import enotherBlock from './EnotherBlock.vue';
 
 export default {
     name: "ChatAsideMainMenu",
     data: function() {
         return {
             usersOnlineList,
-            enotherBlock,
         }
     },
     computed: {

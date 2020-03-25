@@ -105,8 +105,9 @@ export default {
         }
         &.personal {
             &::before {
-                content: '⇒' !important;
+                content: '»' !important;
                 display: inline-block;
+                font-family: Tahoma, sans-serif;
             }
         }
         &.Base-message {

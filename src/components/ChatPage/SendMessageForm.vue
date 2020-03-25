@@ -3,7 +3,7 @@
         <div id="nameBlock"><p>{{currentUserName}}:</p></div>
         <message-field id="messageField" @showSmiles="showSmiles" />
         <div id="extendButtons">
-            <button @click="showSettings"><div><cantina-icons iconName="gear" /></div></button>
+            <button @click="changeWidth"><div><cantina-icons iconName="maximize" /></div></button>
         </div>
         <div id="extendPanel" v-show="isShowExtendPanel"></div>
     </div>
@@ -28,10 +28,8 @@ export default {
     methods: {
         ...mapMutations({
             showExtend: 'chat/showExtendPanel',
+            changeWidth: 'chat/changeWidth',
         }),
-        showSettings: function() {
-            this.showExtend({});
-        },
         showSmiles: function() {
             this.showExtend({});
         }
