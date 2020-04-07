@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <loader-view v-if="isLoading">{{loaderText}}</loader-view>
+    <loader-view v-if="loader.show" :showIcon="loader.showIcon">{{loader.text}}</loader-view>
     <router-view />
   </div>
 </template>
@@ -15,13 +15,9 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isLoading: 'isLoading',
-      loaderText: 'loaderText'
+      loader: 'loader',
     }),
   },
-  mounted: function() {
-    this.$store.commit('hideLoader');
-  }
 }
 
 </script>

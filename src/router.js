@@ -60,7 +60,7 @@ const router = new VueRouter({
       path: '/main',
       component: mainPage,
       meta: {
-        requiresAuth: true,
+        requiresAuth: false,
       }
     },
     {
@@ -73,28 +73,11 @@ const router = new VueRouter({
     }
   ]
 });
-
-// показываем загрузчик
+// показываем лоадер при переходах
 router.beforeEach((to, from, next) => {
-  store.commit('showLoader', 'Соединение...');
-  // если переход на закрытую страницу - сперва проверяем доступность сервера
-  if(to.matched.some(record => record.meta.requiresAuth)) store.dispatch('auth/serverIsAvalible')
-  .then(() => {
-    next();
-  })
-  .catch(() => {
-    store.commit('hideLoader');
-    alert("Не удалось соединиться с сервером...");
-    next(false);
-  });
-  // иначе просто переходим
-  else next();
+  store.commit('showLoader', 'Загрузка...');
+  next();
 });
-router.afterEach(() => {
-  store.commit('hideLoader');
-})
-
-
 // обрабатываем мета-теги маршрутов
 router.beforeEach((to, from, next) => {
   for(let routeId in to.matched) {
@@ -106,6 +89,7 @@ router.beforeEach((to, from, next) => {
       
       // если есть не просроченный токен - пробуем обновить авторизацию
       if(store.getters['auth/token']) {
+        store.commit('showLoader', 'Авторизация...');
         store.dispatch('auth/relogin').finally(() => {
           // если успешно обновили - го некст
           if(store.getters['auth/isAuth']) next();
@@ -136,6 +120,11 @@ router.beforeEach((to, from, next) => {
     // если тегов не найдено - просто идём дальше
     else next();
   }
+});
+
+// прячем лоадер
+router.afterEach(() => {
+  store.commit('hideLoader');
 });
 
 export default router

@@ -6,15 +6,9 @@
                 <p class="errorMessage" v-show="isError">{{errorMessage}}</p>
             </div>
             <div>
-                <p class="label">Аккаунт:</p>
                 <flat-field :class="{errorField: isEmailInvalid ? validation('email') : isEmailInvalid }" type="email" placeholder="E-MAIL" v-model.trim="request.email" />
-                <flat-field :class="{errorField: isPasswordInvalid ? validation('password') : isPasswordInvalid }" :type="showPassword ? 'text' : 'password'" placeholder="ПАРОЛЬ" maxlength="30" v-model.trim="request.password"><a @click.prevent="showPassword = !showPassword">show</a></flat-field>
-            </div>
-            <div>
-                <p class="label">Профиль:</p>
+                <flat-field :class="{errorField: isPasswordInvalid ? validation('password') : isPasswordInvalid }" :type="showPassword ? 'text' : 'password'" placeholder="ПАРОЛЬ" maxlength="30" v-model.trim="request.password"><a @click.prevent="showPassword = !showPassword" title="Показать/Скрыть">⊛</a></flat-field>
                 <flat-field :class="{errorField: isNameInvalid ? validation('name', 'nickname') : isNameInvalid }" placeholder="Никнейм" maxlength="18" v-model.trim="request.name" />
-                <flat-selection :options="$options.gender" placeholder="Пол" v-model="request.gender" />
-                <flat-field :class="{errorField: isLocationInvalid ? validation('location') : isLocationInvalid }" placeholder="Откуда вы" v-model.trim="request.location" />
             </div>
             <div>
                 <flat-button >Зарегистрироваться</flat-button>
@@ -36,19 +30,12 @@ export default {
     components: {
         baseEnterForm,
     },
-    gender: [
-        "Не определился",
-        "Мужской",
-        "Женский"
-    ],
     data: function(){
         return {
             request: {
                 email: '',
                 password: '',
                 name: '',
-                location: '',
-                gender: 0,
             },
             isError: false,
             errorMessage: '',
@@ -56,7 +43,6 @@ export default {
             isEmailInvalid: false,
             isPasswordInvalid: false,
             isNameInvalid: false,
-            isLocationInvalid: false,
         }
     },
     
@@ -71,7 +57,6 @@ export default {
             this.isEmailInvalid = this.validation('email');             // проверка email
             this.isPasswordInvalid = this.validation('password');       // проверка пароля
             this.isNameInvalid = this.validation('name', 'nickname');   // проверка имени
-            this.isLocationInvalid = this.validation('location');       // проверка локации
             if(this.isEmailInvalid || this.isPasswordInvalid || this.isNameInvalid || this.isLocationInvalid) return;
             
             // Запрос на регистрацию

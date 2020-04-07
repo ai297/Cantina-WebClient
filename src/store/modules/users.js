@@ -13,7 +13,8 @@ export default {
         // мутация добавляет нового юзера в список онлайна
         addUserToOnlineList: (state, userData) => {
             for(let i in state.onlineUsers) {
-                if(state.onlineUsers[i].id == userData.id)  {
+                // перебираем всех посетителей в чате и если находим такого же - заменяем данные в списке на новые данные посетителя
+                if(state.onlineUsers[i].userId == userData.userId) {
                     state.onlineUsers.splice(i, 1, userData);
                     return;
                 }
@@ -22,7 +23,7 @@ export default {
         },
         removeUserFromOnlineList: (state, userId) => {
             for(let i in state.onlineUsers) {
-                if(state.onlineUsers[i].id == userId) state.onlineUsers.splice(i, 1);
+                if(state.onlineUsers[i].userId == userId) state.onlineUsers.splice(i, 1);
             }
         },
         clearUserList: state => state.onlineUsers = [],
@@ -34,7 +35,7 @@ export default {
                 .then(response => {
                     for(let key in response.data) context.commit('addUserToOnlineList', response.data[key]);
                 });
-            return context.state.onlineUsers.length > 0;
+            return context.state.onlineUsers.length;
         }
     }
 }

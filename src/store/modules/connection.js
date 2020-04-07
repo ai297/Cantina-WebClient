@@ -22,15 +22,29 @@ export default {
         removeAction: (state, action) => {
             if(state.hubConnection !== undefined) state.hubConnection.off(action.name, action.command);
         },
+        clearConnection: state => {
+            state.hubConnection = undefined;
+        },
     },
     actions: {
+        // запуск соединения с хабом
         connect: ({state, rootGetters}) => {
+            // если не авторизован - ничего не  делаем
             if(!rootGetters['auth/isAuth']) return;
+            // если хабконнекшн создан и соединение ещё не установлено - возвращаем промис, стартующий соединение
             if(state.hubConnection !== undefined && !state.hubConnection.connectionStarted) return state.hubConnection.start();
-            else return false;
+            // иначе возвращаем промис, разрешающийся ошибкой
+            else return new Promise(function(resolve, reject) {
+                reject(false)
+            });
         },
-        disconnect: ({state, getters}) => {
-            if(getters.isConnected) state.hubConnection.stop();
+        disconnect: ({getters, commit}) => {
+            // очищаем хук закрытия соединения
+            //getters.connection.closedCallbacks = [];
+            if(getters.isConnected) getters.connection.stop()
+            .finally(() => {
+                commit('clearConnection');
+            });
         },
         // invoke - ждёт ответа от сервера
         // send - просто отправляет сообщение, не ожидая ответа

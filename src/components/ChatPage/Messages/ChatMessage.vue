@@ -1,8 +1,8 @@
 <template>
     <div class="message-in-list" :class="messageTypeClass">
         <span class="timespan">{{message.dateTime | timeFilter}}</span>
-        <span class="nickname"><message-to-user-link :nickname="message.authorName" :messageType="linkMessageType" /></span>
-        <message-text class="message-text" :message="message" />
+        <span class="nickname" :style="nameStyle"><message-to-user-link :nickname="message.authorName" :messageType="linkMessageType" /></span>
+        <message-text class="message-text" :style="messageStyle" :message="message" />
     </div>
 </template>
 
@@ -48,6 +48,14 @@ export default {
             let msgClass = this.messageType + '-message';
             if(this.isPersonal) msgClass += ' personal';
             return msgClass;
+        },
+        nameStyle: function() {
+            if(this.message.hasOwnProperty("nameStyle") && this.message.nameStyle !== null) return this.message.nameStyle;
+            else return "";
+        },
+        messageStyle: function() {
+            if(this.message.hasOwnProperty("messageStyle") && this.message.messageStyle !== null) return this.message.messageStyle;
+            else return "";
         }
     },
     filters: {
@@ -139,9 +147,10 @@ export default {
         }
         &.System-message {
             .message-text {
-                color: @system-font-color;
+                color: @system-font-color !important;
                 font-size: @label-fontsize;
                 font-weight: bold;
+                font-family: inherit !important;
             }
             .nickname {
                 display: none;

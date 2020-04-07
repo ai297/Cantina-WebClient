@@ -39,7 +39,7 @@ export default {
             this.input='';
             if(!words) return;
             
-            let methods = ["get", "post", "put", "delete"];
+            let methods = ["get", "post", "patch", "delete"];
             
             if(words[1] === undefined || methods.indexOf(words[1].toLowerCase()) < 0) {
                 this.output.push(new ConsoleLine("Неизвестный запрос", "error"));

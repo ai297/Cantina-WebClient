@@ -1,6 +1,6 @@
 <template>
-    <div class="flat-field" :class="{withvalue:(value != '')}">
-        <input :type="type" :maxlength="maxlength" :value="value" v-on="inputListener" @focus="hidePlaceholder = true" @blur="hidePlaceholder = false" />
+    <div class="flat-field" :class="{withvalue:(value != ''), selected: isSelected}">
+        <input :type="type" :maxlength="maxlength" :value="value" v-on="inputListener" @focus="isSelected = true" @blur="isSelected = false" />
         <div class="extender"><slot /></div>
         <div class="placeholder" v-show="isShowPlaceholder" v-html="placeholder"></div>
     </div>
@@ -29,7 +29,7 @@ export default {
     },
     data: function() {
         return {
-            hidePlaceholder: false,
+            isSelected: false,
         }
     },
     computed: {
@@ -45,7 +45,7 @@ export default {
             )
         },
         isShowPlaceholder: function() {
-            return this.value == '' && !this.hidePlaceholder;
+            return this.value == '' && !this.isSelected;
         }
     }
 }
@@ -113,6 +113,9 @@ export default {
             border-radius: 0;
             padding-left: @base-padding;
             background-color: @dark-red;
+        }
+        &.selected {
+            border-color: @green;
         }
     }
 </style>

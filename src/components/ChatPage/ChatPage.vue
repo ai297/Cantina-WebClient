@@ -1,19 +1,23 @@
 <template>
     <div id="chat" :class="{ limitedWidth: isLimitedWidth }">
-        <!-- Основной блок //-->
+        <!-- Основной блок -->
         <chat-main id="chatMain" v-if="isConnected" />
-        <!-- Боковой блок //-->
+        <!-- Боковой блок -->
         <chat-aside id="chatAside" :class="{minimize: !isShowSidebar}" v-if="isConnected" />
-        <!-- форма отправки сообщения //-->
+        <!-- форма отправки сообщения -->
         <send-message-form id="sendingForm" v-if="isConnected" />
-        <!-- Менюшка навигации //-->
+        <!-- Менюшка навигации -->
         <chat-nav-menu id="chatNavMenu" />
-        <!-- Подвал //-->
+        <!-- Подвал -->
         <chat-footer id="chatFooter" />
+        <!-- Модальное окно -->
+        <component v-if="isShowModal" :is="modalComponent" />
     </div>
 </template>
 
 <script>
+const MAX_ITERATIONS = 3;
+
 import { mapGetters, mapActions, mapMutations } from 'vuex';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
@@ -23,17 +27,24 @@ import chatAside from './ChatAsideView.vue';
 import chatNavMenu from './ChatNavMenu.vue';
 import chatFooter from './ChatFooterView.vue';
 import chatMain from './ChatMainView.vue';
+import userSettingsComponent from './ChatUserSettings.vue';
 // константы
 import {API_URL, CHAT_COMMANDS, ROUTING} from '../../constants.js';
 
 export default {
     name: "ChatPage",
     components: {
-        "send-message-form": sendMessageForm,
-        "chat-aside": chatAside,
-        "chat-nav-menu": chatNavMenu,
-        "chat-footer": chatFooter,
-        "chat-main": chatMain
+        sendMessageForm,
+        chatAside,
+        chatNavMenu,
+        chatFooter,
+        chatMain,
+    },
+    data: function() {
+        return {
+            connectionIterations: 0,
+            loadingOnlineUsersIterations: 0,
+        }
     },
     computed: {
         ...mapGetters({
@@ -41,7 +52,10 @@ export default {
             isLimitedWidth: 'chat/isLimitedChatWidth',
             accessToken: 'auth/token',
             hubConnection: 'connection/connection',
-            isConnected: 'connection/isConnected'
+            isConnected: 'connection/isConnected',
+            modalComponent: 'chat/modalComponent',
+            isShowModal: 'chat/showModal',
+            userId: 'auth/userId',
         }),
     },
     methods: {
@@ -53,6 +67,7 @@ export default {
         }),
         ...mapMutations({
             showLoader: 'showLoader',
+            showText: 'showText',
             hideLoader: 'hideLoader',
             setConnection: 'connection/setConnection',
             registerAction: 'connection/registerAction',
@@ -61,56 +76,120 @@ export default {
             removeUser: 'users/removeUserFromOnlineList',
             registerCommand: 'commands/registerCommand',
             deleteCommand: 'commands/deleteCommand',
+            showModal: 'chat/showModal',
+            hideModal: 'chat/hideModal',
+            updateCurrentUserName: 'auth/updateUserName',
         }),
-        changeConnectionState: function(isConnected) {
-            if(!isConnected) alert('Потеряна связь с сервером');
-        },
         createConnection: function() {
             const hubConnection = new HubConnectionBuilder()
                 .withUrl(API_URL.ROOT + API_URL.HUB, { accessTokenFactory: () => this.accessToken })
                 .configureLogging(LogLevel.Information)
                 .build();
-            hubConnection.serverTimeoutInMilliseconds = 20 * 60000;       // время таймаута (минут) 
-            hubConnection.keepAliveIntervalInMilliseconds = 10 * 60000;   // время жизни соединения
+            hubConnection.serverTimeoutInMilliseconds = 1 * 60000;       // время таймаута (минут) 
+            //hubConnection.keepAliveIntervalInMilliseconds = 10 * 60000;   // время жизни соединения
+
+            // Обработка дисконнекта от сервера - повторное авто-подключение
+            hubConnection.onclose( (err) => {
+                if(err != undefined) {
+                    this.showText('Соединение разорвано... Сейчас попытаемся восстановить');
+                    this.connectionIterations = 0;
+                    setTimeout(async () => {
+                        this.hideLoader();
+                        let reconnected = await this.startConnection();
+                        if(!reconnected) { 
+                            this.showText('Сервер недоступен');
+                            setTimeout(() => {
+                                this.hideLoader();
+                                this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
+                            }, 2000);
+                        }
+                    }, 2000);
+                }
+            });
             return hubConnection;
         },
+        // метод пытается подключиться к хабу
+        startConnection: async function() {
+            this.showLoader(`Подключение к серверу (${this.connectionIterations + 1})`);
+            // если подключение не существует - создаём новое
+            if(this.hubConnection === undefined) {
+                this.setConnection(this.createConnection());
+                // регистрируем команды
+                this.registerAction({ name: CHAT_COMMANDS.RECEIVE_MESSAGE, command: (data) =>                       // вывод сообщения
+                    this.runCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, payload: data})
+                });
+                this.registerAction({ name: CHAT_COMMANDS.USER_ENTER, command: (data) => this.addUser(data) });     // добавление юзера в список онлайна
+                this.registerAction({ name: CHAT_COMMANDS.USER_EXIT, command: (id) => this.removeUser(id) });       // удаление юзера из списка онлайн
+                // обновление данных текущего юзера
+                this.registerAction({ name: CHAT_COMMANDS.USER_ENTER, command: (data) => {
+                    if(data.userId === this.userId) this.updateCurrentUserName(data.name);
+                } });
+            }
+
+            // подключаемся к серверу
+            let connectResult = false;
+            try {
+                await this.connectToHub();
+                connectResult = true;
+            } catch {
+                if(this.connectionIterations < MAX_ITERATIONS) {
+                    this.connectionIterations++;
+                    connectResult = await this.startConnection();
+                }
+            }
+            this.hideLoader();
+            return connectResult;
+        },
+        // Метод пытается загрузить список юзеров онлайн
         startLoadingUsers: function() {
-            this.showLoader('Получение списка онлайна...');
+            this.showLoader(`Получение списка онлайна...`);
             setTimeout(async () => {
                 let isLoadUsers = await this.loadOnlineUsers();
-                if(isLoadUsers) this.hideLoader();
-                else this.startLoadingUsers();
+                if(isLoadUsers > 0) this.hideLoader();
+                else {
+                    this.loadingOnlineUsersIterations++;
+                    if(this.loadingOnlineUsersIterations < MAX_ITERATIONS) this.startLoadingUsers();
+                    else {
+                        this.showText('Не удалось подключиться к серверу... Попробуйте обновить страницу.');
+                        setTimeout(() => {
+                            this.hideLoader();
+                            this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
+                        }, 5000);
+                    }
+                }
             }, 200);
         },
     },
     mounted: async function() {
-        this.showLoader('Подключение к серверу');
+        
         // команда выхода из чата
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_EXIT, command: () => {
             this.$router.push(ROUTING.OUT_PAGE);
         }});
+        // команда отображает настройки профиля
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SETTINGS, command: () => this.showModal(userSettingsComponent)});
+        // команда закрывает любое всплывающее окно (настройки/профиль/etc)
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL, command: this.hideModal});
         // добавление и удаление юзера из списка онлайн
         // this.registerCommand({commandName: CHAT_COMMANDS.USER_ENTER, command: (data) => this.addUser(data)});
         // this.registerCommand({commandName: CHAT_COMMANDS.USER_EXIT, command: (id) => this.removeUser(id)});
 
-        if(this.hubConnection === undefined) {
-            // создаём подключение
-            this.setConnection(this.createConnection());
-            // регистрируем команды
-            this.registerAction({ name: CHAT_COMMANDS.RECEIVE_MESSAGE, command: (data) => 
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, payload: data}) });                         // вывод сообщения
-            this.registerAction({ name: CHAT_COMMANDS.USER_ENTER, command: (data) => this.addUser(data) });             // добавление юзера в список онлайна
-            this.registerAction({ name: CHAT_COMMANDS.USER_EXIT, command: (id) => this.removeUser(id) });               // удаление юзера из списка онлайн
+        
+        let connectedResult = await this.startConnection();
+        if(connectedResult) {
+            this.startLoadingUsers();
+        } else {
+            this.showText('Не удалось подключиться к серверу...');
+            setTimeout(() => {
+                this.hideLoader();
+                this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
+            }, 5000);
         }
-        // подключаемся к серверу
-        await this.connectToHub();
-        this.hideLoader();
-        this.$watch('isConnected', this.changeConnectionState);
-        this.startLoadingUsers();
     },
     beforeDestroy: function() {
         this.closeConnection();
         this.deleteCommand(CHAT_COMMANDS.ACTION_EXIT);
+        this.deleteCommand(CHAT_COMMANDS.ACTION_SHOW_SETTINGS);
         // this.deleteCommand(CHAT_COMMANDS.USER_ENTER);
         // this.deleteCommand(CHAT_COMMANDS.USER_EXIT);
     }

@@ -14,19 +14,21 @@ export default new Vuex.Store({
         loader: {
             show: false,
             text: '',
+            showIcon: false,
         }
     },
     getters: {
-        isLoading: state => {
-            return state.loader.show;
-        },
-        loaderText: state => {
-            return state.loader.text;
-        }
+        loader: state => state.loader,
     },
     mutations: {
         showLoader: (state, message) => {
             state.loader.text = message;
+            state.loader.showIcon = true;
+            state.loader.show = true;
+        },
+        showText: (state, text) => {
+            state.loader.text = text;
+            state.loader.showIcon = false;
             state.loader.show = true;
         },
         hideLoader: state => {

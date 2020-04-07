@@ -101,10 +101,7 @@ export default {
         },
         relogin: async context => {
             await context.dispatch('auth', {method: 'get', payload: {}});
-        },
-        serverIsAvalible: () => {
-            return HTTP.get(API_URL.PING);
-        },
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 <template functional>
     <div id="loaderView" >
         <div>
-            <img src="/icons/loading.svg" alt="loading..." width="48" height="48" /><br />
+            <div v-if="props.showIcon"><magic-circle animated /></div>
             <slot />
         </div>
     </div>
@@ -10,6 +10,12 @@
 <script>
 export default {
     name: "LoaderView",
+    props: {
+        showIcon: {
+            type: Boolean,
+            default: false,
+        }
+    }
 }
 </script>
 
@@ -25,14 +31,19 @@ export default {
         width: 100%;
         height: 100%;
         background-color: mix(@body-background-color, rgba(0,0,0,0), 85%);
+        color: @gold;
         & > div {
             display: inline-block;
             font-family: @label-font;
-            color: @system-font-color;
-            text-align: center;
-            img {
+            color: inherit;
+            svg {
+                width: 6rem;
                 margin: 10px;
+                display: inline-block;
             }
+        }
+        div {
+            text-align: center;
         }
     }
 </style>

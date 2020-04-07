@@ -1,6 +1,7 @@
 <template>
     <ul class="chatNavMenu">
         <li v-if="isAdmin"><a @click.prevent="showConsole">Cmd</a></li>
+        <li><a @click.prevent="showSettings">Настройки</a></li>
         <li><a @click.prevent="exit">Выйти</a></li>
     </ul>
 </template>
@@ -27,8 +28,7 @@ export default {
     name: "ChatNavMenu",
     computed: {
         isAdmin: function(){
-            let role = this.$store.getters['auth/role'];
-            return role == ROLES.ADMIN;
+            return this.$store.getters['auth/role'] == ROLES.ADMIN;
         },
     },
     methods: {
@@ -39,6 +39,9 @@ export default {
             if(this.isAdmin) {
                 this.$store.commit('chat/showInteractive', adminConsole);
             }
+        },
+        showSettings: function() {
+            this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SETTINGS});
         },
         exit: function() {
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});

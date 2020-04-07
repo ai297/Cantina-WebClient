@@ -3,13 +3,13 @@
         <div class="msgField">
             <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
                 @keypress.enter.prevent="submit" @keydown="checkLength" @keyup="updateCursorPosition"
-                @paste.prevent="pasteFilter" @input="fieldInput"></div>
+                @paste.prevent="pasteFilter" @input="fieldInput" ></div>
             <button id="smileIcon" @click="showSmiles" title="Смайлики"><div><cantina-icons iconName="smile" /></div></button>
             <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
                 <div><cantina-icons iconName="chat" class="submitIcon" /></div>
             </button>
         </div>
-        <p>Message Type: {{messageType}} / Message Text: {{messageString}} (cp: {{cursorPosition}} / {{messageTextLength}})</p>
+        <p v-if="false">Message Type: {{messageType}} / Message Text: {{messageString}} (cp: {{cursorPosition}} / {{messageTextLength}})</p>
     </div>
 </template>
 
@@ -199,7 +199,7 @@ export default {
             // составляем список получателей
             let recipients = [];
             for(let ui in this.usersInOnline) {
-                if(this.isMessageStringContainsUsername(this.usersInOnline[ui].name)) recipients.push(this.usersInOnline[ui].id);
+                if(this.isMessageStringContainsUsername(this.usersInOnline[ui].name)) recipients.push(this.usersInOnline[ui].userId);
             }
 
             let messageRequest = {

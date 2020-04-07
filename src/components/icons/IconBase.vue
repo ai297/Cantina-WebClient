@@ -8,12 +8,9 @@
 
 <script>
 import iconSmile from './IconSmile.vue';
-import iconLogout from './IconLogout.vue';
 import iconChat from './IconChat.vue';
 import iconGear from './IconGear.vue';
 import iconPeople from './IconPeople.vue';
-import iconIgnore from './IconIgnore.vue';
-import iconClaim from './IconClaim.vue';
 import iconPiramid from './IconPiramid.vue';
 import iconMaximize from './IconMaximize.vue';
 
@@ -23,12 +20,9 @@ export default {
         return {
             icons: {
                 "smile": iconSmile,
-                "logOut": iconLogout,
                 "chat": iconChat,
                 "gear": iconGear,
                 "people": iconPeople,
-                "ignore": iconIgnore,
-                "claim": iconClaim,
                 "piramid": iconPiramid,
                 "maximize": iconMaximize,
             }
@@ -42,3 +36,11 @@ export default {
     }
 }
 </script>
+
+<style lang="less" scoped>
+    svg {
+        display: inline-block;
+        width: 1em;
+        vertical-align: bottom;
+    }
+</style>
