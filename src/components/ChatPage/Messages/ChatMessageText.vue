@@ -4,44 +4,56 @@ import messageToUserLink from './ChatMessageUserLink.vue';
 
 export default {
     name: "MessageText",
+    //functional: true,
     render: function(createElement) {
-        if(!this.message.hasOwnProperty('text')) return false;
+        //let message = context.props.message;
+        let message = this.message;
+        if(message === undefined || !message.hasOwnProperty('text')) return false;
         let VNodes = [];                // массив всех дочерних узлов в сообщении
-        let varsPattern = /<(\d)>/;     // шаблон для поиска в тексте сообщения переменных вида <x>
+        // шаблон находит xml теги
+        let pattern = /<(?<tag>\w+)(?:\s\/)?>((?<value>[^</>]+)<\/\1>)?/i;
+        let userLinkMessageType = (message.type === MESSAGE_TYPES.Privat) ? message.type : MESSAGE_TYPES.Base;
 
-        // рекурсивная функция поиска переменных в тексте сообщения
-        let replacer = (text) => {
-            var match = text.match(varsPattern);
-            if(match == null) VNodes.push(text);
-            else {
-                VNodes.push(text.substring(0, match.index));
-                // Переменную <0> - меняем на имя автора сообщения
-                let linkMessageType;
-                if(this.message.type == MESSAGE_TYPES.Base.name ||
-                this.message.type == MESSAGE_TYPES.Privat.name) {
-                    linkMessageType = this.message.type;
-                } else linkMessageType = MESSAGE_TYPES.Base.name;
-                
-                if(match[1] == 0) VNodes.push(createElement(messageToUserLink, {
-                    props: {
-                        nickname: this.message.authorName,
-                        messageType: linkMessageType
-                    },
-                }));
-                else VNodes.push(match[0]);
-                
-                let nextIndex = match.index + match[0].length;
-                if(nextIndex < text.length) {
-                    replacer(text.substring(nextIndex));
-                } else VNodes.push(text.substring(nextIndex));
+        // перебираем строку сообщения, заменяем известные теги на компоненты, неизвестные вставляем как простой текст
+        // при этом сперва вставляем строку до совпадения с шаблоном как текстовую ноду
+        // далее обрабатываем совпадение с шаблоном
+        // и повторяем всё с начала для части строки после совпадения с шаблоном
+        let match = message.text.match(pattern);
+        while(match !== null) {
+            VNodes.push(message.text.substring(0, match.index));
+            switch(match.groups.tag.toLowerCase()) {
+                case "author":
+                    VNodes.push(createElement(messageToUserLink, {
+                        props: {
+                            nickname: message.authorName,
+                            messageType: userLinkMessageType,
+                        },
+                    }
+                    ));
+                    break;
+                case "user":
+                    VNodes.push(createElement(messageToUserLink, {
+                        props: {
+                            nickname: match.groups.value,
+                            messageType: userLinkMessageType
+                        },
+                    }
+                    ));
+                    break;
             }
+            message.text = message.text.substring(match.index + match[0].length);
+            match = message.text.match(pattern);
         }
-        replacer(this.message.text);
 
+        VNodes.push(message.text);
+        
         return createElement('span', VNodes);
     },
     props: {
-        message: Object
+        message: {
+            type: Object,
+            default: undefined
+        }
     }
 }
 </script>

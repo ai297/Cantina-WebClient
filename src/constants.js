@@ -7,10 +7,16 @@ export const VALIDATION_PATTERNS = {
 }
 
 export const MESSAGE_TYPES = {
-    Base: {num: 10, name: 'Base', command: '', shortCommand: ''},
-    System: {num: 0, name: 'System', command: 'system', shortCommand: '~'},
-    Privat: {num: 30, name: 'Privat', command: 'pm', shortCommand: '@'},
-    ThirdPerson: {num: 20, name: 'ThirdPerson', command: 'me', shortCommand: '*'},
+    Base: 0,
+    Privat: 20,
+    ThirdPerson: 30,
+    System: 100,
+    TYPES: {
+        0: { name: 'Base', command: '', shortCommand: ''},
+        20: { name: 'Privat', command: 'pm', shortCommand: '@'},
+        30: { name: 'ThirdPerson', command: 'me', shortCommand: '*'},
+        100: { name: 'System', command: 'system', shortCommand: '~'},
+    },
 }
 
 export const ROUTING = {

@@ -13,8 +13,8 @@ export default {
             default: '',
         },
         messageType: {
-            type: String,
-            default: MESSAGE_TYPES.Base.name,
+            type: Number,
+            default: MESSAGE_TYPES.Base,
         },
     },
     methods: {

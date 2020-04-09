@@ -33,7 +33,7 @@ export default {
     },
     data: function() {
         return {
-            privatMessageType: MESSAGE_TYPES.Privat.name,
+            privatMessageType: MESSAGE_TYPES.Privat,
         }
     },
     methods: {
@@ -68,11 +68,11 @@ export default {
                 width: 1.8rem;
                 height: 1.8rem;
                 position: relative;
-                border: @ui-border-width+@base-border-width solid @grey;
+                border: @ui-border-width+@base-border-width solid currentColor;
                 border-radius: 1rem;
                 margin-left: 1px;
                 background: radial-gradient(@dark-red, @body-background-color);
-                color: @body-background-color;
+                color: inherit;
                 cursor: pointer;
                 &:hover {
                     border-color:@gold;
@@ -135,7 +135,7 @@ export default {
                 color: inherit;
                 font-size: @input-fontsize;
                 &:hover {
-                    color: @blue;
+                    color: @red;
                 }
             }
         }
@@ -166,7 +166,18 @@ export default {
                 }
             }
         }
+        &.currentUser {
+            .userMenu {
+                display: none;
+            }
+            .avatarSection {
+                color: @dark-red;
+            }
+        }
         &:hover {
+            .userName {
+                color: @blue;
+            }
             .userMenu {
                 width: 2.5rem;
                 padding: 0 @base-padding*2;
@@ -177,9 +188,6 @@ export default {
             }
             .avatarSection {
                 color: @blue;
-            }
-            .avatarWrapper {
-                border-color: @blue;
             }
         }
     }

@@ -16,7 +16,7 @@
 </template>
 
 <script>
-const MAX_ITERATIONS = 3;
+const MAX_ITERATIONS = 4;
 
 import { mapGetters, mapActions, mapMutations } from 'vuex';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
@@ -142,7 +142,7 @@ export default {
         },
         // Метод пытается загрузить список юзеров онлайн
         startLoadingUsers: function() {
-            this.showLoader(`Получение списка онлайна...`);
+            this.showLoader('Получение списка онлайна...');
             setTimeout(async () => {
                 let isLoadUsers = await this.loadOnlineUsers();
                 if(isLoadUsers > 0) this.hideLoader();
@@ -154,16 +154,17 @@ export default {
                         setTimeout(() => {
                             this.hideLoader();
                             this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
-                        }, 5000);
+                        }, 2000);
                     }
                 }
-            }, 200);
+            }, 600);
         },
     },
     mounted: async function() {
         
         // команда выхода из чата
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_EXIT, command: () => {
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_EXIT, command: async () => {
+            await this.$store.dispatch('connection/send', { command: CHAT_COMMANDS.ACTION_EXIT });
             this.$router.push(ROUTING.OUT_PAGE);
         }});
         // команда отображает настройки профиля
@@ -177,6 +178,7 @@ export default {
         
         let connectedResult = await this.startConnection();
         if(connectedResult) {
+            this.loadingOnlineUsersIterations = 0;
             this.startLoadingUsers();
         } else {
             this.showText('Не удалось подключиться к серверу...');

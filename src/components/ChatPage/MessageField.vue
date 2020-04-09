@@ -2,7 +2,7 @@
     <div>
         <div class="msgField">
             <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
-                @keypress.enter.prevent="submit" @keydown="checkLength" @keyup="updateCursorPosition"
+                @keypress.enter.prevent="submit" @keydown="checkLength"
                 @paste.prevent="pasteFilter" @input="fieldInput" ></div>
             <button id="smileIcon" @click="showSmiles" title="Смайлики"><div><cantina-icons iconName="smile" /></div></button>
             <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
@@ -38,7 +38,6 @@ export default {
         return {
             messageString: '',
             messageTextLength: 0,
-            messageType: MESSAGE_TYPES.Base.name,
             cursorPosition: 0,
             disable: false,
         }
@@ -56,12 +55,16 @@ export default {
             registerCommand: 'commands/registerCommand',
             deleteCommand: 'commands/deleteCommand',
         }),
+
+
         // событие onInput на поле ввода
         fieldInput: function() {
             this.updateMessageString(this.$refs['m-field'].innerHTML);
             this.updateCursorPosition();
             this.fieldUpdate();
         },
+
+
         // обновление html в поле ввода
         fieldUpdate: function() {
             this.$refs['m-field'].innerHTML = this.messageString;
@@ -69,29 +72,48 @@ export default {
             this.setCursorPosition(this.cursorPosition);
             this.messageTextLength = this.$refs['m-field'].innerText.length;
         },
+
+
         // обновление содержимого строки сообщения
         updateMessageString: function(newString) {
             newString = newString.replace(/<br>/g, " ");                // удаляем тег <br> (автоматом вставляется в edge например)
-            //newString = newString.replace(/(&nbsp;)+(?!$)/g, "");       // удаляем сущности &nbsp; кроме одной в конце строки
-            newString = newString.replace(/\s+/g, " ");                 // удаляем повторяющиеся пробелы
-            // авто распознавание типов сообщений
-            this.messageType = MESSAGE_TYPES.Base.name;
-            for(let type in MESSAGE_TYPES){
-                if(type != MESSAGE_TYPES.Base.name) {
-                    let commandPattern = new RegExp('^['+MESSAGE_TYPES[type].shortCommand+']|(\\/'+MESSAGE_TYPES[type].command+'\\s+)', 'i');
-                    if(newString.match(commandPattern) !== null) {
-                        this.messageType = MESSAGE_TYPES[type].name;
+            // удаляем тег user, если внутри него не имя одного из присутствующих юзеров
+            newString = newString.replace(/<user>([^<]*)<\/user>/g, (match, val) => {
+                for(let ui in this.usersInOnline) {
+                    if(this.usersInOnline[ui].name == val) return match;
+                }
+                return val;
+            });
+            
+            // распознавание ручного ввода имени юзера
+            let handWritedNamePattern = new RegExp(
+                '^((?:@)|(?:\\/pm\\s))?([a-zа-я]{2,11}\\s?[a-zа-я0-9]{2,11}),',
+                'i'
+                );
+            newString = newString.replace(handWritedNamePattern, (replace, cmd, name) => {
+                for(let ui in this.usersInOnline) {
+                    if(this.usersInOnline[ui].name == name) {
+                        replace = `<user>${name}</user>,`;
                         break;
                     }
                 }
-            }
+                if(cmd !== undefined) {
+                    replace = cmd + replace;
+                }
+                return replace;
+            });
+            
             this.messageString = newString;
         },
+
+
         clearMessageString: function() {
             this.messageString = "";
             this.cursorPosition = 0;
             this.fieldUpdate();
         },
+
+
         // проверяем максимальную длину сообщения и если превышена - игнорируем нажатия любых клавиш, кроме указанных
         checkLength: function(e) {
             if(this.disable) {
@@ -105,6 +127,8 @@ export default {
                 e.preventDefault();
             }
         },
+
+
         // позиция курсора в поле ввода
         updateCursorPosition: function() {
             var field = this.$refs['m-field'];
@@ -117,10 +141,13 @@ export default {
             result = (result < field.innerText.length)?result:field.innerText.length;
             this.cursorPosition = result;
         },
+
+
         //установка новой позиции курсора
         setCursorPosition: function(position) {
             this.$refs['m-field'].focus();
             let child = this.$refs['m-field'].firstChild;
+            position = (position > this.$refs['m-field'].innerText.length) ? this.$refs['m-field'].innerText.length : position;
             while(position > 0) {
                 let length = child.textContent.length;
                 if(position > length) {
@@ -133,40 +160,47 @@ export default {
                 }
             }
         },
+
+
         // // упоминается ли юзернейм в строке ввода сообщения
         isMessageStringContainsUsername: function(userName) {
-            let userNameRegex = new RegExp('(?:^|[^a-zA-Zа-яА-Я0-9]+)(?:' + userName + ')(?:[^a-zA-Zа-яА-Я0-9]+|$)');
+            let userNameRegex = new RegExp('(?:<user>)(?:' + userName + ')(?:</user>)');
             return this.messageString.match(userNameRegex) !== null;
         },
+
+
         // добавить юзернейм в строку ввода сообщения
         addNicknameToMessageString: function(payload) {
             if(!payload.hasOwnProperty('userName')) return false;
-            if(this.isMessageStringContainsUsername(payload.userName)) {
-                this.focus();
-                return;
-            }
-            let insert = payload.userName;
-            let oldMessageString = this.messageString;
-            if(this.messageTextLength > 0) insert+=', ';
-            else insert+=',&nbsp;';
             
-            if(!payload.messageType) payload.messageType = MESSAGE_TYPES.Base.name;
-            // удаляем из строки сообщения команду-указатель на тип сообщения
-            if(this.messageType != MESSAGE_TYPES.Base.name) {
-                let commandPattern = new RegExp('^[' + MESSAGE_TYPES[this.messageType].shortCommand +
-                    ']|(\\/' + MESSAGE_TYPES[this.messageType].command+'\\s+)', 'i');
-                oldMessageString = oldMessageString.replace(commandPattern, '');
+            let insert = '';
+            // если в строке сообщения нещё нет ника юзера - вставляем
+            if(!this.isMessageStringContainsUsername(payload.userName)) {
+                insert = "<user>"+payload.userName+"</user>";
+                if(this.messageTextLength > 0) insert+=', ';
+                else insert+=',&nbsp;';
             }
-            // формируем новую строку сообщения с включенным новым указателем на тип сообщения
-            insert = MESSAGE_TYPES[payload.messageType].shortCommand + insert + oldMessageString;
+            
+            // меняем тип сообщения на новый
+            // для этого сначала удаляем из строки сообщения указатель на старый тип сообщения
+            // и потом формируем строку сообщения с указателем на новый тип сообщения
+            if(!payload.hasOwnProperty('messageType')) payload.messageType = MESSAGE_TYPES.Base;
+            let currentMessageType = this.calculateMessageType();
+            let newMessageString = this.messageString.substring(currentMessageType.command.length);
+            insert = MESSAGE_TYPES.TYPES[payload.messageType].shortCommand + insert + newMessageString;
+
             this.updateMessageString(insert);
             this.fieldUpdate();
             this.focus();
         },
+
+
         // метод для фокуссировки на поле ввода (переводит курсор в конец)
         focus: function() {
             this.setCursorPosition(this.messageTextLength);
         },
+
+
         // обрабатывает вставку из буфера (запретить разметку, только текст)
         pasteFilter(e) {
             let text = '';
@@ -185,41 +219,59 @@ export default {
             }
         },
 
+
         // кнопка смайлика
         showSmiles: function() {
             this.$emit('showSmiles');
             this.focus();
         },
+
+
+        // метод вычисляет тип сообщения и указатель, которым этот тип создаётся (для последующей замены)
+        calculateMessageType: function() {
+            let pattern = '^';
+            for(let type in MESSAGE_TYPES.TYPES) {
+                if(type != MESSAGE_TYPES.Base) {
+                    pattern += '(?<' + MESSAGE_TYPES.TYPES[type].name + '>(?:[' + MESSAGE_TYPES.TYPES[type].shortCommand + '])|(?:\\/' + MESSAGE_TYPES.TYPES[type].command + '\\s))|';
+                }
+            }
+            pattern += '(?<' + MESSAGE_TYPES.TYPES[MESSAGE_TYPES.Base].name + '>\\s?)';
+            pattern = new RegExp(pattern, 'i');
+
+            let match = this.messageString.match(pattern);
+            if(match !== null) {
+                for(let typeName in match.groups) {
+                    if(match.groups[typeName] !== undefined) return {type: MESSAGE_TYPES[typeName], command: match.groups[typeName]};
+                }
+            }
+            return {type: MESSAGE_TYPES.Base, command: ''};
+        },
+
+
         // кнопка отправки сообщения
         submit: async function(){
-            if(this.messageTextLength < 3) {
+            if(this.messageTextLength < 2) {
                 this.focus();
                 return;
             }
             // составляем список получателей
             let recipients = [];
             for(let ui in this.usersInOnline) {
-                if(this.isMessageStringContainsUsername(this.usersInOnline[ui].name)) recipients.push(this.usersInOnline[ui].userId);
+                if(this.isMessageStringContainsUsername(this.usersInOnline[ui].name)) {
+                    recipients.push(this.usersInOnline[ui].userId);
+                }
             }
+
+            // определяем тип сообщения
+            // и удаляем из текста указатель на тип сообщения
+            let messageType = this.calculateMessageType();
 
             let messageRequest = {
-                text: this.messageString.replace(/(&nbsp;)/ig, '').trim(),
-                messageType: MESSAGE_TYPES[this.messageType].num,
-                recipients: recipients
+                text: this.messageString.substring(messageType.command.length).replace(/(&nbsp;)/ig, '').trim(),
+                recipients: recipients,
+                messageType: messageType.type
             }
-
-            // удаляем из текста указатель на тип сообщения
-            if(this.messageType != MESSAGE_TYPES.Base.name) {
-                let commandsPattern;
-                for(let messageType in MESSAGE_TYPES) {
-                    if(MESSAGE_TYPES[messageType].name != MESSAGE_TYPES.Base.name) {
-                        if(!commandsPattern) commandsPattern = '^';
-                        else commandsPattern += '|';
-                        commandsPattern += '(['+MESSAGE_TYPES[messageType].shortCommand+']|(\\/'+MESSAGE_TYPES[messageType].command+'\\s+))';
-                    }
-                }
-                messageRequest.text = messageRequest.text.replace(new RegExp(commandsPattern, 'ig'), '');
-            }
+            
 
             // отправка на сервер
             this.$refs['m-field'].innerHTML="Отправка...";
@@ -280,6 +332,11 @@ export default {
             cursor: text;
             &:focus {
                 outline: none;
+            }
+            user {
+                font-weight: bold;
+                font-style: italic;
+                color: @green;
             }
         }
         button {

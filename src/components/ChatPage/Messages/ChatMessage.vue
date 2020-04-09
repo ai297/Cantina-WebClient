@@ -34,18 +34,16 @@ export default {
             else if(this.message.recipients == this.currentUserId) return true;
             return false;
         },
-        messageType: function() {
-            if(this.message.hasOwnProperty('type') && MESSAGE_TYPES.hasOwnProperty(this.message.type)) {
-                return MESSAGE_TYPES[this.message.type].name;
-            } else return MESSAGE_TYPES.Base.name;
-        },
         linkMessageType: function() {
-            if(this.messageType == MESSAGE_TYPES.Privat.name ||
-            this.messageType == MESSAGE_TYPES.Base.name) return this.messageType;
-            else return MESSAGE_TYPES.Base.name;
+            if(this.message.hasOwnProperty('type') && ( this.message.type === MESSAGE_TYPES.Base ||
+            this.message.type === MESSAGE_TYPES.Privat)) return this.message.type;
+            else return MESSAGE_TYPES.Base;
         },
         messageTypeClass: function() {
-            let msgClass = this.messageType + '-message';
+            let msgClass = '-message';
+            if(this.message.hasOwnProperty('type')) {
+                msgClass = MESSAGE_TYPES.TYPES[this.message.type].name + msgClass;
+            } else msgClass =  MESSAGE_TYPES.Base + msgClass;
             if(this.isPersonal) msgClass += ' personal';
             return msgClass;
         },
