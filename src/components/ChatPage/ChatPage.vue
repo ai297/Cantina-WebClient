@@ -1,15 +1,20 @@
 <template>
     <div id="chat" :class="{ limitedWidth: isLimitedWidth }">
-        <!-- Основной блок -->
-        <chat-main id="chatMain" v-if="isConnected" />
-        <!-- Боковой блок -->
-        <chat-aside id="chatAside" :class="{minimize: !isShowSidebar}" v-if="isConnected" />
-        <!-- форма отправки сообщения -->
-        <send-message-form id="sendingForm" v-if="isConnected" />
-        <!-- Менюшка навигации -->
-        <chat-nav-menu id="chatNavMenu" />
+        <div class="firstLine">
+            <!-- Основной блок -->
+            <chat-main id="chatMain" v-if="isConnected" />
+            <!-- Боковой блок -->
+            <chat-aside id="chatAside" :class="{minimize: !isShowSidebar}" v-if="isConnected" />
+        </div>
+        <div class="secondLine">
+            <!-- форма отправки сообщения -->
+            <send-message-form id="sendingForm" v-if="isConnected" />
+            <!-- Менюшка навигации -->
+            <chat-nav-menu id="chatNavMenu" />
+        </div>
         <!-- Подвал -->
         <chat-footer id="chatFooter" />
+
         <!-- Модальное окно -->
         <component v-if="isShowModal" :is="modalComponent" />
     </div>
@@ -200,55 +205,58 @@ export default {
 
 <style lang="less">
     @import "../../less/vars.less";
+    @double-border: @base-border-width*2;
 
     #chat {
-        display: grid;
-        left: 0;
-        top: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;;
         width: calc(100% - 50px);
         max-width: 100%;
-        height: calc(100vh - 2px);
+        height: calc(100vh - @double-border);
         overflow: hidden;
         padding: 0 10px;
         padding-bottom: 0;
         cursor: default;
-        grid-template-columns: 1fr auto;
-        grid-template-rows: 1fr auto auto auto;
         transition: max-width .5s;
         &.limitedWidth {
             max-width: 85rem;
         }
 
-        #chatMain {
-            grid-row: 1;
-            grid-column: 1;
-        }
-        #sendingForm {
-            grid-row: 2;
-            grid-column-start: 1;
-            grid-column-end: 3;
-        }
-        #chatAside {
-            grid-row: 1;
-            grid-column: 2;
-            width: 22vw;
-            min-width: 16.5rem;
-            max-width: 20rem;
-            transition: all .5s;
-            &.minimize {
-                min-width: 0rem;
-                width: 0vw;
+        .firstLine {
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: 0;
+            display: flex;
+            flex-direction: row;
+            height: 10rem;
+
+            #chatMain {
+                flex-grow: 1;
+                min-width: 25rem;;
+            }
+            #chatAside {
+                flex-grow: 0;
+                width: 22vw;
+                min-width: 16.5rem;
+                max-width: 20rem;
+                transition: all .5s;
+                &.minimize {
+                    min-width: 0rem;
+                    width: 0vw;
+                }
             }
         }
-        #chatNavMenu {
-            grid-row: 3;
-            grid-column-start: 1;
-            grid-column-end: 3;
+        .secondLine {
+            flex-grow: 0;
+            flex-shrink: 0;
+            flex-basis: content;
         }
         #chatFooter {
-            grid-row: 4;
-            grid-column-start: 1;
-            grid-column-end: 3;
+            flex-grow: 0;
+            flex-shrink: 1;
+            flex-basis: content;
         }
+        
     }
 </style>

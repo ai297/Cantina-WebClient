@@ -48,18 +48,7 @@ html {
   font-size: @base-fontsize;
   color: @base-font-color;
 }
-body {
-    background-color: @body-background-color;
-    background-image: url("/images/milkyway.jpg");
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    width: 100%;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-}
+
 a, button, input[type="button"], input[type="submit"] {
   cursor: pointer;
 }
@@ -102,6 +91,7 @@ button {
   color: inherit;
   div {
     font: inherit;
+    line-height: 1em;
   }
   &:focus {
     outline: none;

@@ -9,18 +9,19 @@ export default {
         //let message = context.props.message;
         let message = this.message;
         if(message === undefined || !message.hasOwnProperty('text')) return false;
+        let text = message.text;
         let VNodes = [];                // массив всех дочерних узлов в сообщении
         // шаблон находит xml теги
-        let pattern = /<(?<tag>\w+)(?:\s\/)?>((?<value>[^</>]+)<\/\1>)?/i;
+        let pattern = /<(?<tag>\w+)((?:\s\/>)|(>(?<value>[^<]+)<\/\1>))/i;
         let userLinkMessageType = (message.type === MESSAGE_TYPES.Privat) ? message.type : MESSAGE_TYPES.Base;
 
         // перебираем строку сообщения, заменяем известные теги на компоненты, неизвестные вставляем как простой текст
         // при этом сперва вставляем строку до совпадения с шаблоном как текстовую ноду
         // далее обрабатываем совпадение с шаблоном
         // и повторяем всё с начала для части строки после совпадения с шаблоном
-        let match = message.text.match(pattern);
+        let match = text.match(pattern);
         while(match !== null) {
-            VNodes.push(message.text.substring(0, match.index));
+            VNodes.push(text.substring(0, match.index));
             switch(match.groups.tag.toLowerCase()) {
                 case "author":
                     VNodes.push(createElement(messageToUserLink, {
@@ -40,12 +41,14 @@ export default {
                     }
                     ));
                     break;
+                default:
+                    VNodes.push(match.groups.value);
             }
-            message.text = message.text.substring(match.index + match[0].length);
-            match = message.text.match(pattern);
+            text = text.substring(match.index + match[0].length);
+            match = text.match(pattern);
         }
 
-        VNodes.push(message.text);
+        VNodes.push(text);
         
         return createElement('span', VNodes);
     },

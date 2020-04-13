@@ -1,11 +1,13 @@
 <template>
     <div class="sndMForm">
         <div id="nameBlock"><p>{{currentUserName}}:</p></div>
-        <message-field id="messageField" @showSmiles="showSmiles" />
+        <div id="messageField">
+            <message-field />
+            <div id="extendPanel" v-show="isShowExtendPanel">тест тест тест</div>
+        </div>
         <div id="extendButtons">
             <button @click="changeWidth"><div><cantina-icons iconName="maximize" /></div></button>
         </div>
-        <div id="extendPanel" v-show="isShowExtendPanel"></div>
     </div>
 </template>
 
@@ -30,9 +32,6 @@ export default {
             showExtend: 'chat/showExtendPanel',
             changeWidth: 'chat/changeWidth',
         }),
-        showSmiles: function() {
-            this.showExtend({});
-        }
     },
 }
 </script>
@@ -42,16 +41,20 @@ export default {
 
 
     div.sndMForm {
-        display: grid;
+        display: flex;
         width: 100%;
         margin-top: @base-padding;
-        grid-template-columns: minmax(6rem, auto) minmax(400px, 1fr) minmax(6rem, auto);
+        align-items: flex-start;
 
         #nameBlock {
-            grid-column: 1;
             color: @gold;
-            display: flex;
-            vertical-align: middle;
+            display: inline-block;
+            flex-grow: 0;
+            flex-shrink: 0;
+            max-width: 10rem;
+            min-width: 8rem;
+            flex-basis: auto;
+            padding-right: @base-padding*2;
             p {
                 width: 100%;
                 text-align: right;
@@ -59,18 +62,18 @@ export default {
                 white-space: nowrap;
                 overflow: hidden;
                 line-height: @input-fontsize * 1.4;
-                &::after {
-                    display: inline-block;
-                    content: '';
-                    width: @base-padding * 2;
-                }
             }
         }
         #messageField {
-            grid-column: 2;
+            flex-grow: 1;
+            flex-shrink: 1;
         }
         #extendButtons {
-            grid-column: 3;
+            flex-grow: 0;
+            flex-shrink: 0;
+            flex-basis: auto;
+            min-width: 8rem;
+            line-height: @input-fontsize * 1.4;
             button {
                 display: inline-block;
                 line-height: @input-fontsize * 1.4;
@@ -88,9 +91,8 @@ export default {
             }
         }
         #extendPanel {
-            grid-column-start: 1;
-            grid-column-end: 4;
             text-align: center;
+            background-color: brown;
         }
 
         .selection {

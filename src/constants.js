@@ -8,13 +8,13 @@ export const VALIDATION_PATTERNS = {
 
 export const MESSAGE_TYPES = {
     Base: 0,
-    Privat: 20,
-    ThirdPerson: 30,
+    Privat: 10,
+    ThirdPerson: 20,
     System: 100,
     TYPES: {
         0: { name: 'Base', command: '', shortCommand: ''},
-        20: { name: 'Privat', command: 'pm', shortCommand: '@'},
-        30: { name: 'ThirdPerson', command: 'me', shortCommand: '*'},
+        10: { name: 'Privat', command: 'pm', shortCommand: '@'},
+        20: { name: 'ThirdPerson', command: 'me', shortCommand: '*'},
         100: { name: 'System', command: 'system', shortCommand: '~'},
     },
 }
@@ -25,7 +25,7 @@ export const ROUTING = {
 } 
 
 export const API_URL = {
-    ROOT: 'http://localhost:5000/',
+    ROOT: 'http://192.168.43.193:5000/',
     LOGIN: 'auth',
     REGISTER: 'register',
     ACTIVATION: 'activation',

@@ -5,8 +5,6 @@
             <div class="avatarWrapper" @click="showProfile" :title="`Смотреть профиль ${user.name}`">
                 <div><img src="../../../assets/user.gif" :alt="user.name" width="100%" height="100%" /></div>
             </div>
-            <!--<div class="onlineStatus">▲</div>-->
-            <!--<div class="gender">♂</div>-->
         </div>
         <div class="userName">
             <message-to-user-link :nickname="user.name" title="Написать сообщение" />
@@ -46,7 +44,6 @@ export default {
 
 <style lang="less">
     @import "../../../less/vars.less";
-    @userAvatarInOnlineList-size: 2.5rem;
 
     div.userInOnlineList {
         display: flex;
@@ -55,29 +52,33 @@ export default {
         margin: @base-padding;
         //overflow: hidden;
         .avatarSection {
-            width: 3.2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 3rem;
+            height: 1.6rem + @base-padding;
+            display: block;
             z-index: 20;
             color: @grey;
             position: relative;
             flex-shrink: 0;
             //background-color: @body-background-color;
+            .magic-circle {
+                width: 100%;
+                height: 1.6rem;
+                position: absolute;
+                top: @base-padding/2;
+            }
             .avatarWrapper {
-                width: 1.8rem;
-                height: 1.8rem;
+                width: 1.6rem;
+                height: 1.6rem;
                 position: relative;
+                margin: auto;
                 border: @ui-border-width+@base-border-width solid currentColor;
                 border-radius: 1rem;
-                margin-left: 1px;
                 background: radial-gradient(@dark-red, @body-background-color);
                 color: inherit;
                 cursor: pointer;
                 &:hover {
                     border-color:@gold;
                 }
-
                 & > div {
                     display: flex;
                     width: 100%;
@@ -89,37 +90,6 @@ export default {
                     align-items: center;
                     justify-content: center;
                 }
-            }
-            .magic-circle {
-                width: 100%;
-                position: absolute;
-            }
-            .onlineStatus {
-                    position: absolute;
-                    left: -.45rem;
-                    background-color: @body-background-color;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: .8rem;
-                    height: .8rem;
-                    border: @ui-border-width solid @blue;
-                    border-radius: .5rem;
-                    overflow: hidden;
-                    font-size: .5rem;
-                    color: @green;
-            }
-            .gender {
-                position: absolute;
-                width: .8rem;
-                height: .8rem;
-                overflow: hidden;
-                text-align: center;
-                border-radius: .5rem;
-                font-size: .8rem;
-                line-height: .7rem;
-                background-color: @blue;
-                color: black;
             }
         }
         .userName {

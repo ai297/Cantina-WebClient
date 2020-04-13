@@ -4,7 +4,7 @@
             <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
                 @keypress.enter.prevent="submit" @keydown="checkLength"
                 @paste.prevent="pasteFilter" @input="fieldInput" ></div>
-            <button id="smileIcon" @click="showSmiles" title="Смайлики"><div><cantina-icons iconName="smile" /></div></button>
+            <button class="clearButton" title="Очистить поле ввода" @click="clearMessageString"><div>✕</div></button>
             <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
                 <div><cantina-icons iconName="chat" class="submitIcon" /></div>
             </button>
@@ -40,6 +40,8 @@ export default {
             messageTextLength: 0,
             cursorPosition: 0,
             disable: false,
+            messageTypes: [],
+            messageTypesRegEx: null,
         }
     },
     computed: {
@@ -220,28 +222,12 @@ export default {
         },
 
 
-        // кнопка смайлика
-        showSmiles: function() {
-            this.$emit('showSmiles');
-            this.focus();
-        },
-
-
         // метод вычисляет тип сообщения и указатель, которым этот тип создаётся (для последующей замены)
         calculateMessageType: function() {
-            let pattern = '^';
-            for(let type in MESSAGE_TYPES.TYPES) {
-                if(type != MESSAGE_TYPES.Base) {
-                    pattern += '(?<' + MESSAGE_TYPES.TYPES[type].name + '>(?:[' + MESSAGE_TYPES.TYPES[type].shortCommand + '])|(?:\\/' + MESSAGE_TYPES.TYPES[type].command + '\\s))|';
-                }
-            }
-            pattern += '(?<' + MESSAGE_TYPES.TYPES[MESSAGE_TYPES.Base].name + '>\\s?)';
-            pattern = new RegExp(pattern, 'i');
-
-            let match = this.messageString.match(pattern);
+            let match = this.messageString.match(this.messageTypesRegEx);
             if(match !== null) {
-                for(let typeName in match.groups) {
-                    if(match.groups[typeName] !== undefined) return {type: MESSAGE_TYPES[typeName], command: match.groups[typeName]};
+                for(let type = 0; type < this.messageTypes.length; type++) {
+                    if(match[type + 1] !== undefined) return {type: MESSAGE_TYPES[this.messageTypes[type]], command: match[type + 1]};
                 }
             }
             return {type: MESSAGE_TYPES.Base, command: ''};
@@ -284,6 +270,19 @@ export default {
         },
     },
     mounted: function(){
+        // регулярное выражение для определения типа сообщения
+        let pattern = '^';
+        for(let type in MESSAGE_TYPES.TYPES) {
+            if(type != MESSAGE_TYPES.Base) {
+                this.messageTypes.push(MESSAGE_TYPES.TYPES[type].name);
+                pattern += '((?:[' + MESSAGE_TYPES.TYPES[type].shortCommand + '])|(?:\\/' + MESSAGE_TYPES.TYPES[type].command + '\\s))|';
+            }
+        }
+        pattern += '(\\s?)';
+        this.messageTypes.push(MESSAGE_TYPES.TYPES[MESSAGE_TYPES.Base].name);
+        this.messageTypesRegEx = new RegExp(pattern, 'i');
+
+
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE, command: (data) => this.addNicknameToMessageString(data)});
         this.focus();
     },
@@ -297,10 +296,9 @@ export default {
 <style lang="less">
     @import "../../less/vars.less";
     @msgInput-height: @input-fontsize * 1.4;
-    @msgInput-widthSpacing: @msgInput-height * 3;
 
     .msgField {
-        display: block;
+        display: flex;
         position: relative;
         height: @msgInput-height;
         overflow: hidden;
@@ -318,10 +316,6 @@ export default {
         }
         #message-field {
             display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: calc(100% - @msgInput-widthSpacing - round(@base-padding * 2));
             white-space: nowrap;
             overflow-x: scroll;
             min-height: @msgInput-height * 2;
@@ -330,6 +324,7 @@ export default {
             font-size: @input-fontsize;
             line-height: @msgInput-height;
             cursor: text;
+            flex-grow: 1;
             &:focus {
                 outline: none;
             }
@@ -341,21 +336,13 @@ export default {
         }
         button {
             display: block;
-            position: absolute;
             background-color: inherit;
-        }
-        #smileIcon {
-            right: @msgInput-height * 2;
-            top: 0;
-            height: @msgInput-height;
-            color: inherit;
             &:hover {
                 color: @gold;
             }
         }
         button[type="submit"] {
-            top: 0;
-            right: -@base-border-width;
+            margin-right: -@base-border-width;
             border-width: @base-border-width;
             border-style:  solid;
             border-color: inherit;

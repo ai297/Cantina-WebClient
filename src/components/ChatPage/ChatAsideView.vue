@@ -36,27 +36,30 @@ export default {
     @import "../../less/vars.less";
 
     .chatAside {
-        display: grid;
-        grid-template-rows: auto auto 1fr auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
         overflow: hidden;
         #chatLogo {
+            flex-grow: 0;
             padding-top: @header2-size;
             padding-bottom: @base-padding;
             text-align: center;
-            grid-row: 1;
             .logo {
                 width: 90%;
                 display: inline-block;
             }
         }
         .asideBlockComponent {
-            grid-row: 2;
+            flex-grow: 0;
+            min-height: 8.5rem;
         }
         #asideMenu {
-            grid-row: 3;
+            flex-grow: 1;
+            flex-shrink: 0;
         }
         #asideFooter {
-            grid-row: 4;
+            flex-grow: 0;
         }
     }
 

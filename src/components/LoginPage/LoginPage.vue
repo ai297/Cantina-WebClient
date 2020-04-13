@@ -45,6 +45,6 @@ export default {
     .flyingWindow {
         transition: transform .5s ease-out;
         transform-origin: 50% 50%;
-        position: absolute;
+        position: relative;
     }
 </style>

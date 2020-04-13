@@ -54,21 +54,26 @@ export default {
     @import "../../less/vars.less";
 
     div.chatMain {
-        display: grid;
-        grid-template-rows: auto minmax(38%, 1fr);
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
         padding: @base-padding;
         background-color: @body-background-color;
         #interactive {
+            flex-basis: auto;
+            flex-grow: 0;
             display: block;
-            overflow: hidden;
+            min-height: 0rem;
+            overflow: hidden;;
         }
         #messages-list {
+            flex-grow: 1;
             display: block;
             overflow-y: scroll;
             overflow-x: hidden;
             padding: .5rem;
             border: @base-border-width solid mix(@grey, @body-background-color, 70%);
+            min-height: 40%;
             p {
                 text-align: center;
             }
