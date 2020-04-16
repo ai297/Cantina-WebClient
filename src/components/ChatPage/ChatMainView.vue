@@ -29,7 +29,8 @@ export default {
             scrollSpeed: 1,
             pageTitle: '',
             unreadMessages: 0,
-            titleUpdater: undefined
+            shortTitle: false,
+            titleUpdater: undefined,
         }
     },
     computed: {
@@ -85,9 +86,13 @@ export default {
             this.updatePageTitle();
         },
         updatePageTitle: function() {
+            console.log(this.shortTitle + " / " + this.isWindowFocused);
             if(this.unreadMessages > 0 && !this.isWindowFocused) {
-                if(document.title.match(/^\(\d+\)$/) !== null) document.title = `(${this.unreadMessages}) ${this.pageTitle}`;
+                if(this.shortTitle) document.title = `(${this.unreadMessages}) ${this.pageTitle}`;
                 else document.title = `(${this.unreadMessages})\n`;
+                this.shortTitle = !this.shortTitle;
+                clearTimeout(this.titleUpdater);
+                this.titleUpdater = setTimeout(this.updatePageTitle, 150);
             }
             else document.title = this.pageTitle;
         }
@@ -96,8 +101,8 @@ export default {
         isWindowFocused: function(val) {
             if(val) {
                 this.unreadMessages = 0;
-                clearInterval(this.titleUpdater);
-            } else setInterval(this.updatePageTitle, 300);
+                clearTimeout(this.titleUpdater);
+            }
             this.updatePageTitle();
         }
     },

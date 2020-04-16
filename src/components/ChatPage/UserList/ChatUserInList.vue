@@ -6,9 +6,7 @@
                 <div><img src="../../../assets/user.gif" :alt="user.name" width="100%" height="100%" /></div>
             </div>
         </div>
-        <div class="userName">
-            <message-to-user-link :nickname="user.name" title="Написать сообщение" />
-        </div>
+        <div class="userName"><message-to-user-link :nickname="user.name" title="Написать сообщение" /></div>
         <div class="userMenu"><message-to-user-link :nickname="user.name" :messageType="privatMessageType" title="Личное сообщение">ЛС</message-to-user-link></div>
     </div>
 </template>
@@ -110,20 +108,20 @@ export default {
             }
         }
         .userMenu {
-            width: 0rem;
+            width: .8rem;
             height: 1.5rem;
             overflow: hidden;
             padding: 0;
             z-index: 5;
-            background: @dark-grey;
             text-align: center;
             transition: all .2s ease;
             font-size: @label-fontsize;
             line-height: 1.5rem;
-            border-left: .2rem solid @grey;
+            border: none;
             border-radius: 0 .75rem .75rem 0;
             &::before {
-                content: '\00A0\00A0\00A0';
+                content: '❯\00A0\00A0\00A0';
+                color: @blue;
             }
 
             a {
@@ -151,7 +149,9 @@ export default {
             .userMenu {
                 width: 2.5rem;
                 padding: 0 @base-padding*2;
+                border-left: .2rem solid @grey;
                 border-color: @blue;
+                background: @dark-grey;
                 &::before {
                     display: none;
                 }
