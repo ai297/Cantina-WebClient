@@ -63,6 +63,7 @@ export default {
 
     div.asideSecond {
         text-align: center;
+        white-space: nowrap;
 
         #currentOnlineTime {
             

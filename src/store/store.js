@@ -15,10 +15,12 @@ export default new Vuex.Store({
             show: false,
             text: '',
             showIcon: false,
-        }
+        },
+        windowFocused: true,
     },
     getters: {
         loader: state => state.loader,
+        isWindowFocused: state => state.windowFocused,
     },
     mutations: {
         showLoader: (state, message) => {
@@ -33,7 +35,10 @@ export default new Vuex.Store({
         },
         hideLoader: state => {
             state.loader.show = false;
-        }
+        },
+        setFocusWindow: (state, isFocused) => {
+            state.windowFocused = isFocused;
+        },
     },
     modules: {
         auth,

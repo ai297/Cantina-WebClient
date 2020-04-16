@@ -12,7 +12,7 @@ export default {
         let text = message.text;
         let VNodes = [];                // массив всех дочерних узлов в сообщении
         // шаблон находит xml теги
-        let pattern = /<(?<tag>\w+)((?:\s\/>)|(>(?<value>[^<]+)<\/\1>))/i;
+        let pattern = /<(?<tag>\w+)((?:\s\/>)|(>(?<value>[\dа-я\w\s]+)<\/\1>))/i;
         let userLinkMessageType = (message.type === MESSAGE_TYPES.Privat) ? message.type : MESSAGE_TYPES.Base;
 
         // перебираем строку сообщения, заменяем известные теги на компоненты, неизвестные вставляем как простой текст
@@ -48,7 +48,7 @@ export default {
             match = text.match(pattern);
         }
 
-        VNodes.push(text);
+        VNodes.push(text.replace(/(<([^>]+)>)/ig, ""));
         
         return createElement('span', VNodes);
     },

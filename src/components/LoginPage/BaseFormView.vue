@@ -32,6 +32,7 @@
                 & > div {
                     display: inline-block;
                     width: 70%;
+                    font-size: @input-fontsize;
                 }
                 div > a {
                     font-family: @label-font;
@@ -55,6 +56,7 @@
                 .errorMessage {
                     font-weight: bold;
                     color: @red;
+                    font-size: 1rem;
                 }
                 .label {
                     font-size: @label-fontsize;

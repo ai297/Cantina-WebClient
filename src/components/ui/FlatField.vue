@@ -56,10 +56,11 @@ export default {
     @doublePadding: @base-padding * 2;
     .flat-field {
         display: flex;
+        flex-direction: row;
         position: relative;
         overflow: hidden;
         margin: .4em;
-        font-size: @input-fontsize;
+        font-size: 1em;
         font-family: @button-font;
         background: none;
         border: @ui-border-width solid @gold;

@@ -82,10 +82,11 @@ export default {
 
     .flat-selection {
         display: flex;
+        flex-direction: row;
         position: relative;
         min-height: calc(1em + @double-padding);
         margin: .4em;
-        font-size: @input-fontsize;
+        font-size: 1em;
         font-family: @button-font;
         background: none;
         border: @ui-border-width solid @gold;

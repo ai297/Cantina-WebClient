@@ -2,7 +2,10 @@ import Vue from 'vue';
 
 import Router from './router.js';                   // <-- в этом файле настраивается маршрутизация
 import Store from './store/store.js';               // <-- глобальная стейт-машина
-Vue.config.productionTip = false
+
+// фокус окна браузера
+window.onfocus = () => Store.commit('setFocusWindow', true);
+window.onblur = () => Store.commit('setFocusWindow', false);
 
 // глобальные компоненты
 import App from './App.vue';                                        // <-- родительский компонент, в него загружаются все остальные компоненты

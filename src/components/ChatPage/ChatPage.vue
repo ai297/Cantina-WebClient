@@ -1,14 +1,14 @@
 <template>
-    <div id="chat" :class="{ limitedWidth: isLimitedWidth }">
+    <div id="chat" :class="{ limitedWidth: isLimitedWidth, isDataNotLoaded: !isDataLoaded, hideSideBar: (!isShowSidebar || !isDataLoaded) }">
         <div class="firstLine">
             <!-- Основной блок -->
-            <chat-main id="chatMain" v-if="isConnected" />
+            <chat-main id="chatMain" />
             <!-- Боковой блок -->
-            <chat-aside id="chatAside" :class="{minimize: !isShowSidebar}" v-if="isConnected" />
+            <chat-aside id="chatAside" />
         </div>
         <div class="secondLine">
             <!-- форма отправки сообщения -->
-            <send-message-form id="sendingForm" v-if="isConnected" />
+            <send-message-form id="sendingForm" />
             <!-- Менюшка навигации -->
             <chat-nav-menu id="chatNavMenu" />
         </div>
@@ -57,10 +57,10 @@ export default {
             isLimitedWidth: 'chat/isLimitedChatWidth',
             accessToken: 'auth/token',
             hubConnection: 'connection/connection',
-            isConnected: 'connection/isConnected',
             modalComponent: 'chat/modalComponent',
             isShowModal: 'chat/showModal',
             userId: 'auth/userId',
+            isDataLoaded: 'connection/isDataLoaded',
         }),
     },
     methods: {
@@ -77,6 +77,7 @@ export default {
             setConnection: 'connection/setConnection',
             registerAction: 'connection/registerAction',
             removeAction: 'connection/removeAction',
+            setDataLoadedState: 'connection/setDataLoaded',
             addUser: 'users/addUserToOnlineList',
             removeUser: 'users/removeUserFromOnlineList',
             registerCommand: 'commands/registerCommand',
@@ -84,8 +85,12 @@ export default {
             showModal: 'chat/showModal',
             hideModal: 'chat/hideModal',
             updateCurrentUserName: 'auth/updateUserName',
+            changeAsideBlockMode: 'chat/changeAsideBlockMode',
         }),
+
+
         createConnection: function() {
+            // TODO: отключить логи
             const hubConnection = new HubConnectionBuilder()
                 .withUrl(API_URL.ROOT + API_URL.HUB, { accessTokenFactory: () => this.accessToken })
                 .configureLogging(LogLevel.Information)
@@ -113,6 +118,8 @@ export default {
             });
             return hubConnection;
         },
+
+
         // метод пытается подключиться к хабу
         startConnection: async function() {
             this.showLoader(`Подключение к серверу (${this.connectionIterations + 1})`);
@@ -145,24 +152,30 @@ export default {
             this.hideLoader();
             return connectResult;
         },
+
+
         // Метод пытается загрузить список юзеров онлайн
-        startLoadingUsers: function() {
-            this.showLoader('Получение списка онлайна...');
-            setTimeout(async () => {
-                let isLoadUsers = await this.loadOnlineUsers();
-                if(isLoadUsers > 0) this.hideLoader();
-                else {
-                    this.loadingOnlineUsersIterations++;
-                    if(this.loadingOnlineUsersIterations < MAX_ITERATIONS) this.startLoadingUsers();
-                    else {
-                        this.showText('Не удалось подключиться к серверу... Попробуйте обновить страницу.');
-                        setTimeout(() => {
-                            this.hideLoader();
-                            this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
-                        }, 2000);
-                    }
+        startLoadingUsers: async function() {
+            // тут уведомление о загрузке юзеров?
+
+            let isLoadUsers = await this.loadOnlineUsers();
+            if(isLoadUsers > 0) {
+                // действие при успешной загрузке
+                this.setDataLoadedState();  // мутация устанавливает флаг успешной загрузки данных
+                this.runCommand({commandName: CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE});
+            }
+            else {
+                this.loadingOnlineUsersIterations++;
+                if(this.loadingOnlineUsersIterations < MAX_ITERATIONS) {
+                    setTimeout(this.startLoadingUsers, 600);
+                } else {
+                    this.showText('Возникли проблемы получения данных с сервера, это какой-то баг...');
+                    setTimeout(() => {
+                        // выход из чата
+                        this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
+                    }, 2000);
                 }
-            }, 600);
+            }
         },
     },
     mounted: async function() {
@@ -175,12 +188,19 @@ export default {
         // команда отображает настройки профиля
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SETTINGS, command: () => this.showModal(userSettingsComponent)});
         // команда закрывает любое всплывающее окно (настройки/профиль/etc)
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL, command: this.hideModal});
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL, command: () => {
+            this.hideModal();
+            this.runCommand({commandName: CHAT_COMMANDS.ACTION_FOCUS_INPUT_FIELD});
+        } });
         // добавление и удаление юзера из списка онлайн
         // this.registerCommand({commandName: CHAT_COMMANDS.USER_ENTER, command: (data) => this.addUser(data)});
         // this.registerCommand({commandName: CHAT_COMMANDS.USER_EXIT, command: (id) => this.removeUser(id)});
+        
+        // команда показывает или скрывает боковую панель
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CHANGE_SIDEBAR, command: this.changeAsideBlockMode});
 
         
+        // Подключаемся к серверу
         let connectedResult = await this.startConnection();
         if(connectedResult) {
             this.loadingOnlineUsersIterations = 0;
@@ -195,8 +215,10 @@ export default {
     },
     beforeDestroy: function() {
         this.closeConnection();
+        this.setDataLoadedState(false);
         this.deleteCommand(CHAT_COMMANDS.ACTION_EXIT);
         this.deleteCommand(CHAT_COMMANDS.ACTION_SHOW_SETTINGS);
+        this.deleteCommand(CHAT_COMMANDS.ACTION_CHANGE_SIDEBAR);
         // this.deleteCommand(CHAT_COMMANDS.USER_ENTER);
         // this.deleteCommand(CHAT_COMMANDS.USER_EXIT);
     }
@@ -210,7 +232,7 @@ export default {
     #chat {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;;
+        justify-content: space-between;
         width: calc(100% - 50px);
         max-width: 100%;
         height: calc(100vh - @double-border);
@@ -222,18 +244,20 @@ export default {
         &.limitedWidth {
             max-width: 85rem;
         }
-
         .firstLine {
             flex-grow: 1;
             flex-shrink: 1;
-            flex-basis: 0;
+            flex-basis: 0%;
             display: flex;
             flex-direction: row;
             height: 10rem;
+            overflow: hidden;
+            justify-content: center;
 
             #chatMain {
                 flex-grow: 1;
-                min-width: 25rem;;
+                flex-shrink: 1;
+                width: 5rem;
             }
             #chatAside {
                 flex-grow: 0;
@@ -241,22 +265,69 @@ export default {
                 min-width: 16.5rem;
                 max-width: 20rem;
                 transition: all .5s;
-                &.minimize {
-                    min-width: 0rem;
-                    width: 0vw;
-                }
             }
         }
         .secondLine {
             flex-grow: 0;
             flex-shrink: 0;
-            flex-basis: content;
+            height: auto;
+            overflow: hidden;
+            max-height: 10rem;
+            transition: max-height .5s;
         }
         #chatFooter {
             flex-grow: 0;
             flex-shrink: 1;
-            flex-basis: content;
         }
-        
+
+        &.isDataNotLoaded {
+            .secondLine {
+                max-height: 0;
+            }
+        } 
+        &.hideSideBar {
+            #chatAside {
+                min-width: 0rem;
+                width: 0vw;
+            }
+        }       
+    }
+
+    @media screen and (max-width: 699px) {
+        #chat {
+            width: 100%;
+            
+            .firstLine #chatAside {
+                min-width: 0;
+                width: 0;
+            }
+            #chatFooter {
+                display: none;
+            }
+            .secondLine {
+                margin-bottom: 1.5rem;
+            }
+            &.hideSideBar {
+                #chatMain {
+                    max-width: 0;
+                    margin: 0;
+                    padding: 0;
+                    border: none;
+                }
+                #chatAside {
+                    flex-grow: 1;
+                    width: auto;
+                    min-width: unset;
+                }
+            }
+        }
+    }
+    @media screen and (max-height: 599px) {
+        #chat #chatFooter {
+            display: none;
+        }
+        #chat .secondLine {
+            margin-bottom: 0;
+        }
     }
 </style>

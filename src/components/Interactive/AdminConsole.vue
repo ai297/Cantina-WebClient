@@ -93,8 +93,9 @@ export default {
         overflow-y: scroll !important;
         overflow-x: hidden;
         max-height: calc(100% - 1rem);
-        border: @base-border-width solid mix(@grey, @body-background-color, 70%);
-        padding: .5rem;
+        border-bottom: @base-border-width solid mix(@grey, @body-background-color, 70%);
+        margin-bottom: @base-padding;
+        padding-bottom: @base-padding;
         & > .output {
             color: @blue;
             & > pre {

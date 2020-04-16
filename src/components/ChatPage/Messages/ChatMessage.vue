@@ -1,14 +1,16 @@
 <template>
     <div class="message-in-list" :class="messageTypeClass">
-        <span class="timespan">{{message.dateTime | timeFilter}}</span>
+        <div class="date" v-if="showDate"><span>{{getMessageDate}}</span></div>
+        <span class="time" :class="{'alwaysShow':isShowTime}">{{getMessageTime}}</span>
+        <span class="personalMark" v-if="isPersonal">{{privatMarker}}</span>
         <span class="nickname" :style="nameStyle"><message-to-user-link :nickname="message.authorName" :messageType="linkMessageType" /></span>
         <message-text class="message-text" :style="messageStyle" :message="message" />
     </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import { MESSAGE_TYPES } from '../../../constants.js';
+import { mapGetters, mapActions } from 'vuex';
+import { MESSAGE_TYPES, MOUNTHS, CHAT_COMMANDS } from '../../../constants.js';
 import messageToUserLink from './ChatMessageUserLink.vue';
 import messageText from './ChatMessageText.vue';
 
@@ -20,11 +22,25 @@ export default {
     },
     props: {
         message: Object,
+        showDate: {
+            type: Boolean,
+            default: false
+        }
+    },
+    data: function() {
+        return {
+            privatMarker: '»',
+        }
     },
     computed: {
         ...mapGetters({
             currentUserId: 'auth/userId',
+            isShowTime: 'messages/showTime',
+            lastMessgeDate: 'messages/lastMessgeDate',
         }),
+        messageDate: function() {
+            return new Date(this.message.dateTime);
+        },
         isPersonal: function() {
             // если поле "получатель" - массив, то ищем в массиве id текущего юзера
             if(Array.isArray(this.message.recipients)) {
@@ -54,16 +70,24 @@ export default {
         messageStyle: function() {
             if(this.message.hasOwnProperty("messageStyle") && this.message.messageStyle !== null) return this.message.messageStyle;
             else return "";
-        }
-    },
-    filters: {
-        timeFilter: function(value) {
-            if(!value) return "--:--";
-            var msgDate = new Date(value);
-            var msgHours = msgDate.getHours() < 10 ? "0" + msgDate.getHours() : msgDate.getHours();
-            var msgMinutes = msgDate.getMinutes() < 10 ? "0" + msgDate.getMinutes() : msgDate.getMinutes();
+        },
+        getMessageTime: function() {
+            let msgHours = this.messageDate.getHours() < 10 ? "0" + this.messageDate.getHours() : this.messageDate.getHours();
+            let msgMinutes = this.messageDate.getMinutes() < 10 ? "0" + this.messageDate.getMinutes() : this.messageDate.getMinutes();
             return msgHours + ":" + msgMinutes;
         },
+        getMessageDate: function() {
+            return `${this.messageDate.getDate()} ${MOUNTHS[this.messageDate.getMonth()]} ${this.messageDate.getFullYear()}г.`;
+        },
+    },
+    methods: {
+        ...mapActions({
+            runCommand: 'commands/run',
+        })
+    },
+    mounted: function() {
+        if(this.message.authorId == this.currentUserId && this.message.type == MESSAGE_TYPES.Privat) this.privatMarker = "•";
+        if(this.isPersonal) this.runCommand({commandName: CHAT_COMMANDS.ACTION_PLAY_NEW_MESSAGE_SOUND});
     }
 }
 </script>
@@ -83,13 +107,28 @@ export default {
                 text-decoration: underline;
             }
         }
-        span {
+        & > span {
             margin-right: @base-padding;
         }
-        .timespan {
+        .time {
             font-family: @label-font;
             color: @system-font-color;
             font-size: @label-fontsize;
+        }
+        .date {
+            text-align: center;
+            margin: @base-padding 0;
+            font-size: @label-fontsize;
+            & > span {
+                background-color: @dark-grey;
+                padding: @base-padding 1em;
+                border-radius: 1em;
+                font-family: @label-font;
+                color: @system-font-color;
+            }
+        }
+        .personalMark {
+            color: @system-font-color;
         }
         .nickname {
             color: @dark-gold;
@@ -109,15 +148,8 @@ export default {
             font-size: @label-fontsize;
             text-align: right;
         }
-        &.personal {
-            &::before {
-                content: '»' !important;
-                display: inline-block;
-                font-family: Tahoma, sans-serif;
-            }
-        }
         &.Base-message {
-            .timespan {
+            .time:not(.alwaysShow) {
                 display: none;
             }
             .nickname a::after {
@@ -126,21 +158,19 @@ export default {
             }
         }
         &.Privat-message {
-            .timespan {
+            .time:not(.alwaysShow) {
                 display: none;
             }
             .nickname a::after {
                 content: ' (лично):';
                 display: inline;
             }
-            &::before {
-                content: '•';
-                display: inline-block;
-            }
         }
         &.ThirdPerson-message {
             .nickname, .message-text {
                 font-style: italic;
+                font-family: @label-font !important;
+                color: @dark-gold !important;
             }
         }
         &.System-message {
@@ -152,6 +182,46 @@ export default {
             }
             .nickname {
                 display: none;
+            }
+        }
+        &.Error-message {
+            background-color: @dark-grey;
+            padding-left: @base-padding;
+            font-size: @label-fontsize;
+            .time {
+                color: inherit;
+            }
+            .nickname {
+                color: inherit !important;
+                font-family: @label-font !important;
+                &::after {
+                    content: ':';
+                }
+            }
+            .message-text {
+                font-style: italic;
+                font-family: @label-font !important;
+                color: @red !important;
+            }
+        }
+        &.Information-message {
+            background-color: @dark-grey;
+            padding-left: @base-padding;
+            font-size: @label-fontsize;
+            .time {
+                color: inherit;
+            }
+            .nickname {
+                color: inherit !important;
+                font-family: @label-font !important;
+                &::after {
+                    content: ':';
+                }
+            }
+            .message-text {
+                font-style: italic;
+                font-family: @label-font !important;
+                color: @green !important;
             }
         }
     }

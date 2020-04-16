@@ -42,5 +42,6 @@ export default {
         },
         hideModal: state => state.showModal = false,
         changeWidth: state => state.limitedChatWidth = !state.limitedChatWidth,
+        changeAsideBlockMode: state => state.showSidebar = !state.showSidebar,
     },
 }

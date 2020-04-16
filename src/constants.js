@@ -11,11 +11,15 @@ export const MESSAGE_TYPES = {
     Privat: 10,
     ThirdPerson: 20,
     System: 100,
+    Information: 101,
+    Error: 102,
     TYPES: {
         0: { name: 'Base', command: '', shortCommand: ''},
         10: { name: 'Privat', command: 'pm', shortCommand: '@'},
         20: { name: 'ThirdPerson', command: 'me', shortCommand: '*'},
         100: { name: 'System', command: 'system', shortCommand: '~'},
+        101: {name: 'Information', command: 'info', shortCommand: 'ì'},
+        102: {name: "Error", command: 'error', shortCommand: 'è'}
     },
 }
 
@@ -25,7 +29,7 @@ export const ROUTING = {
 } 
 
 export const API_URL = {
-    ROOT: 'http://192.168.43.193:5000/',
+    ROOT: 'http://localhost:5000/',
     LOGIN: 'auth',
     REGISTER: 'register',
     ACTIVATION: 'activation',
@@ -57,6 +61,10 @@ export const CHAT_COMMANDS = {
     ACTION_EXIT: 'Exit',
     ACTION_SHOW_SETTINGS: 'ShowUserSettings',
     ACTION_CLOSE_MODAL: 'HideModalView',
+    ACTION_CHANGE_SIDEBAR: "ChangeSideBarMode",
+    ACTION_FOCUS_INPUT_FIELD: "FocusInputField",
+    ACTION_SCROLL_TO_LAST_MESSAGE: "ScrollToLastMessage",
+    ACTION_PLAY_NEW_MESSAGE_SOUND: "PlayNewMessageSound",
     // методы сервера
     SEND_MESSAGE: 'SendMessage',
 }

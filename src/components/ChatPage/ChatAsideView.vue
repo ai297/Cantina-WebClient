@@ -52,7 +52,7 @@ export default {
         }
         .asideBlockComponent {
             flex-grow: 0;
-            min-height: 8.5rem;
+            min-height: 5rem;
         }
         #asideMenu {
             flex-grow: 1;
@@ -94,6 +94,16 @@ export default {
         }
         to {
             margin-top: 0%;
+        }
+    }
+
+
+    @media screen and (max-height: 599px) {
+        #chatAside {
+            padding-top: 1rem;
+        }
+        .chatAside #chatLogo, .chatAside #asideFooter {
+            display: none;
         }
     }
 </style>

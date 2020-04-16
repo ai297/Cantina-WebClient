@@ -3,13 +3,15 @@ export default {
     namespaced: true,
     state: {
         hubConnection: undefined,
+        dataLoaded: false,
     },
     getters: {
         connection: state => state.hubConnection,
-        isConnected: state => () => {
+        isConnected: state => {
             if(state.hubConnection !== undefined) return state.hubConnection.state === HubConnectionState.Connected;
             else return false;
         },
+        isDataLoaded: state => state.dataLoaded,
     },
     mutations: {
         // создаём экземпляр signalR
@@ -24,6 +26,9 @@ export default {
         },
         clearConnection: state => {
             state.hubConnection = undefined;
+        },
+        setDataLoaded: (state, isLoaded = true) => {
+            state.dataLoaded = isLoaded;
         },
     },
     actions: {

@@ -67,6 +67,7 @@ export default {
         #messageField {
             flex-grow: 1;
             flex-shrink: 1;
+            width: 5rem;
         }
         #extendButtons {
             flex-grow: 0;
@@ -102,4 +103,10 @@ export default {
             background-color: @content-bgcolor;
         }
     }
+
+    @media screen and (max-width: 700px) {
+        div.sndMForm #nameBlock, #extendButtons {
+            display: none;
+        }
+    }   
 </style>

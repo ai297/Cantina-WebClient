@@ -24,11 +24,6 @@ export default {
 
 <style lang="less">
 @import "./less/vars.less";
-* {
-    margin: 0;
-    padding: 0;
-    font-family: @main-font;
-}
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -37,10 +32,11 @@ export default {
 }
 ::-webkit-scrollbar-thumb {
   background-color: @dark-grey;
+  border: @base-border-width solid @body-background-color;
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: @gold;
+  background-color: @dark-gold;
 }
 
 html {

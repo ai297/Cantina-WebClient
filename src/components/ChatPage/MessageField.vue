@@ -1,15 +1,12 @@
 <template>
-    <div>
-        <div class="msgField">
-            <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
-                @keypress.enter.prevent="submit" @keydown="checkLength"
-                @paste.prevent="pasteFilter" @input="fieldInput" ></div>
-            <button class="clearButton" title="Очистить поле ввода" @click="clearMessageString"><div>✕</div></button>
-            <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
-                <div><cantina-icons iconName="chat" class="submitIcon" /></div>
-            </button>
-        </div>
-        <p v-if="false">Message Type: {{messageType}} / Message Text: {{messageString}} (cp: {{cursorPosition}} / {{messageTextLength}})</p>
+    <div class="msgField">
+        <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
+            @keypress.enter.prevent="submit" @keydown="checkLength"
+            @paste.prevent="pasteFilter" @input="fieldInput" ></div>
+        <button class="clearButton" title="Очистить поле ввода" @click="clearMessageString"><div>✕</div></button>
+        <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
+            <div><cantina-icons iconName="chat" class="submitIcon" /></div>
+        </button>
     </div>
 </template>
 
@@ -284,10 +281,12 @@ export default {
 
 
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE, command: (data) => this.addNicknameToMessageString(data)});
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_FOCUS_INPUT_FIELD, command: this.focus});
         this.focus();
     },
     beforeDestroy: function() {
         this.deleteCommand(CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE);
+        this.deleteCommand(CHAT_COMMANDS.ACTION_FOCUS_INPUT_FIELD);
     }
 
 }
@@ -337,6 +336,7 @@ export default {
         button {
             display: block;
             background-color: inherit;
+            flex-shrink: 0;
             &:hover {
                 color: @gold;
             }

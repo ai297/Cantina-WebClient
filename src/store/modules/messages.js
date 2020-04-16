@@ -5,6 +5,8 @@ export default {
     state: {
         messages: new Queue(),
         maxCount: 100,
+        showTimeAlways: false,
+        lastMessageDate: undefined,
     },
     getters: {
         getMessages: state => {
@@ -12,7 +14,8 @@ export default {
         },
         count: state => {
             return state.messages.getSize();
-        }
+        },
+        showTime: state => state.showTimeAlways,
     },
     mutations: {
         addMessage: (state, message) => {
@@ -25,6 +28,9 @@ export default {
         },
         clearMessages: state => {
             state.messages = new Queue();
+        },
+        changeShowTimeMode: state => {
+            state.showTimeAlways = !state.showTimeAlways;
         },
     },
     actions: {
