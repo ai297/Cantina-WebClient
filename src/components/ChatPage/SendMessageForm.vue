@@ -183,7 +183,7 @@ export default {
             if(messageType.type != MESSAGE_TYPES.Base) messageText = messageText.substring(messageType.command.length);
 
             // Обработка содержимого строки сообщения
-            messageText = messageText.replace(/(?:<user[^>]*>)(.+)(?:<\/user>)/ig, "<user>$1</user>");                  // 1. тег юзер
+            messageText = messageText.replace(/(?:<user[^>]*>)([^<]+)(?:<\/user>)/ig, "<user>$1</user>");                  // 1. тег юзер
             messageText = messageText.replace(/<img src=['"]+\/smiles\/([^"'.]+)[^>]*>/ig, "<smile>$1</smile>");    // 2. смайлики
             //messageText = messageText.replace(/(.){6,}/ig, "$1$1$1(много раз)");                                        // 3. любые повторяющиеся символы больше 5х
             messageText = messageText.replace(/<(?!\/?((user)|(author)|(smile)))[^>]*(?:\s\/)?>/ig, "");                // N. очистка всех лишних тегов

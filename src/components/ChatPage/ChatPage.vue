@@ -94,7 +94,7 @@ export default {
             // TODO: отключить логи
             const hubConnection = new HubConnectionBuilder()
                 .withUrl(API_URL.ROOT + API_URL.HUB, { accessTokenFactory: () => this.accessToken })
-                .configureLogging(LogLevel.Information)
+                .configureLogging(LogLevel.Error)
                 .build();
             hubConnection.serverTimeoutInMilliseconds = 1 * 60000;       // время таймаута (минут) 
             //hubConnection.keepAliveIntervalInMilliseconds = 10 * 60000;   // время жизни соединения
