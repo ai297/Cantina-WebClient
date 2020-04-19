@@ -29,7 +29,7 @@ export const ROUTING = {
 } 
 
 export const API_URL = {
-    ROOT: 'https://api.thecantina.ru/',
+    ROOT: 'http://localhost:5000/',
     LOGIN: 'auth',
     REGISTER: 'register',
     ACTIVATION: 'activation',
