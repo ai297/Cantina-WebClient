@@ -1,7 +1,7 @@
 <template>
     <overlay-view @click="saveSettings">
         <template v-slot:header><cantina-icons iconName="gear" /> Настройки</template>
-        <p v-if="(error !== false)" class="errorInfo">{{error}}</p>
+        <p v-if="(error !== false)" class="userSettingsForm errorInfo">{{error}}</p>
         <form @submit.prevent="updateSettings" v-if="isDataLoaded" class="userSettingsForm">
             <div class="settingsBlock messageSample">
                 <span class="nickname" :style="getStyleString(selectedNameFontIndex, selectedNameColorIndex)">
@@ -79,6 +79,7 @@ export default {
             selectedMessageColorIndex: 0,
             
             error: false,
+            loadingError: false,
             isNameInvalid: false,
         }
     },
@@ -106,6 +107,11 @@ export default {
             return fontStyle + colorStyle;
         },
         saveSettings: function() {
+            if(this.loadingError) {
+                this.runCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL});
+                return;
+            }
+
             this.error = false;
             // валидация формы
             this.isNameInvalid = this.validation('name', 'nickname');   // проверка имени
@@ -194,6 +200,8 @@ export default {
         })
         .catch(() => {
             this.error = 'Ошибка загрузки данных';
+            this.loadingError = true;
+            setTimeout(() => this.runCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL}), 1500);
         })
         .finally(() => {
             this.hideLoader();
@@ -202,18 +210,22 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
     @import "../../less/vars.less";
-    p.errorInfo {
+    p.userSettingsForm.errorInfo {
         color: @red;
         padding: 1rem;
         font-weight: bold;
     }
+    
     .userSettingsForm {
         width: 100%;
         display: flex;
         flex-wrap: wrap;
         justify-content:stretch;
+        overflow: hidden;
+        overflow-y: scroll;
+
         label {
             display: block;
             font-family: @label-font;

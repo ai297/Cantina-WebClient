@@ -25,7 +25,7 @@ export default {
         text-align: center;
         color: @blue;
         font-size: 1em;
-        font-weight: bold;
+        //font-weight: bold;
         margin: @base-padding / 2 @base-padding;
         box-shadow: 0 1px 3px @btn-base-bgcolor;
         border-radius: @label-fontsize;

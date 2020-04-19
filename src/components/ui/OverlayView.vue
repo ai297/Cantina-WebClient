@@ -26,10 +26,10 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
     @import "../../less/vars.less";
     
-    .overlayView {
+    div.overlayView {
         display: flex;
         position: absolute;
         top: 0; left: 0;
@@ -66,7 +66,10 @@ export default {
                 padding: @base-padding * 2;
                 background-color: @dark-grey;
                 overflow: hidden;
-                overflow-y: scroll;
+                display: flex;
+                ::-webkit-scrollbar-thumb {
+                    background-color: @dark-gold;
+                }
             }
             & > .footer {
                 flex-grow: 0;

@@ -1,7 +1,7 @@
 export default {
     namespaced: true,
     state: {
-        limitedChatWidth: true,
+        limitedChatWidth: localStorage.getItem("limitedWidth"),
         currentAsideComponent: undefined,
         showSidebar: true,
         showExtendPanel: false,
@@ -9,16 +9,21 @@ export default {
         interactiveComponent: "div",
         modalComponent: "div",
         showModal: false,
+        showSmiles: false,
     },
     getters: {
         isShowSidebar: state => state.showSidebar,
-        isLimitedChatWidth: state => state.limitedChatWidth,
+        isLimitedChatWidth: (state) => {
+            if(state.limitedChatWidth === null) return true;
+            else return state.limitedChatWidth === "true";
+        },
         isShowExtendPanel: state => state.showExtendPanel,
         getCurrentAsideComponent: state => state.currentAsideComponent,
         getExtendPanelComponent: state => state.extendPanelComponent,
         interactiveComponent: state => state.interactiveComponent,
         modalComponent: state => state.modalComponent,
         showModal: state => state.showModal,
+        showSmiles: state => state.showSmiles,
     },
     mutations: {
         changeAsideBlock: (state, component) => {
@@ -35,13 +40,17 @@ export default {
             else state.interactiveComponent = "div";
         },
         showModal: (state, component) => {
-            if(!state.modalComponent.hasOwnProperty("name") || state.modalComponent.name != component.name) {
+            if(!state.modalComponent != component) {
                 state.modalComponent = component;
                 state.showModal = true;
             } else state.showModal = !state.showModal;
         },
         hideModal: state => state.showModal = false,
-        changeWidth: state => state.limitedChatWidth = !state.limitedChatWidth,
+        changeWidth: (state) => {
+            localStorage.setItem("limitedWidth", !(state.limitedChatWidth === "true"));
+            state.limitedChatWidth = localStorage.getItem("limitedWidth");
+        },
         changeAsideBlockMode: state => state.showSidebar = !state.showSidebar,
+        showSmiles: state => state.showSmiles = !state.showSmiles,
     },
 }

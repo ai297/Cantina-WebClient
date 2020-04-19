@@ -108,7 +108,7 @@ export default {
             }
         }
         .userMenu {
-            width: .8rem;
+            width: 2rem;
             height: 1.5rem;
             overflow: hidden;
             padding: 0;
@@ -118,11 +118,11 @@ export default {
             font-size: @label-fontsize;
             line-height: 1.5rem;
             border: none;
-            border-radius: 0 .75rem .75rem 0;
-            &::before {
-                content: '❯\00A0\00A0\00A0';
-                color: @blue;
-            }
+            border-radius: .75rem;
+            // &::before {
+            //     content: '❯\00A0\00A0\00A0';
+            //     color: @blue;
+            // }
 
             a {
                 font-family: @label-font;
@@ -149,12 +149,10 @@ export default {
             .userMenu {
                 width: 2.5rem;
                 padding: 0 @base-padding*2;
-                border-left: .2rem solid @grey;
-                border-color: @blue;
                 background: @dark-grey;
-                &::before {
-                    display: none;
-                }
+                // &::before {
+                //     display: none;
+                // }
             }
             .avatarSection {
                 color: @blue;

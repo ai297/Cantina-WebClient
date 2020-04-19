@@ -6,7 +6,7 @@
         <transition name="aside-main" mode="out-in" :duration="{ enter: 800, leave: 500 }">
             <component :is="asideBlock" class="asideBlockComponent" />
         </transition>
-        <aside-main-menu id="asideMenu" />
+        <aside-menu id="asideMenu" />
         <aside-second id="asideFooter" />
     </div>
 </template>
@@ -14,14 +14,14 @@
 <script>
 import { mapGetters } from 'vuex';
 import asideSecond from './ChatAsideSecond.vue';
-import asideMainMenu from './ChatAsideMainMenu.vue';
+import asideMenu from './ChatAsideMenu.vue';
 import animatedLogo from '../ui/AnimatedLogo.vue';
 
 export default {
     name: "ChatAside",
     components: {
         asideSecond,
-        asideMainMenu,
+        asideMenu,
         animatedLogo,
     },
     computed: {
@@ -38,8 +38,9 @@ export default {
     .chatAside {
         display: flex;
         flex-direction: column;
-        justify-content: stretch;
         overflow: hidden;
+        justify-content: flex-start;
+        align-items: stretch;
         #chatLogo {
             flex-grow: 0;
             padding-top: @header2-size;
@@ -52,14 +53,18 @@ export default {
         }
         .asideBlockComponent {
             flex-grow: 0;
-            min-height: 5rem;
+            min-height: 6.5rem;
         }
         #asideMenu {
             flex-grow: 1;
             flex-shrink: 0;
+            flex-basis: auto;
         }
         #asideFooter {
             flex-grow: 0;
+            flex-shrink: 0;
+            flex-basis: auto;
+            max-height: 50%;
         }
     }
 
@@ -98,11 +103,11 @@ export default {
     }
 
 
-    @media screen and (max-height: 599px) {
+    @media screen and (max-height: 599px), screen and (max-width: 699px) {
         #chatAside {
             padding-top: 1rem;
         }
-        .chatAside #chatLogo, .chatAside #asideFooter {
+        .chatAside #chatLogo {
             display: none;
         }
     }

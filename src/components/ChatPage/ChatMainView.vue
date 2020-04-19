@@ -86,7 +86,6 @@ export default {
             this.updatePageTitle();
         },
         updatePageTitle: function() {
-            console.log(this.shortTitle + " / " + this.isWindowFocused);
             if(this.unreadMessages > 0 && !this.isWindowFocused) {
                 if(this.shortTitle) document.title = `(${this.unreadMessages}) ${this.pageTitle}`;
                 else document.title = `(${this.unreadMessages})\n`;

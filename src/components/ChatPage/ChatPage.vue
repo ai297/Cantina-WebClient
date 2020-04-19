@@ -33,6 +33,7 @@ import chatNavMenu from './ChatNavMenu.vue';
 import chatFooter from './ChatFooterView.vue';
 import chatMain from './ChatMainView.vue';
 import userSettingsComponent from './ChatUserSettings.vue';
+import smileSelector from './ChatSmilesSelector.vue';
 // константы
 import {API_URL, CHAT_COMMANDS, ROUTING} from '../../constants.js';
 
@@ -187,6 +188,8 @@ export default {
         }});
         // команда отображает настройки профиля
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SETTINGS, command: () => this.showModal(userSettingsComponent)});
+        // команда открывает окно настройки смайликов
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES_SETTINGS, command: () => this.showModal(smileSelector)});
         // команда закрывает любое всплывающее окно (настройки/профиль/etc)
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL, command: () => {
             this.hideModal();
@@ -218,6 +221,8 @@ export default {
         this.setDataLoadedState(false);
         this.deleteCommand(CHAT_COMMANDS.ACTION_EXIT);
         this.deleteCommand(CHAT_COMMANDS.ACTION_SHOW_SETTINGS);
+        this.deleteCommand(CHAT_COMMANDS.ACTION_CLOSE_MODAL);
+        this.deleteCommand(CHAT_COMMANDS.ACTION_SHOW_SMILES_SETTINGS);
         this.deleteCommand(CHAT_COMMANDS.ACTION_CHANGE_SIDEBAR);
         // this.deleteCommand(CHAT_COMMANDS.USER_ENTER);
         // this.deleteCommand(CHAT_COMMANDS.USER_EXIT);
