@@ -18,8 +18,8 @@ export const MESSAGE_TYPES = {
         10: { name: 'Privat', command: 'pm', shortCommand: '@'},
         20: { name: 'ThirdPerson', command: 'me', shortCommand: '*'},
         100: { name: 'System', command: 'system', shortCommand: '~'},
-        101: {name: 'Information', command: 'info', shortCommand: 'ì'},
-        102: {name: "Error", command: 'error', shortCommand: 'è'}
+        101: {name: 'Information', command: 'info', shortCommand: null},
+        102: {name: "Error", command: 'error', shortCommand: null}
     },
 }
 
@@ -67,8 +67,8 @@ export const CHAT_COMMANDS = {
     ACTION_ADD_NAME_TO_MESSAGE: 'AddNameToMessage',
     ACTION_INSERT_SMILE_TO_MESSAGE: 'InsertSmileToMessage',
     ACTION_INSERT_TEXT_TO_MESSAGE: "InsertTextToMessage",
-    ACTION_SCROLL_TO_LAST_MESSAGE: "ScrollToLastMessage",
     ACTION_PLAY_NEW_MESSAGE_SOUND: "PlayNewMessageSound",
+    ACTION_SCROLL_TO_LAST_MESSAGE: "ScrollToLastMessage",
     // методы сервера
     SEND_MESSAGE: 'SendMessage',
 }

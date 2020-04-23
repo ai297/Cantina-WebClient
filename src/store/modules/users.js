@@ -5,13 +5,24 @@ export default {
     namespaced: true,
     state: {
         onlineUsers: [],
+        currentUser: {
+            id: 0,
+            name,
+            enterTime: null,
+        }
     },
     getters: {
         usersInOinline: state => state.onlineUsers,
+        currentUser: state => state.currentUser,
     },
     mutations: {
         // мутация добавляет нового юзера в список онлайна
         addUserToOnlineList: (state, userData) => {
+            // обновление данных текущего юзера
+            if(userData.userId == state.currentUser.id) {
+                state.currentUser.name = userData.name;
+                state.currentUser.enterTime = userData.enterTime;                
+            }
             for(let i in state.onlineUsers) {
                 // перебираем всех посетителей в чате и если находим такого же - заменяем данные в списке на новые данные посетителя
                 if(state.onlineUsers[i].userId == userData.userId) {
@@ -27,6 +38,7 @@ export default {
             }
         },
         clearUserList: state => state.onlineUsers = [],
+        setCurrentUserId: (state, id) => state.currentUser.id = id,
     },
     actions: {
         loadOnlineUsers: async context => {

@@ -6,9 +6,9 @@
             <source src="/sounds/newMessage.mp3" type="audio/mpeg">
         </audio>
         <component id="interactive" :is="interactiveComponent" />
-        <div id="messages-list" ref="messagesList" @mouseup="selectInputField">
+        <div id="messages-list" ref="messagesList" @mouseup="selectInputField" :class="{manualScrolling: !autoScroll}" @scroll="scrollMessages">
             <chat-message v-for="(item, index) in messagesQueue" :key="index" :message="item" :showDate="isShowDate(index)" />
-            <p v-show="isNotMessages">Нет сообщений</p>
+            <p v-if="messagesCount == 0">Нет сообщений</p>
         </div>
     </div>
 </template>
@@ -26,11 +26,12 @@ export default {
     },
     data: function() {
         return {
-            scrollSpeed: 1,
             pageTitle: '',
             unreadMessages: 0,
             shortTitle: false,
             titleUpdater: undefined,
+            scrollSpeed: 1,
+            scrollTimer: null,
         }
     },
     computed: {
@@ -38,12 +39,11 @@ export default {
             isWindowFocused: 'isWindowFocused',
             messagesQueue: 'messages/getMessages',
             messagesCount: 'messages/count',
+            soundNotice: 'messages/soundNotice',
             interactiveComponent: 'chat/interactiveComponent',
             isDataLoaded: 'connection/isDataLoaded',
-        }),
-        isNotMessages: function() {
-            return this.messagesCount <= 0;
-        }
+            autoScroll: "chat/autoScroll",
+        })
     },
     methods: {
         ...mapActions({
@@ -54,6 +54,7 @@ export default {
             clearMessages: 'messages/clearMessages',
             registerCommand: 'commands/registerCommand',
             deleteCommand: 'commands/deleteCommand',
+            switchScrollMode: 'chat/switchScrollMode',
         }),
         isShowDate: function(index) {
             let currentDate = new Date(this.messagesQueue[index].dateTime).getDate();
@@ -70,15 +71,15 @@ export default {
             if(this.$refs['messagesList'].scrollTop + this.scrollSpeed < this.$refs['messagesList'].scrollHeight - this.$refs['messagesList'].clientHeight) {
                 this.$refs['messagesList'].scrollTop += this.scrollSpeed;
                 this.scrollSpeed += 2;
-                setTimeout(this.scrollToLastMessage, 10);
+                this.scrollTimer = setTimeout(this.scrollToLastMessage, 10);
             }
             else {
-                this.scrollSpeed = 1;
                 this.$refs['messagesList'].scrollTop = this.$refs['messagesList'].scrollHeight - this.$refs['messagesList'].clientHeight;
+                this.scrollSpeed = 1;
             }
         },
         playNewMessageSound: function() {
-            if(this.isDataLoaded) this.$refs['newMessageSoundPlayer'].play();
+            if(this.isDataLoaded && this.soundNotice) this.$refs['newMessageSoundPlayer'].play();
         },
         addNewMessage: function(message) {
             this.addMessage(message);
@@ -87,13 +88,21 @@ export default {
         },
         updatePageTitle: function() {
             if(this.unreadMessages > 0 && !this.isWindowFocused) {
+                document.getElementById("favicon").href="/icons/favicon-d.png";
                 if(this.shortTitle) document.title = `(${this.unreadMessages}) ${this.pageTitle}`;
                 else document.title = `(${this.unreadMessages})\n`;
                 this.shortTitle = !this.shortTitle;
                 clearTimeout(this.titleUpdater);
                 this.titleUpdater = setTimeout(this.updatePageTitle, 150);
             }
-            else document.title = this.pageTitle;
+            else {
+                document.getElementById("favicon").href="/icons/favicon.png";
+                document.title = this.pageTitle;
+            }
+        },
+        scrollMessages: function() {
+            if(this.$refs['messagesList'].scrollTop >= (this.$refs['messagesList'].scrollHeight - this.$refs['messagesList'].clientHeight - 10)) this.switchScrollMode(true);
+            else this.switchScrollMode(false);
         }
     },
     watch: {
@@ -101,23 +110,26 @@ export default {
             if(val) {
                 this.unreadMessages = 0;
                 clearTimeout(this.titleUpdater);
-            }
+                this.scrollMessages();
+            } else this.switchScrollMode(false);
             this.updatePageTitle();
+        },
+        autoScroll: function(val) {
+            if(val) this.scrollToLastMessage();
         }
-    },
-    updated: function() {
-        this.scrollToLastMessage();
     },
     mounted: function() {
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, command: this.addNewMessage});
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE, command: this.scrollToLastMessage});
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_PLAY_NEW_MESSAGE_SOUND, command: this.playNewMessageSound});
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE, command: () => {
+            if(this.autoScroll) this.scrollToLastMessage();
+        }});
         this.pageTitle = document.title;
     },
     beforeDestroy: function() {
         this.deleteCommand(CHAT_COMMANDS.ACTION_ADD_MESSAGE);
-        this.deleteCommand(CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE);
         this.deleteCommand(CHAT_COMMANDS.ACTION_PLAY_NEW_MESSAGE_SOUND);
+        this.deleteCommand(CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE);
         this.clearMessages();
     }
 }
@@ -154,6 +166,9 @@ export default {
             padding: .5rem;
             p {
                 text-align: center;
+            }
+            &.manualScrolling::-webkit-scrollbar-thumb {
+                background-color: @dark-gold;
             }
         }
     }

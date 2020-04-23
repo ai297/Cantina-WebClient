@@ -2,49 +2,41 @@
     <div class="asideSecond">
         <smiles-panel id="smile-panel" v-if="isShowSmiles" />
         <div v-show="isShowSmiles"><flat-button @click="showSmilesSettings">Настроить смайлики</flat-button></div>
+        <settings-panel />
         <div id="currentOnlineTime">
             Вы в Кантине: <span>{{onlineTime}}</span> мин.
-        </div>
-        <div id="serverTime">
-            {{formattedCurrentTime}}
         </div>
     </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations, mapActions} from 'vuex';
-import {MOUNTHS, CHAT_COMMANDS} from "../../constants.js";
+import {CHAT_COMMANDS} from "../../constants.js";
 import smilesPanel from './ChatSmilesPanel.vue';
+import settingsPanel from './ChatSettingsPanel.vue';
 
 export default {
     name: "ChatAsideSecond",
     components: {
         smilesPanel,
+        settingsPanel,
     },
     data: function() {
         return {
-            enterTime: Date.now(),
             currentTime: Date.now()
         }
     },
     computed: {
         ...mapGetters({
-            usersInOnline: 'users/usersInOinline',
-            currentUserId: 'auth/userId',
+            currentUser: 'users/currentUser',
             isShowSmiles: 'chat/showSmiles',
         }),
-        onlineTime: function() {
-            return Math.round((new Date(this.currentTime) - this.enterTime) / 60000);
+        enterTime: function() {
+            return new Date(this.currentUser.enterTime);
         },
-        formattedCurrentTime: function() {
-            let dt = new Date(this.currentTime);
-            let hours = dt.getHours() < 10 ? "0" + dt.getHours() : dt.getHours();
-            let minutes = dt.getMinutes() < 10 ? "0" + dt.getMinutes() : dt.getMinutes();
-            let day = dt.getDate();
-            let mounth = MOUNTHS[dt.getMonth()];
-            let year = dt.getFullYear();
-            return `${day} ${mounth} ${year}г. ${hours}:${minutes}`;
-        }
+        onlineTime: function() {
+            return Math.round((this.currentTime - this.enterTime) / 60000);
+        },
     },
     methods: {
         ...mapActions({
@@ -59,19 +51,12 @@ export default {
             this.currentTime = Date.now();
             setTimeout(this.updateCurrentTime, 1000);
         },
-        currentUserEnterTime: function() {
-            for(let i in this.usersInOnline){
-                if(this.usersInOnline[i].id == this.currentUserId) return new Date(this.usersInOnline[i].enterTime)
-            }
-            return new Date(Date.now());
-        },
         showSmilesSettings: function() {
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES});
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES_SETTINGS});
         },
     },
     mounted: function() {
-        this.enterTime = this.currentUserEnterTime();
         this.updateCurrentTime();
 
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES, command: this.showSmiles});
@@ -112,12 +97,9 @@ export default {
                 color: @dark-gold;
             }
         }
-        #serverTime {
-            color: @blue;
-        }
     }
     @media screen and (max-height: 599px), screen and (max-width: 699px) {
-        div.asideSecond #currentOnlineTime, div.asideSecond #serverTime {
+        div.asideSecond #currentOnlineTime {
             display: none;
         }
     }

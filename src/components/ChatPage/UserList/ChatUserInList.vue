@@ -3,7 +3,7 @@
         <div class="avatarSection">
             <magic-circle />
             <div class="avatarWrapper" @click="showProfile" :title="`Смотреть профиль ${user.name}`">
-                <div><img src="../../../assets/user.gif" :alt="user.name" width="100%" height="100%" /></div>
+                <div><img src="../../../assets/avatar.png" :alt="user.name" width="100%" height="100%" /></div>
             </div>
         </div>
         <div class="userName"><message-to-user-link :nickname="user.name" title="Написать сообщение" /></div>

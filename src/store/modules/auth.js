@@ -10,7 +10,6 @@ export default {
             type: '',
             text: '',
         },
-        currentUserName: '',
     },
     getters: {
         isAuth: state => state.auth.isAuth,
@@ -32,10 +31,6 @@ export default {
                 return role ? role : ROLES.USER;
             }
         },
-        userName: (state) => {
-            if(state.currentUserName == '') return 'Unathorized';
-            else return state.currentUserName;
-        },
         userId: (state, getters) => {
             if(!getters.token) return -1;
             else return getters.tokenInfo[CLAIMS.ID] * 1;
@@ -55,8 +50,6 @@ export default {
         authResult: (state, payload) => {
             state.auth = payload;
         },
-        updateCurrentUser: (state, userData) => state.currentUser = userData,
-        updateUserName: (state, name) => state.currentUserName = name,
     },
     actions: {
         auth: (context, data) => {
@@ -72,7 +65,6 @@ export default {
                 let res = response.data;
                 if(res.success) {
                     context.commit("setToken", res.token);
-                    context.commit("updateUserName", res.userName);
                     context.commit("authResult", {isAuth: true});
                 }
                 else {

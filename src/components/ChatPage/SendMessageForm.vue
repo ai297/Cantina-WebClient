@@ -1,6 +1,6 @@
 <template>
     <div class="sndMForm">
-        <div id="nameBlock"><p>{{currentUserName}}:</p></div>
+        <div id="nameBlock"><p>{{currentUser.name}}:</p></div>
         <div id="inputBlock">
             <div class="message-field" :class="{focused:messageFieldFocused}">
                 <html-field id="message-field" ref="messageField"
@@ -18,7 +18,7 @@
             </div>
         </div>
         <div id="extendButtons">
-            <button @click="changeWidth"><div><cantina-icons iconName="maximize" /></div></button>
+            <!--<button @click="chatSettings" title="Настройки"><div><cantina-icons iconName="gear" /></div></button>-->
         </div>
         <div id="extendPanel" v-show="isShowExtendPanel"><component :is="extendPanelComponent" /></div>
     </div>
@@ -51,7 +51,7 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentUserName: 'auth/userName',
+            currentUser: 'users/currentUser',
             usersInOnline: 'users/usersInOinline',
             isShowExtendPanel: 'chat/isShowExtendPanel',
             extendPanelComponent: 'chat/getExtendPanelComponent',
@@ -64,11 +64,9 @@ export default {
         }),
         ...mapMutations({
             showExtend: 'chat/showExtendPanel',
-            changeWidth: 'chat/changeWidth',
             registerCommand: 'commands/registerCommand',
             deleteCommand: 'commands/deleteCommand',
         }),
-        
 
         // при потере фокуса с поля ввода
         blurMessageField: function() {
@@ -183,10 +181,9 @@ export default {
             if(messageType.type != MESSAGE_TYPES.Base) messageText = messageText.substring(messageType.command.length);
 
             // Обработка содержимого строки сообщения
-            messageText = messageText.replace(/(?:<user[^>]*>)([^<]+)(?:<\/user>)/ig, "<user>$1</user>");                  // 1. тег юзер
-            messageText = messageText.replace(/<img src=['"]+\/smiles\/([^"'.]+)[^>]*>/ig, "<smile>$1</smile>");    // 2. смайлики
-            //messageText = messageText.replace(/(.){6,}/ig, "$1$1$1(много раз)");                                        // 3. любые повторяющиеся символы больше 5х
-            messageText = messageText.replace(/<(?!\/?((user)|(author)|(smile)))[^>]*(?:\s\/)?>/ig, "");                // N. очистка всех лишних тегов
+            messageText = messageText.replace(/(?:<user[^>]*>)([^<]+)(?:<\/user>)/ig, "<user>$1</user>");                   // 1. тег юзер
+            messageText = messageText.replace(/<img src=['"]+\/smiles\/([^"'.]+)[^>]*>/ig, "<smile>$1</smile>");            // 2. смайлики
+            messageText = messageText.replace(/<(?!\/?((user)|(author)|(smile)))[^>]*(?:\s\/)?>/ig, "");                    // N. очистка всех лишних тегов
             
             //console.log(messageText);
 
@@ -215,7 +212,9 @@ export default {
         for(let type in MESSAGE_TYPES.TYPES) {
             if(type != MESSAGE_TYPES.Base) {
                 this.messageTypes.push(MESSAGE_TYPES.TYPES[type].name);
-                pattern += '((?:[' + MESSAGE_TYPES.TYPES[type].shortCommand + '])|(?:\\/' + MESSAGE_TYPES.TYPES[type].command + '\\s))|';
+                if(MESSAGE_TYPES.TYPES[type].shortCommand !== null)
+                    pattern += '((?:[' + MESSAGE_TYPES.TYPES[type].shortCommand + '])|(?:\\/' + MESSAGE_TYPES.TYPES[type].command + '\\s))|';
+                else pattern += '(\\/' + MESSAGE_TYPES.TYPES[type].command + '\\s)|';
             }
         }
         pattern += '(\\s?)';
@@ -235,6 +234,7 @@ export default {
         this.deleteCommand(CHAT_COMMANDS.ACTION_FOCUS_INPUT_FIELD);
         this.deleteCommand(CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE);
         this.deleteCommand(CHAT_COMMANDS.ACTION_INSERT_SMILE_TO_MESSAGE);
+        this.deleteCommand(CHAT_COMMANDS.ACTION_INSERT_TEXT_TO_MESSAGE);
     }
 }
 </script>

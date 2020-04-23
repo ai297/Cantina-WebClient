@@ -1,16 +1,27 @@
-<template>
-    <div class="volumeButton"><button @click="clickMethod">
-        <div><slot /></div>
-    </button></div>
-</template>
-
 <script>
 export default {
     name: "volumeButton",
-    methods: {
-        clickMethod: function(){
-            this.$emit('click');
+    functional: true,
+    props: {
+        active: {
+            type: Boolean,
+            default: false
+        },
+        bright: {
+            type: Boolean,
+            default: false
         }
+    },
+    render: function(createElement, context){
+        let button = createElement("button", {
+            on: context.listeners,
+            attrs: context.data.attrs,
+            class: context.data.class,
+            style: context.data.style
+        }, [createElement("div", context.children)]);
+        return createElement("div", {
+            class: {volumeButton: true, actv: context.props.active, bright: context.props.bright}
+        }, [button]);
     }
 }
 </script>
@@ -34,7 +45,7 @@ export default {
             background: radial-gradient(mix(@blue, @btn-base-bgcolor, 30%), @btn-base-bgcolor);
             border: solid 2px @btn-base-bgcolor;
             border-radius: inherit;
-            padding: @base-padding / 2 @base-padding * 2;
+            padding: @base-padding/2 @base-padding;
             font-weight: inherit;
             font-size: inherit;
             color: inherit;
@@ -49,11 +60,10 @@ export default {
         }
         &:hover {
             background: linear-gradient(to bottom, @blue, mix(@blue, @btn-base-bgcolor, 50%));
-            color: @gold;
             button {
                 background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
                 svg {
-                    color: inherit;
+                    color: @gold;
                 }
             }
         }
@@ -83,11 +93,11 @@ export default {
 
         &.actv {
             background: linear-gradient(to bottom, @blue, mix(@blue, @btn-base-bgcolor, 50%));
-            color: @gold;
+            color: @blue;
             button {
                 background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
                 svg {
-                    color: @blue;
+                    color: @gold;
                 }
             }
         }

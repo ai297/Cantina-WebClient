@@ -1,9 +1,8 @@
 <template>
     <ul class="chatNavMenu">
         <li v-if="isAdmin"><a @click.prevent="showConsole">Cmd</a></li>
-        <li><a @click.prevent="showSettings">Настройки</a></li>
+        <li><a @click.prevent="showSettings">Профиль</a></li>
         <li><a @click.prevent="exit" class="exitLink">Выход</a></li>
-        <li><a @click.prevent="changeSideBar">Боковая панель</a></li>
     </ul>
 </template>
 
@@ -47,9 +46,6 @@ export default {
         exit: function() {
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
         },
-        changeSideBar: function() {
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_CHANGE_SIDEBAR});
-        }
     },
 }
 </script>

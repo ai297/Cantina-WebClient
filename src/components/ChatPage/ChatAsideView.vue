@@ -8,6 +8,7 @@
         </transition>
         <aside-menu id="asideMenu" />
         <aside-second id="asideFooter" />
+        <div class="asideHoverBlock" v-if="!isShowSidebar" :class="{reverse: isreverseDirection}">&nbsp;</div>
     </div>
 </template>
 
@@ -27,6 +28,8 @@ export default {
     computed: {
         ...mapGetters({
             asideBlock: 'chat/getCurrentAsideComponent',
+            isShowSidebar: 'chat/isShowSidebar',
+            isreverseDirection: 'chat/isReversedDirection',
         }),
     }
 }
@@ -37,8 +40,8 @@ export default {
 
     .chatAside {
         display: flex;
+        position: relative;
         flex-direction: column;
-        overflow: hidden;
         justify-content: flex-start;
         align-items: stretch;
         #chatLogo {
@@ -59,12 +62,28 @@ export default {
             flex-grow: 1;
             flex-shrink: 0;
             flex-basis: auto;
+            overflow: hidden;
         }
         #asideFooter {
             flex-grow: 0;
             flex-shrink: 0;
             flex-basis: auto;
             max-height: 50%;
+            overflow: hidden;
+        }
+        .asideHoverBlock {
+            position: absolute;
+            top: 0;
+            width: 10vw;
+            height: 100%;
+            opacity: .3;
+            transition: all .5s;
+            &:not(.reverse) {
+                left: -10vw;
+            }
+            &.reverse {
+                right: -10vw;
+            }
         }
     }
 
@@ -106,6 +125,7 @@ export default {
     @media screen and (max-height: 599px), screen and (max-width: 699px) {
         #chatAside {
             padding-top: 1rem;
+            align-items: center;
         }
         .chatAside #chatLogo {
             display: none;

@@ -1,6 +1,9 @@
 <template>
-    <div id="chat" :class="{ limitedWidth: isLimitedWidth, isDataNotLoaded: !isDataLoaded, hideSideBar: (!isShowSidebar || !isDataLoaded) }">
-        <div class="firstLine">
+    <div id="chat"
+    :class="{ limitedWidth: isLimitedWidth, isDataNotLoaded: !isDataLoaded, hideSideBar: ((!isShowSidebar && !isMinWidth() )|| !isDataLoaded) }"
+    @mousedown="swipeChecker" @mouseup="swipeChecker"
+    @touchstart="swipeChecker" @touchend="swipeChecker">
+        <div class="firstLine" :style="{'flex-direction': (reverseDirection && !isMinWidth()) ? 'row-reverse' : 'row'}" ref="panels">
             <!-- Основной блок -->
             <chat-main id="chatMain" />
             <!-- Боковой блок -->
@@ -50,6 +53,12 @@ export default {
         return {
             connectionIterations: 0,
             loadingOnlineUsersIterations: 0,
+            pointer: {
+                x: 0,
+                y: 0,
+            },
+            scrollSpeed: 1,
+            swipeTimer: null
         }
     },
     computed: {
@@ -62,6 +71,7 @@ export default {
             isShowModal: 'chat/showModal',
             userId: 'auth/userId',
             isDataLoaded: 'connection/isDataLoaded',
+            reverseDirection: 'chat/isReversedDirection',
         }),
     },
     methods: {
@@ -85,10 +95,75 @@ export default {
             deleteCommand: 'commands/deleteCommand',
             showModal: 'chat/showModal',
             hideModal: 'chat/hideModal',
-            updateCurrentUserName: 'auth/updateUserName',
             changeAsideBlockMode: 'chat/changeAsideBlockMode',
+            setCurrentUserId: 'users/setCurrentUserId',
         }),
-
+        isMinWidth: function() {
+            return window.innerWidth < 700;
+        },
+        // Определяем событие свайпа
+        swipeChecker: function(e) {
+            // нажатие мыши
+            let dX = 0;
+            let dY = 0;
+            if(e.type == "mousedown") {
+                this.pointer.x = e.screenX;
+                this.pointer.y = e.screenY;
+                return;
+            }
+            // касание тачскрина
+            else if(e.type == "touchstart") {
+                this.pointer.x = e.changedTouches[0].screenX;
+                this.pointer.y = e.changedTouches[0].screenY;
+                return;
+            }
+            // отпускание мыши
+            else if(e.type == "mouseup") {
+                dX = e.screenX - this.pointer.x;
+                dY = e.screenY - this.pointer.y;
+            }
+            // отпускание тачскрина
+            else if(e.type == "touchend") {
+                dX = e.changedTouches[0].screenX - this.pointer.x;
+                dY = e.changedTouches[0].screenY - this.pointer.y;
+            }
+            // определяем свайп
+            let isHorizontal = Math.abs(dX) > Math.abs(dY);
+            let checkDistance = false;
+            if(isHorizontal) checkDistance = window.innerWidth / 5 <= Math.abs(dX);
+            else checkDistance = window.innerHeight / 5 <= Math.abs(dY);
+            if(isHorizontal && dX > 0 && checkDistance) {
+                // свайп вправо
+                this.swipePanels("right");
+            } else if(isHorizontal && dX < 0 && checkDistance) {
+                // свайп влево
+                this.swipePanels("left");
+            } else if(dY > 0 && checkDistance) {
+                // свайп вниз
+            } else if(dY < 0 && checkDistance) {
+                // свайп вверх
+            }
+        },
+        // смена панелей свайпом
+        swipePanels: function(direction) {
+            if(direction == "left" && this.$refs['panels'].scrollLeft + this.scrollSpeed < this.$refs['panels'].scrollWidth - this.$refs['panels'].clientWidth) {
+                this.$refs['panels'].scrollLeft += this.scrollSpeed;
+                this.scrollSpeed++;
+                this.swipeTimer = setTimeout(() => this.swipePanels("left"), 10);
+            }
+            else if(direction == "left") {
+                this.scrollSpeed = 1;
+                this.$refs['panels'].scrollLeft = this.$refs['panels'].scrollWidth - this.$refs['panels'].clientWidth;
+            }
+            else if(direction == "right" && this.$refs['panels'].scrollLeft - this.scrollSpeed > 0) {
+                this.$refs['panels'].scrollLeft -= this.scrollSpeed;
+                this.scrollSpeed++;
+                this.swipeTimer = setTimeout(() => this.swipePanels("right"), 10);
+            } else if(direction == "right") {
+                this.scrollSpeed = 1;
+                this.$refs['panels'].scrollLeft = 0;
+            }
+        },
 
         createConnection: function() {
             // TODO: отключить логи
@@ -96,7 +171,7 @@ export default {
                 .withUrl(API_URL.ROOT + API_URL.HUB, { accessTokenFactory: () => this.accessToken })
                 .configureLogging(LogLevel.Information)
                 .build();
-            hubConnection.serverTimeoutInMilliseconds = 1 * 60000;       // время таймаута (минут) 
+            hubConnection.serverTimeoutInMilliseconds = 2 * 60000;       // время таймаута (минут * 60000)
             //hubConnection.keepAliveIntervalInMilliseconds = 10 * 60000;   // время жизни соединения
 
             // Обработка дисконнекта от сервера - повторное авто-подключение
@@ -133,10 +208,6 @@ export default {
                 });
                 this.registerAction({ name: CHAT_COMMANDS.USER_ENTER, command: (data) => this.addUser(data) });     // добавление юзера в список онлайна
                 this.registerAction({ name: CHAT_COMMANDS.USER_EXIT, command: (id) => this.removeUser(id) });       // удаление юзера из списка онлайн
-                // обновление данных текущего юзера
-                this.registerAction({ name: CHAT_COMMANDS.USER_ENTER, command: (data) => {
-                    if(data.userId === this.userId) this.updateCurrentUserName(data.name);
-                } });
             }
 
             // подключаемся к серверу
@@ -163,7 +234,7 @@ export default {
             if(isLoadUsers > 0) {
                 // действие при успешной загрузке
                 this.setDataLoadedState();  // мутация устанавливает флаг успешной загрузки данных
-                this.runCommand({commandName: CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE});
+                setTimeout(() => this.runCommand({commandName: CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE}), 500);
             }
             else {
                 this.loadingOnlineUsersIterations++;
@@ -180,10 +251,9 @@ export default {
         },
     },
     mounted: async function() {
-        
+        this.setCurrentUserId(this.userId);
         // команда выхода из чата
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_EXIT, command: async () => {
-            await this.$store.dispatch('connection/send', { command: CHAT_COMMANDS.ACTION_EXIT });
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_EXIT, command: () => {
             this.$router.push(ROUTING.OUT_PAGE);
         }});
         // команда отображает настройки профиля
@@ -216,7 +286,8 @@ export default {
             }, 5000);
         }
     },
-    beforeDestroy: function() {
+    beforeDestroy: async function() {
+        await this.$store.dispatch('connection/send', { command: CHAT_COMMANDS.ACTION_EXIT });
         this.closeConnection();
         this.setDataLoadedState(false);
         this.deleteCommand(CHAT_COMMANDS.ACTION_EXIT);
@@ -254,10 +325,10 @@ export default {
             flex-shrink: 1;
             flex-basis: 0%;
             display: flex;
-            flex-direction: row;
             height: 10rem;
             overflow: hidden;
-            justify-content: center;
+            justify-content: flex-start;
+            box-sizing: border-box;
 
             #chatMain {
                 flex-grow: 1;
@@ -266,6 +337,7 @@ export default {
             }
             #chatAside {
                 flex-grow: 0;
+                flex-shrink: 0;
                 width: 22vw;
                 min-width: 16.5rem;
                 max-width: 20rem;
@@ -294,6 +366,10 @@ export default {
             #chatAside {
                 min-width: 0rem;
                 width: 0vw;
+                &:hover {
+                    width: 22vw;
+                    min-width: 16.5rem;
+                }
             }
         }       
     }
@@ -302,9 +378,19 @@ export default {
         #chat {
             width: 100%;
             
-            .firstLine #chatAside {
-                min-width: 0;
-                width: 0;
+            .firstLine {
+                #chatMain {
+                    flex-shrink: 0;
+                    padding: 0;
+                    margin: 0;
+                    flex-basis: 100%;
+                    border: 0;
+                }
+                #chatAside {
+                    flex-basis: 100%;
+                    flex-shrink: 0;
+                    max-width: unset;
+                }
             }
             #chatFooter {
                 display: none;
@@ -312,19 +398,7 @@ export default {
             .secondLine {
                 margin-bottom: 1.5rem;
             }
-            &.hideSideBar {
-                #chatMain {
-                    max-width: 0;
-                    margin: 0;
-                    padding: 0;
-                    border: none;
-                }
-                #chatAside {
-                    flex-grow: 1;
-                    width: auto;
-                    min-width: unset;
-                }
-            }
+            
         }
     }
     @media screen and (max-height: 599px) {

@@ -2,20 +2,29 @@ export default {
     namespaced: true,
     state: {
         limitedChatWidth: localStorage.getItem("limitedWidth"),
+        showSidebar: localStorage.getItem("showSidebar"),
+        reversDirection: localStorage.getItem("reversDirection"),
         currentAsideComponent: undefined,
-        showSidebar: true,
         showExtendPanel: false,
         extendPanelComponent: "div",
         interactiveComponent: "div",
         modalComponent: "div",
         showModal: false,
         showSmiles: false,
+        autoScroll: true,
     },
     getters: {
-        isShowSidebar: state => state.showSidebar,
+        isShowSidebar: state => {
+            if(state.showSidebar === null) return true;
+            else return state.showSidebar === "true";
+        },
         isLimitedChatWidth: (state) => {
             if(state.limitedChatWidth === null) return true;
             else return state.limitedChatWidth === "true";
+        },
+        isReversedDirection: (state) => {
+            if(state.reversDirection === null) return false;
+            else return state.reversDirection === "true";
         },
         isShowExtendPanel: state => state.showExtendPanel,
         getCurrentAsideComponent: state => state.currentAsideComponent,
@@ -24,6 +33,7 @@ export default {
         modalComponent: state => state.modalComponent,
         showModal: state => state.showModal,
         showSmiles: state => state.showSmiles,
+        autoScroll: state => state.autoScroll,
     },
     mutations: {
         changeAsideBlock: (state, component) => {
@@ -50,7 +60,18 @@ export default {
             localStorage.setItem("limitedWidth", !(state.limitedChatWidth === "true"));
             state.limitedChatWidth = localStorage.getItem("limitedWidth");
         },
-        changeAsideBlockMode: state => state.showSidebar = !state.showSidebar,
+        switchAsideMode: state => {
+            localStorage.setItem("showSidebar", !(state.showSidebar === "true"));
+            state.showSidebar = localStorage.getItem("showSidebar");
+        },
+        switchDirection: state => {
+            localStorage.setItem("reversDirection", !(state.reversDirection === "true"));
+            state.reversDirection = localStorage.getItem("reversDirection");
+        },
         showSmiles: state => state.showSmiles = !state.showSmiles,
+        switchScrollMode: (state, mode = null) => {
+            if(mode === null) state.autoScroll = !state.autoScroll;
+            else state.autoScroll = mode;
+        },
     },
 }

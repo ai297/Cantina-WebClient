@@ -1,7 +1,7 @@
 <template>
     <div class="asideMenu">
-        <volume-button @click="changeAsideBlock(usersOnlineList)" :class="{actv: isCurrentComponent(usersOnlineList)}"><cantina-icons iconName="people" /> Онлайн</volume-button>
-        <volume-button @click="showSmiles" :class="{actv: isShowSmiles}"><cantina-icons iconName="smile" /> Смайлики</volume-button>
+        <volume-button @click="changeAsideBlock(usersOnlineList)"  :active="isCurrentComponent(usersOnlineList)" title="Показать список присутствующих"><cantina-icons iconName="people" /> Онлайн</volume-button>
+        <volume-button @click="showSmiles" :active="isShowSmiles" title="Показать смайлики"><cantina-icons iconName="smile" /> Смайлики</volume-button>
     </div>
 </template>
 
