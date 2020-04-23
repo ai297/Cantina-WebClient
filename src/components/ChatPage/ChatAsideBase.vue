@@ -22,7 +22,7 @@ export default {
 
 <style lang="less">
     @import "../../less/vars.less";
-    @asideBlock-border-color: mix(@blue, rgba(0,0,0,0), 70%);
+    @asideBlock-border-color: mix(@blue, @body-background-color, 70%);
     @asideBlock-header-height: @header3-size;
 
     div.asideBlock {

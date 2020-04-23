@@ -18,8 +18,8 @@ export const MESSAGE_TYPES = {
         10: { name: 'Privat', command: 'pm', shortCommand: '@'},
         20: { name: 'ThirdPerson', command: 'me', shortCommand: '*'},
         100: { name: 'System', command: 'system', shortCommand: '~'},
-        101: {name: 'Information', command: 'info', shortCommand: 'ì'},
-        102: {name: "Error", command: 'error', shortCommand: 'è'}
+        101: {name: 'Information', command: 'info', shortCommand: null},
+        102: {name: "Error", command: 'error', shortCommand: null}
     },
 }
 
@@ -56,15 +56,19 @@ export const CHAT_COMMANDS = {
     USER_ENTER: 'AddUserToOnlineList',
     USER_EXIT: 'RemoveUserFromOnlineList',
     // управление клиентом
-    ACTION_ADD_NAME_TO_MESSAGE: 'AddNameToMessage',
     ACTION_ADD_MESSAGE: 'AddMessage',
     ACTION_EXIT: 'Exit',
     ACTION_SHOW_SETTINGS: 'ShowUserSettings',
+    ACTION_SHOW_SMILES: "ShowSmiles",
+    ACTION_SHOW_SMILES_SETTINGS: 'ShowSmilesSettings',
     ACTION_CLOSE_MODAL: 'HideModalView',
     ACTION_CHANGE_SIDEBAR: "ChangeSideBarMode",
     ACTION_FOCUS_INPUT_FIELD: "FocusInputField",
-    ACTION_SCROLL_TO_LAST_MESSAGE: "ScrollToLastMessage",
+    ACTION_ADD_NAME_TO_MESSAGE: 'AddNameToMessage',
+    ACTION_INSERT_SMILE_TO_MESSAGE: 'InsertSmileToMessage',
+    ACTION_INSERT_TEXT_TO_MESSAGE: "InsertTextToMessage",
     ACTION_PLAY_NEW_MESSAGE_SOUND: "PlayNewMessageSound",
+    ACTION_SCROLL_TO_LAST_MESSAGE: "ScrollToLastMessage",
     // методы сервера
     SEND_MESSAGE: 'SendMessage',
 }

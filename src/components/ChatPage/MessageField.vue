@@ -2,7 +2,7 @@
     <div class="msgField">
         <div id="message-field" ref="m-field" :contenteditable="enable" tabindex="1"
             @keypress.enter.prevent="submit" @keydown="checkLength"
-            @paste.prevent="pasteFilter" @input="fieldInput" ></div>
+            @paste.prevent="pasteFilter" @input="fieldInput" @drop.prevent="focus"></div>
         <button class="clearButton" title="Очистить поле ввода" @click="clearMessageString"><div>✕</div></button>
         <button type="submit" @click.prevent="submit" tabindex="2" title="Отправить сообщение">
             <div><cantina-icons iconName="chat" class="submitIcon" /></div>
@@ -15,6 +15,8 @@ import { mapGetters, mapActions, mapMutations } from 'vuex';
 import {MESSAGE_TYPES, CHAT_COMMANDS} from '../../constants.js';
 
 const MAX_MESSAGE_LENGTH = 384;
+const MAX_SMILES_COUNT = 5;
+
 const ENTER_CODE = 13;
 const BACKSPACE_CODE = 8;
 const DELETE_CODE = 46;
@@ -68,8 +70,9 @@ export default {
         fieldUpdate: function() {
             this.$refs['m-field'].innerHTML = this.messageString;
             this.$refs['m-field'].focus();
-            this.setCursorPosition(this.cursorPosition);
             this.messageTextLength = this.$refs['m-field'].innerText.length;
+            this.setCursorPosition(this.cursorPosition);
+            
         },
 
 
@@ -85,10 +88,7 @@ export default {
             });
             
             // распознавание ручного ввода имени юзера
-            let handWritedNamePattern = new RegExp(
-                '^((?:@)|(?:\\/pm\\s))?([a-zа-я]{2,11}\\s?[a-zа-я0-9]{2,11}),',
-                'i'
-                );
+            let handWritedNamePattern = new RegExp('^((?:@)|(?:\\/pm\\s))?([a-zа-я]{2,11}\\s?[a-zа-я0-9]{2,11}),', 'i');
             newString = newString.replace(handWritedNamePattern, (replace, cmd, name) => {
                 for(let ui in this.usersInOnline) {
                     if(this.usersInOnline[ui].name == name) {
@@ -168,7 +168,7 @@ export default {
         },
 
 
-        // добавить юзернейм в строку ввода сообщения
+        // добавить юзернейм в поле ввода сообщения
         addNicknameToMessageString: function(payload) {
             if(!payload.hasOwnProperty('userName')) return false;
             
@@ -191,6 +191,20 @@ export default {
             this.updateMessageString(insert);
             this.fieldUpdate();
             this.focus();
+        },
+
+        // вставить смайлик в поле ввода сообщения
+        inserSmile: function(filename) {
+            let smilesInMessageString = this.messageString.match(/<img/ig);
+            if(smilesInMessageString !== null && smilesInMessageString.length >= MAX_SMILES_COUNT) {
+                this.focus();
+                return false;
+            }
+            
+            let smile = document.createElement("img");
+            smile.src="/smiles/" + filename;
+            this.$refs['m-field'].appendChild(smile);
+            this.fieldInput();
         },
 
 
@@ -280,7 +294,8 @@ export default {
         this.messageTypesRegEx = new RegExp(pattern, 'i');
 
 
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE, command: (data) => this.addNicknameToMessageString(data)});
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE, command: this.addNicknameToMessageString});
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_INSERT_SMILE, command: this.inserSmile});
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_FOCUS_INPUT_FIELD, command: this.focus});
         this.focus();
     },
@@ -331,6 +346,10 @@ export default {
                 font-weight: bold;
                 font-style: italic;
                 color: @green;
+            }
+            img {
+                max-height: @msgInput-height;
+                vertical-align: middle;
             }
         }
         button {

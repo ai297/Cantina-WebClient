@@ -26,6 +26,7 @@ export default {
 @import "./less/vars.less";
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
   background: none;
@@ -80,7 +81,7 @@ p {
 }
 button {
   font-family: @button-font;
-  font-size: 1rem;
+  font-size: 1em;
   padding: 0 .5em;
   border: none;
   background: none;
@@ -88,6 +89,7 @@ button {
   div {
     font: inherit;
     line-height: 1em;
+    white-space: nowrap;
   }
   &:focus {
     outline: none;

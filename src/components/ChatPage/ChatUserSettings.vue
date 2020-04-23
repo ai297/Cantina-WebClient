@@ -1,7 +1,7 @@
 <template>
     <overlay-view @click="saveSettings">
-        <template v-slot:header><cantina-icons iconName="gear" /> Настройки</template>
-        <p v-if="(error !== false)" class="errorInfo">{{error}}</p>
+        <template v-slot:header><cantina-icons iconName="gear" /> Настройки профиля</template>
+        <p v-if="(error !== false)" class="userSettingsForm errorInfo">{{error}}</p>
         <form @submit.prevent="updateSettings" v-if="isDataLoaded" class="userSettingsForm">
             <div class="settingsBlock messageSample">
                 <span class="nickname" :style="getStyleString(selectedNameFontIndex, selectedNameColorIndex)">
@@ -18,7 +18,7 @@
                     <div v-for="(item, index) of genders" :key="index">{{item}}</div>
                 </flat-select>
                 <label>Откуда вы:</label>
-                <flat-field placeholder="Планета" maxlength="32" v-model.trim="userProfile.location" />
+                <flat-field :class="{errorField: isLocationInvalid ? validation('location') : isLocationInvalid }" placeholder="Планета" maxlength="32" v-model.trim="userProfile.location" />
                 <label>О себе:</label>
                 <textarea v-model="userProfile.description" maxlength="250"></textarea>
             </div>
@@ -79,7 +79,9 @@ export default {
             selectedMessageColorIndex: 0,
             
             error: false,
+            loadingError: false,
             isNameInvalid: false,
+            isLocationInvalid: false,
         }
     },
     methods: {
@@ -106,10 +108,16 @@ export default {
             return fontStyle + colorStyle;
         },
         saveSettings: function() {
+            if(this.loadingError) {
+                this.runCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL});
+                return;
+            }
+
             this.error = false;
             // валидация формы
             this.isNameInvalid = this.validation('name', 'nickname');   // проверка имени
-            if(this.isNameInvalid) return;
+            this.isLocationInvalid = this.validation('location');       // проверка города
+            if(this.isNameInvalid || this.isLocationInvalid) return;
 
             // настройки шрифта и цвета
             let nameStyle = {};
@@ -122,21 +130,21 @@ export default {
             
             // сохранение профиля
             HTTP.patch(API_URL.USERINFO, this.userProfile)
-            .then(() => {
+            .then((response) => {
                 // если успешно
-                this.runCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, payload: {
+                if(response.data.length > 0) this.runCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, payload: {
                     authorId: 0,
                     authorName: 'System',
                     dateTime: new Date(),
                     recipients: this.userProfile.userId,
                     type: MESSAGE_TYPES.Information,
-                    text: "Настройки сохранены."
+                    text: response.data
                 }});
             })
             .catch((error) => {
                 // если ошибка
                 let errorText;
-                if(error.response !== undefined) {
+                if(error.response !== undefined && typeof(error.response.data) === "string") {
                     errorText = error.response.data;
                 }
                 else errorText = 'Не удалось соединиться с сервером.';
@@ -147,7 +155,7 @@ export default {
                     dateTime: new Date(),
                     recipients: this.userProfile.userId,
                     type: MESSAGE_TYPES.Error,
-                    text: "Не удалось сохранить изменения. " + errorText
+                    text: "Не удалось обновить профиль. " + errorText
                 }});
             });
 
@@ -194,6 +202,8 @@ export default {
         })
         .catch(() => {
             this.error = 'Ошибка загрузки данных';
+            this.loadingError = true;
+            setTimeout(() => this.runCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL}), 3000);
         })
         .finally(() => {
             this.hideLoader();
@@ -202,18 +212,22 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
     @import "../../less/vars.less";
-    p.errorInfo {
+    p.userSettingsForm.errorInfo {
         color: @red;
         padding: 1rem;
         font-weight: bold;
     }
+    
     .userSettingsForm {
         width: 100%;
         display: flex;
         flex-wrap: wrap;
         justify-content:stretch;
+        overflow: hidden;
+        overflow-y: scroll;
+
         label {
             display: block;
             font-family: @label-font;

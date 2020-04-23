@@ -3,7 +3,7 @@
         <div class="avatarSection">
             <magic-circle />
             <div class="avatarWrapper" @click="showProfile" :title="`Смотреть профиль ${user.name}`">
-                <div><img src="../../../assets/user.gif" :alt="user.name" width="100%" height="100%" /></div>
+                <div><img src="../../../assets/avatar.png" :alt="user.name" width="100%" height="100%" /></div>
             </div>
         </div>
         <div class="userName"><message-to-user-link :nickname="user.name" title="Написать сообщение" /></div>
@@ -108,7 +108,7 @@ export default {
             }
         }
         .userMenu {
-            width: .8rem;
+            width: 2rem;
             height: 1.5rem;
             overflow: hidden;
             padding: 0;
@@ -118,11 +118,11 @@ export default {
             font-size: @label-fontsize;
             line-height: 1.5rem;
             border: none;
-            border-radius: 0 .75rem .75rem 0;
-            &::before {
-                content: '❯\00A0\00A0\00A0';
-                color: @blue;
-            }
+            border-radius: .75rem;
+            // &::before {
+            //     content: '❯\00A0\00A0\00A0';
+            //     color: @blue;
+            // }
 
             a {
                 font-family: @label-font;
@@ -149,12 +149,10 @@ export default {
             .userMenu {
                 width: 2.5rem;
                 padding: 0 @base-padding*2;
-                border-left: .2rem solid @grey;
-                border-color: @blue;
                 background: @dark-grey;
-                &::before {
-                    display: none;
-                }
+                // &::before {
+                //     display: none;
+                // }
             }
             .avatarSection {
                 color: @blue;

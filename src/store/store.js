@@ -17,10 +17,15 @@ export default new Vuex.Store({
             showIcon: false,
         },
         windowFocused: true,
+        minCssWidth: 700,
     },
     getters: {
         loader: state => state.loader,
         isWindowFocused: state => state.windowFocused,
+        minWidth: state => state.minCssWidth,
+        isMinWidth: state => () => {
+            return window.innerWidth < state.minCssWidth;
+        }
     },
     mutations: {
         showLoader: (state, message) => {

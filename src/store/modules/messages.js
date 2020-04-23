@@ -5,7 +5,8 @@ export default {
     state: {
         messages: new Queue(),
         maxCount: 100,
-        showTimeAlways: false,
+        showTimeAlways: localStorage.getItem("showTimeAlways"),
+        soundNotice: localStorage.getItem("soundNotice"),
         lastMessageDate: undefined,
     },
     getters: {
@@ -15,7 +16,14 @@ export default {
         count: state => {
             return state.messages.getSize();
         },
-        showTime: state => state.showTimeAlways,
+        showTime: state => {
+            if(state.showTimeAlways === null) return false;
+            else return state.showTimeAlways === "true";
+        },
+        soundNotice: state => {
+            if(state.soundNotice === null) return true;
+            else return state.soundNotice === "true";
+        }
     },
     mutations: {
         addMessage: (state, message) => {
@@ -26,11 +34,14 @@ export default {
             // добавляем сообщение в очередь
             state.messages.enqueue(message);
         },
-        clearMessages: state => {
-            state.messages = new Queue();
+        clearMessages: state => state.messages = new Queue(),
+        switchTimeMode: state => {
+            localStorage.setItem("showTimeAlways", !(state.showTimeAlways === "true"));
+            state.showTimeAlways = localStorage.getItem("showTimeAlways");
         },
-        changeShowTimeMode: state => {
-            state.showTimeAlways = !state.showTimeAlways;
+        switchSoundNoticeMode: state => {
+            localStorage.setItem("soundNotice", !(state.soundNotice === "true"));
+            state.soundNotice = localStorage.getItem("soundNotice");
         },
     },
     actions: {

@@ -1,6 +1,7 @@
 <script>
 import { MESSAGE_TYPES } from '../../../constants.js';
 import messageToUserLink from './ChatMessageUserLink.vue';
+import smile from '../Smile.vue';
 
 export default {
     name: "MessageText",
@@ -12,7 +13,7 @@ export default {
         let text = message.text;
         let VNodes = [];                // массив всех дочерних узлов в сообщении
         // шаблон находит xml теги
-        let pattern = /<(?<tag>\w+)((?:\s\/>)|(>(?<value>[\dа-я\w\s]+)<\/\1>))/i;
+        let pattern = /<(?<tag>\w+)((?:\s\/>)|(>(?<value>[^<]+)<\/\1>))/i;
         let userLinkMessageType = (message.type === MESSAGE_TYPES.Privat) ? message.type : MESSAGE_TYPES.Base;
 
         // перебираем строку сообщения, заменяем известные теги на компоненты, неизвестные вставляем как простой текст
@@ -38,8 +39,10 @@ export default {
                             nickname: match.groups.value,
                             messageType: userLinkMessageType
                         },
-                    }
-                    ));
+                    }));
+                    break;
+                case "smile":
+                    VNodes.push(createElement(smile, {}, match.groups.value));
                     break;
                 default:
                     VNodes.push(match.groups.value);

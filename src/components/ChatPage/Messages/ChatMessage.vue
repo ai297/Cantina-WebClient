@@ -1,7 +1,7 @@
 <template>
     <div class="message-in-list" :class="messageTypeClass">
         <div class="date" v-if="showDate"><span>{{getMessageDate}}</span></div>
-        <span class="time" :class="{'alwaysShow':isShowTime}">{{getMessageTime}}</span>
+        <span class="time" :class="{'alwaysShow':(isShowTime && !isMinWidth())}">{{getMessageTime}}</span>
         <span class="personalMark" v-if="isPersonal">{{privatMarker}}</span>
         <span class="nickname" :style="nameStyle"><message-to-user-link :nickname="message.authorName" :messageType="linkMessageType" /></span>
         <message-text class="message-text" :style="messageStyle" :message="message" />
@@ -37,6 +37,8 @@ export default {
             currentUserId: 'auth/userId',
             isShowTime: 'messages/showTime',
             lastMessgeDate: 'messages/lastMessgeDate',
+            isMinWidth: "isMinWidth",
+            isDataLoaded: 'connection/isDataLoaded',
         }),
         messageDate: function() {
             return new Date(this.message.dateTime);
@@ -88,6 +90,7 @@ export default {
     mounted: function() {
         if(this.message.authorId == this.currentUserId && this.message.type == MESSAGE_TYPES.Privat) this.privatMarker = "•";
         if(this.isPersonal) this.runCommand({commandName: CHAT_COMMANDS.ACTION_PLAY_NEW_MESSAGE_SOUND});
+        if(this.isDataLoaded) this.runCommand({commandName: CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE});
     }
 }
 </script>
@@ -137,6 +140,9 @@ export default {
             a {
                 font-style: italic;
             }
+            img.smile {
+                padding: @base-padding/2 0;
+            }
         }
         &::before {
             display: none;
@@ -185,7 +191,7 @@ export default {
             }
         }
         &.Error-message {
-            background-color: @dark-grey;
+            background-color: @dark-red;
             padding-left: @base-padding;
             font-size: @label-fontsize;
             .time {
@@ -201,7 +207,7 @@ export default {
             .message-text {
                 font-style: italic;
                 font-family: @label-font !important;
-                color: @red !important;
+                color: @blue !important;
             }
         }
         &.Information-message {
