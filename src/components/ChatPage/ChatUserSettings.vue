@@ -2,7 +2,7 @@
     <overlay-view @click="saveSettings">
         <template v-slot:header><cantina-icons iconName="gear" /> Настройки профиля</template>
         <p v-if="(error !== false)" class="userSettingsForm errorInfo">{{error}}</p>
-        <form @submit.prevent="updateSettings" v-if="isDataLoaded" class="userSettingsForm">
+        <form @submit.prevent="saveSettings" @keypress.enter.prevent="saveSettings" v-if="isDataLoaded" class="userSettingsForm">
             <div class="settingsBlock messageSample">
                 <span class="nickname" :style="getStyleString(selectedNameFontIndex, selectedNameColorIndex)">
                     {{userProfile.name}}: </span>

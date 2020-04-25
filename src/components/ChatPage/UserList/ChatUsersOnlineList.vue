@@ -1,8 +1,8 @@
 <template>
     <aside-base :caption="'Сейчас в чате <span>' + countUsers + '</span> чел.'">
-            <div id="usersOnlineList">
-                <user-in-list v-for="user in usersInOnline" :key="user.id" :user="user" :isCurrentUser="isItCurrentUser(user.userId)" />
-            </div>
+        <div id="usersOnlineList">
+            <user-in-list v-for="user in usersInOnline" :key="user.id" :user="user" :isCurrentUser="isItCurrentUser(user.userId)" />
+        </div>
     </aside-base>
 </template>
 

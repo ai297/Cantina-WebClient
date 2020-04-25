@@ -2,7 +2,7 @@
     <div class="chatSettingsPanel">
         <volume-button @click="switchScrollMode()" :active="autoScroll" title="Авто прокрутка к новым сообщениям"><cantina-icons iconName="scroll" /></volume-button>
         <volume-button @click="changeWidth" :active="!isLimitedChatWidth" title="Растянуть на весь экран (для экранов FullHD и больше)"><cantina-icons iconName="maximize" /></volume-button>
-        <volume-button @click="changeAsideBlockMode" :active="isShowSidebar" title="Скрывать боковую панель"><cantina-icons iconName="aside" /></volume-button>
+        <volume-button @click="changeAsideBlockMode" :active="!isShowSidebar" title="Скрывать боковую панель (будет показываться при наведении курсора в правую часть экрана)"><cantina-icons iconName="aside" /></volume-button>
         <volume-button @click="switchTimeMode" :active="isShowTime" title="Показывать время сообщений"><cantina-icons iconName="time" /></volume-button>
         <volume-button @click="switchSoundNoticeMode" :active="soundNotice" title="Звуковое уведомление о сообщениях"><cantina-icons iconName="sound" /></volume-button>
         <volume-button @click="switchDirection" :active="reverseDirection" title="Переместить боковую панель влево"><cantina-icons iconName="direction" /></volume-button>

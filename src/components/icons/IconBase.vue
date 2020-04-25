@@ -10,6 +10,7 @@ import iconTime from './IconTime.vue';
 import iconSound from './IconSound.vue';
 import iconDirection from './IconDirection.vue';
 import iconScroll from './IconScroll.vue';
+import iconRadio from './IconRadio.vue';
 
 const icons = {
     "smile": iconSmile,
@@ -23,6 +24,7 @@ const icons = {
     "sound": iconSound,
     "direction": iconDirection,
     "scroll": iconScroll,
+    "radio": iconRadio,
 }
 
 export default {

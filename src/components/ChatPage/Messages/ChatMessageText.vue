@@ -22,7 +22,11 @@ export default {
         // и повторяем всё с начала для части строки после совпадения с шаблоном
         let match = text.match(pattern);
         while(match !== null) {
-            VNodes.push(text.substring(0, match.index));
+            VNodes.push(createElement("span", {
+                domProps: { 
+                    innerHTML: text.substring(0, match.index)
+                }
+            }));
             switch(match.groups.tag.toLowerCase()) {
                 case "author":
                     VNodes.push(createElement(messageToUserLink, {
@@ -45,13 +49,22 @@ export default {
                     VNodes.push(createElement(smile, {}, match.groups.value));
                     break;
                 default:
-                    VNodes.push(match.groups.value);
+                    VNodes.push(createElement("span", {
+                        domProps: { 
+                            innerHTML: match.groups.value
+                        }
+                    }));
+                    //VNodes.push(match.groups.value);
             }
             text = text.substring(match.index + match[0].length);
             match = text.match(pattern);
         }
-
-        VNodes.push(text.replace(/(<([^>]+)>)/ig, ""));
+        text = text.replace(/(<([^>]+)>)/ig, "");
+        VNodes.push(createElement("span", {
+            domProps: { 
+                innerHTML: text
+            }
+        }));
         
         return createElement('span', VNodes);
     },

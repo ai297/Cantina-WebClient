@@ -6,6 +6,7 @@ import connection from './modules/connection.js';
 import messages from './modules/messages.js';
 import users from './modules/users.js';
 import commands from './modules/commands.js';
+import radio from './modules/radio.js';
 
 Vue.use(Vuex);
 
@@ -52,5 +53,6 @@ export default new Vuex.Store({
         messages,
         users,
         commands,
+        radio,
     },
 })

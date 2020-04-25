@@ -30,7 +30,7 @@ import { mapGetters, mapActions, mapMutations } from 'vuex';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
 // компоненты
-import sendMessageForm from './SendMessageForm.vue';
+import sendMessageForm from './SendMessageForm/SendMessageForm.vue';
 import chatAside from './ChatAsideView.vue';
 import chatNavMenu from './ChatNavMenu.vue';
 import chatFooter from './ChatFooterView.vue';
@@ -271,6 +271,7 @@ export default {
         
         // команда показывает или скрывает боковую панель
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CHANGE_SIDEBAR, command: this.changeAsideBlockMode});
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SWIPE_PANELS, command: this.swipePanels});
 
         
         // Подключаемся к серверу

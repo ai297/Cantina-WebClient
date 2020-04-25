@@ -119,6 +119,7 @@ export default {
         }
     },
     mounted: function() {
+        this.$refs['newMessageSoundPlayer'].volume = 0.5;
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, command: this.addNewMessage});
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_PLAY_NEW_MESSAGE_SOUND, command: this.playNewMessageSound});
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SCROLL_TO_LAST_MESSAGE, command: () => {

@@ -26,7 +26,6 @@ Vue.component("kotor-border", kotorBorder);
 Vue.component("cantina-icons", cantinaIcons);
 Vue.component("magic-circle", magicCircle);
 
-
 /////-> Поехали! (точка входа)
 var vm = new Vue({
   router: Router,

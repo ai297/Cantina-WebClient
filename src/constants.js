@@ -15,7 +15,7 @@ export const MESSAGE_TYPES = {
     Error: 102,
     TYPES: {
         0: { name: 'Base', command: '', shortCommand: ''},
-        10: { name: 'Privat', command: 'pm', shortCommand: '@'},
+        10: { name: 'Privat', command: 'pm', shortCommand: '#'},
         20: { name: 'ThirdPerson', command: 'me', shortCommand: '*'},
         100: { name: 'System', command: 'system', shortCommand: '~'},
         101: {name: 'Information', command: 'info', shortCommand: null},
@@ -29,7 +29,7 @@ export const ROUTING = {
 } 
 
 export const API_URL = {
-    ROOT: 'http://localhost:5000/',
+    ROOT: 'http://192.168.43.193:5000/',
     LOGIN: 'auth',
     REGISTER: 'register',
     ACTIVATION: 'activation',
@@ -66,9 +66,9 @@ export const CHAT_COMMANDS = {
     ACTION_FOCUS_INPUT_FIELD: "FocusInputField",
     ACTION_ADD_NAME_TO_MESSAGE: 'AddNameToMessage',
     ACTION_INSERT_SMILE_TO_MESSAGE: 'InsertSmileToMessage',
-    ACTION_INSERT_TEXT_TO_MESSAGE: "InsertTextToMessage",
     ACTION_PLAY_NEW_MESSAGE_SOUND: "PlayNewMessageSound",
     ACTION_SCROLL_TO_LAST_MESSAGE: "ScrollToLastMessage",
+    ACTION_SWIPE_PANELS: 'SwipePanels',
     // методы сервера
     SEND_MESSAGE: 'SendMessage',
 }

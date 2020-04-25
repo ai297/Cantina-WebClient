@@ -1,7 +1,7 @@
 <template>
     <div class="asideSecond">
-        <smiles-panel id="smile-panel" v-if="isShowSmiles" />
         <div v-show="isShowSmiles"><flat-button @click="showSmilesSettings">Настроить смайлики</flat-button></div>
+        <smiles-panel id="smile-panel" v-if="isShowSmiles" />
         <settings-panel />
         <div id="currentOnlineTime">
             Вы в Кантине: <span>{{onlineTime}}</span> мин.
@@ -52,7 +52,7 @@ export default {
             setTimeout(this.updateCurrentTime, 1000);
         },
         showSmilesSettings: function() {
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES});
+            this.showSmiles();
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES_SETTINGS});
         },
     },
