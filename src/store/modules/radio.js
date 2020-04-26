@@ -1,26 +1,26 @@
+
 export default {
     namespaced: true,
     state: {
         player: null,
+        analyser: null,
         streams: {
             mp3: "http://136.243.156.30:1701/stream/2/"
         },
-        volume: 50,
-        play: false,
+        volume: 60,
         durattion: '--.--',
+        isPlaying: false,
     },
     getters: {
         audio: state => state.player,
         volume: state => state.volume,
-        isPlaying: state => state.play,
+        isPlaying: state => state.isPlaying,
         duration: state => state.durattion,
     },
     mutations: {
-        createElement: (state) => {
+        createElement: (state, node) => {
             if(state.player === null) {
                 state.player = new Audio();
-                state.player.setAttribute("controls", false);
-                state.player.setAttribute("src", state.streams.mp3);
                 state.player.addEventListener("timeupdate", function() {
                     let s = parseInt(state.player.currentTime % 60);
                     s = (s < 10)? '0'+s : s;
@@ -28,7 +28,10 @@ export default {
                     m = (m < 10)? '0'+m : m;
                     state.durattion = `${m}.${s}`;
                 }, false);
+                state.player.load();
             }
+            node.appendChild(state.player);
+            state.isPlaying = !state.player.paused;
         },
         deleteElement: state => {
             state.player.remove();
@@ -36,12 +39,15 @@ export default {
         },
         playPause: state => {
             if(state.player !== null) {
-                state.play = !state.play;
-                if(state.play){
+                if(!state.isPlaying){
                     state.player.volume =  parseFloat(state.volume / 100);
+                    state.player.setAttribute("src", state.streams.mp3);
+                    state.player.load();
                     state.player.play();
+                    state.isPlaying = !state.player.paused;
                 } else {
                     state.player.pause();
+                    state.isPlaying = !state.player.paused;
                 }
             }
         },

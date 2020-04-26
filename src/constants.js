@@ -29,7 +29,7 @@ export const ROUTING = {
 } 
 
 export const API_URL = {
-    ROOT: 'http://192.168.43.193:5000/',
+    ROOT: 'http://localhost:5000/',
     LOGIN: 'auth',
     REGISTER: 'register',
     ACTIVATION: 'activation',

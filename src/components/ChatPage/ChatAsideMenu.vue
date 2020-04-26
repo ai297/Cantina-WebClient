@@ -1,7 +1,7 @@
 <template>
     <div class="asideMenu">
-        <volume-button @click="changeAsideBlock(usersOnlineList)"  :active="isCurrentComponent(usersOnlineList)" title="Показать список присутствующих"><cantina-icons iconName="people" /> Онлайн</volume-button>
-        <volume-button @click="changeAsideBlock(radioModule)"  :active="isCurrentComponent(radioModule)" title="Открыть радио"><cantina-icons iconName="radio" /> Радио</volume-button>
+        <volume-button @click="changeAsideBlock(usersOnlineList)"  :active="isCurrentComponent(usersOnlineList)" title="Показать список присутствующих"><cantina-icons iconName="people" /> Кто тут</volume-button>
+        <volume-button @click="changeAsideBlock(radioModule)"  :active="isCurrentComponent(radioModule)" title="Открыть радио" :bright="radioIconBlink"><cantina-icons iconName="radio" /> Радио</volume-button>
     </div>
 </template>
 
@@ -17,12 +17,14 @@ export default {
         return {
             usersOnlineList,
             radioModule,
+            radioIconBlink: false,
         }
     },
     computed: {
         ...mapGetters({
             asideBlock: 'chat/getCurrentAsideComponent',
             isShowSmiles: 'chat/showSmiles',
+            isRadioPlaying: 'radio/isPlaying',
         }),
     },
     methods: {
@@ -36,9 +38,21 @@ export default {
             if(this.asideBlock !== undefined) return this.asideBlock.name == component.name;
             else return false;
         },
+        setRadioIconBlink: function() {
+            if(this.isRadioPlaying) {
+                this.radioIconBlink = !this.radioIconBlink;
+                setTimeout(this.setRadioIconBlink, 700);
+            } else this.radioIconBlink = false;
+        }
+    },
+    watch: {
+        isRadioPlaying: function() {
+            this.setRadioIconBlink();
+        }
     },
     mounted: function(){
         this.changeAsideBlock(this.usersOnlineList);
+        this.setRadioIconBlink();
     },
 }
 </script>
