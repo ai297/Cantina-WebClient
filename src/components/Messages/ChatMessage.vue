@@ -10,7 +10,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { MESSAGE_TYPES, MOUNTHS, CHAT_COMMANDS } from '../../../constants.js';
+import { MESSAGE_TYPES, MOUNTHS, CHAT_COMMANDS } from '../../constants.js';
 import messageToUserLink from './ChatMessageUserLink.vue';
 import messageText from './ChatMessageText.vue';
 
@@ -96,7 +96,7 @@ export default {
 </script>
 
 <style lang="less">
-    @import "../../../less/vars.less";
+    @import "../../less/vars.less";
 
     div.message-in-list {
         width: 100%;

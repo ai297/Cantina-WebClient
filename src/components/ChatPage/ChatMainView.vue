@@ -17,7 +17,7 @@
 
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import {CHAT_COMMANDS} from '../../constants.js';
-import chatMessage from './Messages/ChatMessage.vue';
+import chatMessage from '../Messages/ChatMessage.vue';
 
 export default {
     name: "chatMain",

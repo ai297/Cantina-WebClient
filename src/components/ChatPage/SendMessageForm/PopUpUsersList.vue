@@ -4,7 +4,7 @@
     </ul>
 </template>
 <script>
-import messageToUserLink from '../Messages/ChatMessageUserLink.vue';
+import messageToUserLink from '../../Messages/ChatMessageUserLink.vue';
 export default {
     name: "PopUpUsersList",
     components: {

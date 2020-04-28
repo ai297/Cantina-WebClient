@@ -64,7 +64,7 @@ export default {
             HTTP.post(API_URL.REGISTER, this.request)
             .then(() => {
                 // успешная регистрация
-                this.$router.push("/activation?email=" + this.request.email);
+                this.$router.push("/activation");
             })
             .catch((error) => {
                 // ошибка запроса

@@ -33,8 +33,8 @@ import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import sendMessageForm from './SendMessageForm/SendMessageForm.vue';
 import chatAside from './ChatAsideView.vue';
 import chatNavMenu from './ChatNavMenu.vue';
-import chatFooter from './ChatFooterView.vue';
 import chatMain from './ChatMainView.vue';
+import chatFooter from '../FooterView.vue';
 import userSettingsComponent from './ChatUserSettings.vue';
 import smileSelector from './ChatSmilesSelector.vue';
 // константы

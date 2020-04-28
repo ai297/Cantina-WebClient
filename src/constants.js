@@ -36,6 +36,7 @@ export const API_URL = {
     USERINFO: 'userinfo',
     HUB: 'hub',
     ONLINE_USERS: 'onlineusers',
+    ARCHIVE: 'archive',
 };
 
 export const ROLES = {

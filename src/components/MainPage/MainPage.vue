@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import chatFooter from '../ChatPage/ChatFooterView.vue';
+import chatFooter from '../FooterView.vue';
 
 export default {
     name: "MainPage",

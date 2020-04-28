@@ -1,6 +1,7 @@
 <template>
     <ul class="chatNavMenu">
         <li v-if="isAdmin"><a @click.prevent="showConsole">Cmd</a></li>
+        <li><a @click.prevent="showArchive">Архив</a></li>
         <li><a @click.prevent="showSettings">Профиль</a></li>
         <li><a @click.prevent="exit" class="exitLink">Выход</a></li>
     </ul>
@@ -46,6 +47,9 @@ export default {
         exit: function() {
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
         },
+        showArchive: function() {
+            window.open();
+        }
     },
 }
 </script>
@@ -56,7 +60,7 @@ export default {
     ul.chatNavMenu {
         display: block;
         text-align: center;
-        padding: @base-padding;
+        padding: .8em 0;
         line-height: @base-fontsize;
         white-space: nowrap;
         list-style: disc;

@@ -23,7 +23,7 @@ import {mapActions, mapMutations, mapGetters} from 'vuex';
 import {CHAT_COMMANDS, MESSAGE_TYPES} from '../../constants.js';
 import {OLD_SMILES, OLD_SMILES_DEFAULT} from '../../old-smiles.js';
 import overlayView from '../ui/OverlayView.vue';
-import Smile from './Smile.vue';
+import Smile from '../Smile.vue';
 
 export default {
     name: "UserSettings",

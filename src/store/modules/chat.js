@@ -5,8 +5,6 @@ export default {
         showSidebar: localStorage.getItem("showSidebar"),
         reversDirection: localStorage.getItem("reversDirection"),
         currentAsideComponent: undefined,
-        showExtendPanel: false,
-        extendPanelComponent: "div",
         interactiveComponent: "div",
         modalComponent: "div",
         showModal: false,
@@ -26,9 +24,7 @@ export default {
             if(state.reversDirection === null) return false;
             else return state.reversDirection === "true";
         },
-        isShowExtendPanel: state => state.showExtendPanel,
         getCurrentAsideComponent: state => state.currentAsideComponent,
-        getExtendPanelComponent: state => state.extendPanelComponent,
         interactiveComponent: state => state.interactiveComponent,
         modalComponent: state => state.modalComponent,
         showModal: state => state.showModal,
@@ -38,12 +34,6 @@ export default {
     mutations: {
         changeAsideBlock: (state, component) => {
             state.currentAsideComponent = component;
-        },
-        showExtendPanel: (state, component) => {
-            if (!state.extendPanelComponent.hasOwnProperty("name") || state.extendPanelComponent.name != component.name) {
-                state.extendPanelComponent = component;
-                state.showExtendPanel = true;
-            } else state.showExtendPanel = !state.showExtendPanel;
         },
         showInteractive: (state, component) => {
             if(!state.interactiveComponent.hasOwnProperty("name") || state.interactiveComponent.name != component.name) state.interactiveComponent = component;

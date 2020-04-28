@@ -59,9 +59,10 @@ export default {
             }
         }
         &:hover {
-            background: linear-gradient(to bottom, @blue, mix(@blue, @btn-base-bgcolor, 50%));
+            background: linear-gradient(to bottom, @light-blue, @blue);
+            color: @light-blue;
             button {
-                background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
+                background: radial-gradient(@dark-red, @btn-base-bgcolor);
                 svg {
                     color: @gold;
                 }
@@ -82,6 +83,7 @@ export default {
 
         &.bright {
             background: linear-gradient(to bottom, @gold, @dark-gold);
+            color: @light-blue;
             &:hover {
                 background: @gold;
                 color: white;
@@ -92,8 +94,8 @@ export default {
         }
 
         &.actv {
-            background: linear-gradient(to bottom, @blue, mix(@blue, @btn-base-bgcolor, 50%));
-            color: @blue;
+            background: linear-gradient(to bottom, @blue, mix(@blue, @body-background-color, 50%));
+            color: @light-blue;
             button {
                 background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
                 svg {

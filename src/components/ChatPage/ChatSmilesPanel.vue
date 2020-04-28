@@ -1,7 +1,7 @@
 <script>
 import {CHAT_COMMANDS} from '../../constants.js';
 import {OLD_SMILES_DEFAULT} from '../../old-smiles.js';
-import Smile from './Smile.vue';
+import Smile from '../Smile.vue';
 
 export default {
     functional: true,

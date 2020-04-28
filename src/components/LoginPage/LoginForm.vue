@@ -61,7 +61,7 @@ export default {
                 else {
                     switch(result.type) {
                         case "activation":
-                            this.$router.push("/activation?email="+this.request.email);
+                            this.$router.push("/activation");
                             break;
                         case "error":
                             this.errorMessage = result.text;

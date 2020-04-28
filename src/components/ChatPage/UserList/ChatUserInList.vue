@@ -13,7 +13,7 @@
 
 <script>
 import {MESSAGE_TYPES} from '../../../constants.js';
-import messageToUserLink from '../Messages/ChatMessageUserLink.vue';
+import messageToUserLink from '../../Messages/ChatMessageUserLink.vue';
 
 export default {
     name: "UserInList",

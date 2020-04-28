@@ -37,8 +37,6 @@
                     4.7h-210c-0.094-1.6-0.15-3.1-0.15-4.7 0.0053-1.6 0.062-3.1 0.16-4.7zm0.1 11h210c-0.26 3.2-0.71 6.3-1.3 9.4h-207c-0.63-3.1-1.1-6.2-1.3-9.4zm1.7
                     11h207c-0.66 2.9-1.5 5.8-2.5 8.6h-202c-0.97-2.8-1.8-5.7-2.4-8.6z" class="back" />
                     <ellipse cx="150" cy="80" rx="80" ry="80" class="back" />
-                    <path d="m107 80a43 43 0 0 0 43 43 43 43 0 0 0 43-43 43 43 0 0 0-43-43 43 43 0 0 0-43 43zm3.8 0a39 39 0 0 1 12-28l3.6 3.6a34 34 0 0 1 24-10 34
-                    34 0 0 1 24 10l3.6-3.6a39 39 0 0 1 12 28 39 39 0 0 1-12 28l-3.6-3.6a34 34 0 0 1-24 10 34 34 0 0 1-24-10l-3.6 3.6a39 39 0 0 1-12-28z" class="circle-border" />
                     <path d="m80 80a70 70 0 0 0 9.4 35l3.7-2.2a66 66 0 0 0 57 33 66 66 0 0 0 57-33l3.7 2.2a70 70 0 0 0 9.4-35 70 70 0 0 0-9.4-35l-3.7 2.2a66 66 0
                     0 0-57-33 66 66 0 0 0-57 33l-3.7-2.2a70 70 0 0 0-9.4 35zm8.2 0a62 62 0 0 1 62-62 62 62 0 0 1 62 62 62 62 0 0 1-62 62 62 62 0 0 1-62-62z" class="circle-border" />
 
@@ -58,10 +56,14 @@
                     2.4-19zm123 71c-13 13-31 21-51 21-14 0-26-3.7-37-10l-0.78 1.3c11 6.6 24 10 38 10 20 0 39-8.1 52-21z" class="rotor2" />
 
                     <g class="play-button" @click="startPlay">
-                        <ellipse cx="150" cy="80" rx="30" ry="30" />
+                        <ellipse cx="150" cy="80" rx="36" ry="36" />
                         <path v-show="isPlaying" d="m142 68h17c1.8 0 3.3 1.5 3.3 3.3v17c0 1.8-1.5 3.3-3.3 3.3h-17c-1.8 0-3.3-1.5-3.3-3.3v-17c0-1.8 1.5-3.3 3.3-3.3z" />
                         <path v-show="!isPlaying" d="m166 80c0 3-23 16-26 15-2.6-1.5-2.6-28 0-30 2.6-1.5 26 12 26 15z" />
                     </g>
+
+                    <path d="m107 80a43 43 0 0 0 43 43 43 43 0 0 0 43-43 43 43 0 0 0-43-43 43 43 0 0 0-43 43zm3.8 0a39 39 0 0 1 12-28l3.6 3.6a34 34 0 0 1 24-10 34
+                    34 0 0 1 24 10l3.6-3.6a39 39 0 0 1 12 28 39 39 0 0 1-12 28l-3.6-3.6a34 34 0 0 1-24 10 34 34 0 0 1-24-10l-3.6 3.6a39 39 0 0 1-12-28z" class="circle-border" />
+
                     <g id="radio-volume-minus" class="volume-buttons" @click="changeVolume(volume - 20)">
                         <path d="m23 55-10 10v30l10 10h22c-2.7-8.1-4.1-17-4.1-25 0.021-8.5 1.4-17 4.1-25z" class="back" />
                         <path d="m21 81v-2h12v2z"/>
@@ -138,22 +140,22 @@ export default {
         display: block;
         z-index: -1;
         overflow: hidden;
-        width: 75%;
+        width: 80%;
         height: 0vw;
         min-height: 0rem;
-        max-height: 15rem;
+        max-height: 20rem;
         border: @base-padding solid @body-background-color;
         border-radius: 100% ~"/" 60%;
         opacity: 1;
         transition: all .7s;
-        background: linear-gradient(to top, mix(@blue, rgba(0,0,0,0), 70%), rgba(0,0,0,0) 50%, rgba(0,0,0,0));
+        background: linear-gradient(to top, @blue, rgba(0,0,0,0) 50%, rgba(0,0,0,0));
         margin: 0 auto;
 
         &.dancer {
-            height: 16vw;
+            height: 17vw;
             min-height: 13rem;
             &.playing video {
-                opacity: .65;
+                opacity: .7;
             }
         }
 
@@ -167,13 +169,14 @@ export default {
 
     #radio-module {
         margin-top: 0;
+        margin-bottom: .5rem;
         position: relative;
         z-index: 1;
         display: inline-block;
-        width: 95%;
+        width: 75%;
         transition: all .5s;
         &.dancer {
-            margin-top: -22%;
+            margin-top: -24%;
         }
         svg {
             display: block;
@@ -205,7 +208,7 @@ export default {
                     fill: url(#playButtonOffGradient);
                 }
                 path {
-                    fill: @gold;
+                    fill: @blue;
                     stroke: none;
                     opacity: .5;
                     transition: opacity .5s;
@@ -257,15 +260,14 @@ export default {
             .extBottomButtons {
                 fill: @grey;
                 path {
-                    cursor: pointer;
                     opacity: .5;
                     transition: all .7s;
                     &:hover {
                         opacity: 1;
                     }
                 }
-                .lefttButton {
-                    display: none;
+                .rightButton {
+                   cursor: pointer;
                 }
             }
 
@@ -288,7 +290,7 @@ export default {
             }
             #playButtonOffGradient {
                 stop:first-child {
-                    stop-color: @gold;
+                    stop-color: @blue;
                 }
                 stop:last-child {
                     stop-color: @body-background-color;

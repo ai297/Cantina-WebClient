@@ -22,7 +22,6 @@ export default {
 
 <style lang="less">
     @import "../../less/vars.less";
-    @asideBlock-border-color: mix(@blue, @body-background-color, 70%);
     @asideBlock-header-height: @header3-size;
 
     div.asideBlock {
@@ -57,7 +56,7 @@ export default {
         .asideBlockBorder {
             svg {
                 width: 96%;
-                color: @asideBlock-border-color;
+                color: @blue;
             }
         }
         #asideContentContainer {

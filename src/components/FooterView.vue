@@ -1,6 +1,6 @@
 <template functional>
     <div class="chatFooter" :id="props.id">
-        <p>Cantina chat v.0.1.1 (pre-alpha), 2020г.</p>
+        <p>Cantina chat v.0.2 (alpha), 2020г.</p>
     </div>
 </template>
 
@@ -17,7 +17,7 @@ export default {
 </script>
 
 <style lang="less">
-    @import "../../less/vars.less";
+    @import "../less/vars.less";
 
     div.chatFooter {
         text-align: center;

@@ -25,7 +25,6 @@
         <div id="extendButtons">
             <button @click="showSmiles" title="Смайлики"><div><cantina-icons iconName="smile" /></div></button>
         </div>
-        <div id="extendPanel" v-show="isShowExtendPanel"><component :is="extendPanelComponent" /></div>
     </div>
 </template>
 
@@ -68,8 +67,6 @@ export default {
         ...mapGetters({
             currentUser: 'users/currentUser',
             usersInOnline: 'users/usersInOinline',
-            isShowExtendPanel: 'chat/isShowExtendPanel',
-            extendPanelComponent: 'chat/getExtendPanelComponent',
         }),
 
         // сортрованный список юзеров в онлайне, исключающий тех, кто уже есть в строке сообщения, TODO: а так же текущего юзера.
@@ -89,7 +86,6 @@ export default {
             runCommand: 'commands/run',
         }),
         ...mapMutations({
-            showExtend: 'chat/showExtendPanel',
             registerCommand: 'commands/registerCommand',
             deleteCommand: 'commands/deleteCommand',
         }),
@@ -195,6 +191,7 @@ export default {
 
         // отслеживание ввода юзера
         inputController: function(input) {
+            // ВВОД ЮЗЕРА С ИСВОЛЬЗОВАНИЕМ POP-UP СПИСКА
             // ввод @ предлагает выбрать юзера из присутствующих в чате
             let match = input.match(/@([a-zа-я]{1,11}\s?[a-zа-я0-9]{0,})$/i);
             if(input[input.length - 1] == "@") {
@@ -206,8 +203,7 @@ export default {
                 this.selectedUserMode = true;   // включаем менюшку выбора юзеров
             } else if(match !== null) {
                 this.sortValue = match[1];
-            }
-            else this.selectedUserMode = false;   // включаем менюшку выбора юзеров
+            } else this.selectedUserMode = false;   // включаем менюшку выбора юзеров
         },
 
         // нажатие клавишь при вводе
@@ -239,13 +235,6 @@ export default {
 
             let messageText = this.newMessageString.replace(/\s{2,}/ig, ' ').trim();
             if(messageText.length < 2) return;
-            // составляем список получателей
-            let recipients = [];
-            for(let ui in this.usersInOnline) {
-                if(this.isMessageStringContainsUsername(this.usersInOnline[ui].name)) {
-                    recipients.push(this.usersInOnline[ui].userId);
-                }
-            }
 
             // определяем тип сообщения
             // и удаляем из текста указатель на тип сообщения и повторяющиеся пробелы
@@ -256,6 +245,19 @@ export default {
             messageText = messageText.replace(/(?:<user[^>]*>)([^<]+)(?:<\/user>)/ig, "<user>$1</user>");                   // 1. тег юзер
             messageText = messageText.replace(/<img src=['"]+\/smiles\/([^"'.]+)[^>]*>/ig, "<smile>$1</smile>");            // 2. смайлики
             messageText = messageText.replace(/<(?!\/?((user)|(author)|(smile)))[^>]*(?:\s\/)?>/ig, "");                    // N. очистка всех лишних тегов
+
+            // составляем список получателей
+            let recipients = [];
+            let recMatch = messageText.match(/^([a-zа-я]{2,11}\s?[a-zа-я0-9]{2,11})[,.*()[\]{}:;!?/\\]+/i);
+
+            for(let ui in this.usersInOnline) {
+                if(this.isMessageStringContainsUsername(this.usersInOnline[ui].name)) {
+                    recipients.push(this.usersInOnline[ui].userId);
+                } else if(recMatch !== null && this.usersInOnline[ui].name == recMatch[1]) {
+                    recipients.push(this.usersInOnline[ui].userId);
+                    messageText = messageText.replace(recMatch[1], `<user>${recMatch[1]}</user>`);
+                }
+            }
             
             //console.log(messageText);
 
@@ -469,13 +471,6 @@ export default {
                     color: @gold;
                 }
             }
-        }
-
-        #extendPanel {
-            flex-basis: 100%;
-            flex-grow: 1;
-            flex-shrink: 1;
-            width: 100%;
         }
     }
 

@@ -1,5 +1,5 @@
 <script>
-import { MESSAGE_TYPES } from '../../../constants.js';
+import { MESSAGE_TYPES } from '../../constants.js';
 import messageToUserLink from './ChatMessageUserLink.vue';
 import smile from '../Smile.vue';
 

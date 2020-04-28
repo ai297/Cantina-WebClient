@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { MESSAGE_TYPES, CHAT_COMMANDS } from '../../../constants.js'
+import { MESSAGE_TYPES, CHAT_COMMANDS } from '../../constants.js'
 
 export default {
     name: "MessageToUserLink",
