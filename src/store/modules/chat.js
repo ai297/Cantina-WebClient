@@ -6,8 +6,6 @@ export default {
         reversDirection: localStorage.getItem("reversDirection"),
         currentAsideComponent: undefined,
         interactiveComponent: "div",
-        modalComponent: "div",
-        showModal: false,
         showSmiles: false,
         autoScroll: true,
     },
@@ -26,8 +24,6 @@ export default {
         },
         getCurrentAsideComponent: state => state.currentAsideComponent,
         interactiveComponent: state => state.interactiveComponent,
-        modalComponent: state => state.modalComponent,
-        showModal: state => state.showModal,
         showSmiles: state => state.showSmiles,
         autoScroll: state => state.autoScroll,
     },
@@ -39,13 +35,6 @@ export default {
             if(!state.interactiveComponent.hasOwnProperty("name") || state.interactiveComponent.name != component.name) state.interactiveComponent = component;
             else state.interactiveComponent = "div";
         },
-        showModal: (state, component) => {
-            if(!state.modalComponent != component) {
-                state.modalComponent = component;
-                state.showModal = true;
-            } else state.showModal = !state.showModal;
-        },
-        hideModal: state => state.showModal = false,
         changeWidth: (state) => {
             localStorage.setItem("limitedWidth", !(state.limitedChatWidth === "true"));
             state.limitedChatWidth = localStorage.getItem("limitedWidth");

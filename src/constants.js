@@ -50,6 +50,19 @@ export const CLAIMS = {
     ROLE: "ut",
 }
 
+export const STATUS = {
+    HIDDEN: 0,
+    ONLINE: 1,
+    NOT_ACTIVE: 2,
+    NOT_AVAILABLE: 3,
+    _TITLES: [
+        "Невидимый",
+        "В сети",
+        "Не активен",
+        "Отошёл",
+    ]
+}
+
 export const CHAT_COMMANDS = {
     // методы клиента
     RECEIVE_MESSAGE: 'ReceiveMessage',
@@ -59,10 +72,7 @@ export const CHAT_COMMANDS = {
     // управление клиентом
     ACTION_ADD_MESSAGE: 'AddMessage',
     ACTION_EXIT: 'Exit',
-    ACTION_SHOW_SETTINGS: 'ShowUserSettings',
     ACTION_SHOW_SMILES: "ShowSmiles",
-    ACTION_SHOW_SMILES_SETTINGS: 'ShowSmilesSettings',
-    ACTION_CLOSE_MODAL: 'HideModalView',
     ACTION_CHANGE_SIDEBAR: "ChangeSideBarMode",
     ACTION_FOCUS_INPUT_FIELD: "FocusInputField",
     ACTION_ADD_NAME_TO_MESSAGE: 'AddNameToMessage',
@@ -72,21 +82,22 @@ export const CHAT_COMMANDS = {
     ACTION_SWIPE_PANELS: 'SwipePanels',
     // методы сервера
     SEND_MESSAGE: 'SendMessage',
+    SET_STATUS: 'SetStatus',
 }
 
 export const MOUNTHS = [
-    "января",
-    "февраля",
-    "марта",
-    "апреля",
-    "мая",
-    "июня",
-    "июля",
-    "августа",
-    "сентября",
-    "октября",
-    "ноября",
-    "декабря"
+    "Январь",
+    "Февраль",
+    "Март",
+    "Апрель",
+    "Май",
+    "Июнь",
+    "Июль",
+    "Август",
+    "Сентябрь",
+    "Октябрь",
+    "Ноябрь",
+    "Декабрь"
 ]
 
 export const GENDER = [

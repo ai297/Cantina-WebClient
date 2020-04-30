@@ -1,5 +1,5 @@
 <template>
-    <overlay-view @click="saveSettings">
+    <base-modal @click="saveSettings">
         <template v-slot:header><cantina-icons iconName="smile" /> Настройка смайликов</template>
         <div class="smilesSelector">
             <ul class="menu">
@@ -15,20 +15,20 @@
                 <li><a @click.prevent="resetSmiles">Вернуть стандартную подборку</a></li>
             </ul>
         </div>
-    </overlay-view>
+    </base-modal>
 </template>
 
 <script>
 import {mapActions, mapMutations, mapGetters} from 'vuex';
 import {CHAT_COMMANDS, MESSAGE_TYPES} from '../../constants.js';
 import {OLD_SMILES, OLD_SMILES_DEFAULT} from '../../old-smiles.js';
-import overlayView from '../ui/OverlayView.vue';
+import baseModal from './ChatBaseModal.vue';
 import Smile from '../Smile.vue';
 
 export default {
     name: "UserSettings",
     components: {
-        overlayView,
+        baseModal,
         Smile,
     },
     data: function(){
@@ -37,6 +37,7 @@ export default {
             allSmiles: OLD_SMILES,
             activeCategory: 0,
             isReseted: false,
+            isChanged: false,
         }
     },
     computed: {
@@ -58,6 +59,7 @@ export default {
         ...mapMutations({
             showLoader: 'showLoader',
             hideLoader: 'hideLoader',
+            closeModal: 'closeModal',
         }),
         getFileName: function(cat, smile) {
             return `${OLD_SMILES[cat].path}${OLD_SMILES[cat].files[smile]}`;
@@ -74,16 +76,19 @@ export default {
             if(index < 0) this.selected.push(file);
             else this.selected.splice(index, 1);
             this.isReseted = false;
+            this.isChanged = true;
         },
 
         resetSmiles: function() {
             this.selected.splice(0, this.selected.length);
             for(let stdSm in OLD_SMILES_DEFAULT) this.selected.push(OLD_SMILES_DEFAULT[stdSm]);
             this.isReseted = true;
+            this.isChanged = true;
         },
 
         clearSelected: function() {
             this.selected.splice(0, this.selected.length);
+            this.isChanged = true;
         },
 
         saveSettings: function() {
@@ -92,10 +97,10 @@ export default {
             else localStorage.setItem("favoriteSmiles", JSON.stringify(this.selected));
 
             // закрываем окно с настройками в любом случае
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL});
+            this.closeModal();
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES});
 
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, payload: {
+            if(this.isChanged) this.runCommand({commandName: CHAT_COMMANDS.ACTION_ADD_MESSAGE, payload: {
                 authorId: 0,
                 authorName: 'System',
                 dateTime: new Date(),

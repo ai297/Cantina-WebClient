@@ -6,9 +6,10 @@ export default {
     state: {
         onlineUsers: [],
         currentUser: {
-            id: 0,
+            userId: 0,
             name,
             enterTime: null,
+            status: 1,
         }
     },
     getters: {
@@ -19,9 +20,8 @@ export default {
         // мутация добавляет нового юзера в список онлайна
         addUserToOnlineList: (state, userData) => {
             // обновление данных текущего юзера
-            if(userData.userId == state.currentUser.id) {
-                state.currentUser.name = userData.name;
-                state.currentUser.enterTime = userData.enterTime;                
+            if(userData.userId == state.currentUser.userId) {
+                state.currentUser = userData;              
             }
             for(let i in state.onlineUsers) {
                 // перебираем всех посетителей в чате и если находим такого же - заменяем данные в списке на новые данные посетителя
@@ -38,7 +38,7 @@ export default {
             }
         },
         clearUserList: state => state.onlineUsers = [],
-        setCurrentUserId: (state, id) => state.currentUser.id = id,
+        setCurrentUserId: (state, id) => state.currentUser.userId = id,
     },
     actions: {
         loadOnlineUsers: async context => {

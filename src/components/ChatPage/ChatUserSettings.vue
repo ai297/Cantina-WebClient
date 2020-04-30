@@ -1,5 +1,5 @@
 <template>
-    <overlay-view @click="saveSettings">
+    <base-modal @click="saveSettings">
         <template v-slot:header><cantina-icons iconName="gear" /> Настройки профиля</template>
         <p v-if="(error !== false)" class="userSettingsForm errorInfo">{{error}}</p>
         <form @submit.prevent="saveSettings" @keypress.enter.prevent="saveSettings" v-if="isDataLoaded" class="userSettingsForm">
@@ -39,19 +39,19 @@
                 </flat-select>
             </div>
         </form>
-    </overlay-view>
+    </base-modal>
 </template>
 
 <script>
 import {mapActions, mapMutations} from 'vuex';
 import {HTTP} from '../../http-common.js';
 import {CHAT_COMMANDS, API_URL, GENDER, FONTS, COLORS, VALIDATION_PATTERNS, MESSAGE_TYPES} from '../../constants.js';
-import overlayView from '../ui/OverlayView.vue';
+import baseModal from './ChatBaseModal.vue';
 
 export default {
     name: "UserSettings",
     components: {
-        overlayView,
+        baseModal
     },
     data: function(){
         return {
@@ -91,6 +91,7 @@ export default {
         ...mapMutations({
             showLoader: 'showLoader',
             hideLoader: 'hideLoader',
+            closeModal: 'closeModal',
         }),
         validation: function(field, pattern = field) {
             if(this.userProfile[field].match(VALIDATION_PATTERNS[pattern]) === null) return true;
@@ -109,7 +110,7 @@ export default {
         },
         saveSettings: function() {
             if(this.loadingError) {
-                this.runCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL});
+                this.closeModal();
                 return;
             }
 
@@ -160,12 +161,14 @@ export default {
             });
 
             // закрываем окно с настройками в любом случае
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL});
+            this.closeModal();
         },
+    },
+    beforeMount: function() {
+        this.showLoader("Загрузка профиля...");
     },
     mounted: function() {
         // Загружаем данные профиля
-        this.showLoader("Загрузка профиля...");
         HTTP.get(API_URL.USERINFO).then(result => {
             this.isDataLoaded = true;
             this.userProfile = result.data;
@@ -203,7 +206,7 @@ export default {
         .catch(() => {
             this.error = 'Ошибка загрузки данных';
             this.loadingError = true;
-            setTimeout(() => this.runCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL}), 3000);
+            setTimeout(() => this.closeModal(), 3000);
         })
         .finally(() => {
             this.hideLoader();

@@ -42,6 +42,6 @@ export default {
         padding: @base-padding;
         padding-top: 0;
         text-align: left;
-        background-color: @body-background-color;
+        // /background-color: @body-background-color;
     }
 </style>

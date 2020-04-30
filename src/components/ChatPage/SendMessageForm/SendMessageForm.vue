@@ -67,6 +67,7 @@ export default {
         ...mapGetters({
             currentUser: 'users/currentUser',
             usersInOnline: 'users/usersInOinline',
+            isMinWidth: 'isMinWidth',
         }),
 
         // сортрованный список юзеров в онлайне, исключающий тех, кто уже есть в строке сообщения, TODO: а так же текущего юзера.
@@ -92,7 +93,7 @@ export default {
 
 
         showSmiles: function() {
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_SWIPE_PANELS, payload: "left"});
+            if(this.isMinWidth) this.runCommand({commandName: CHAT_COMMANDS.ACTION_SWIPE_PANELS, payload: "left"});
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES});
         },
 

@@ -1,21 +1,25 @@
 <template>
   <div id="app">
     <loader-view v-if="loader.show" :showIcon="loader.showIcon">{{loader.text}}</loader-view>
+    <modal-wrapper v-if="modal.show" :component="modal.component" />
     <router-view />
   </div>
 </template>
 
 <script>
 import loaderView from './components/ui/LoaderView.vue';
+import modalWrapper from './components/ui/ModalWrapper.vue';
 import {mapGetters} from 'vuex';
 export default {
   name: 'app',
   components: {
     loaderView,
+    modalWrapper,
   },
   computed: {
     ...mapGetters({
       loader: 'loader',
+      modal: 'modal',
     }),
   },
 }

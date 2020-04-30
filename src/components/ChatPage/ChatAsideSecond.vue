@@ -14,6 +14,7 @@ import {mapGetters, mapMutations, mapActions} from 'vuex';
 import {CHAT_COMMANDS} from "../../constants.js";
 import smilesPanel from './ChatSmilesPanel.vue';
 import settingsPanel from './ChatSettingsPanel.vue';
+import smilesSettings from './ChatSmilesSelector.vue'
 
 export default {
     name: "ChatAsideSecond",
@@ -35,7 +36,8 @@ export default {
             return new Date(this.currentUser.enterTime);
         },
         onlineTime: function() {
-            return Math.round((this.currentTime - this.enterTime) / 60000);
+            if(this.enterTime < (this.currentTime - 865000000)) return this.currentUser.onlineTime;
+            return Math.round(this.currentUser.onlineTime + (this.currentTime - this.enterTime) / 60000);
         },
     },
     methods: {
@@ -43,6 +45,7 @@ export default {
             runCommand: 'commands/run',
         }),
         ...mapMutations({
+            showModal: 'showModal',
             registerCommand: 'commands/registerCommand',
             deleteCommand: 'commands/deleteCommand',
             showSmiles: 'chat/showSmiles',
@@ -53,7 +56,7 @@ export default {
         },
         showSmilesSettings: function() {
             this.showSmiles();
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES_SETTINGS});
+            this.showModal(smilesSettings);
         },
     },
     mounted: function() {
@@ -76,6 +79,7 @@ export default {
         white-space: nowrap;
         flex-direction: column;
         font-size: @label-fontsize;
+        padding-bottom: 1em;
 
         #smile-panel {
             display: flex;

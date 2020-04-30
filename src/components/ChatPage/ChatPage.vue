@@ -17,9 +17,6 @@
         </div>
         <!-- Подвал -->
         <chat-footer id="chatFooter" />
-
-        <!-- Модальное окно -->
-        <component v-if="isShowModal" :is="modalComponent" />
     </div>
 </template>
 
@@ -35,8 +32,9 @@ import chatAside from './ChatAsideView.vue';
 import chatNavMenu from './ChatNavMenu.vue';
 import chatMain from './ChatMainView.vue';
 import chatFooter from '../FooterView.vue';
-import userSettingsComponent from './ChatUserSettings.vue';
-import smileSelector from './ChatSmilesSelector.vue';
+//import userSettingsComponent from './ChatUserSettings.vue';
+//import smileSelector from './ChatSmilesSelector.vue';
+//import archiveDatesPanel from '../ArchivePage/ArchiveDatesPanel.vue';
 // константы
 import {API_URL, CHAT_COMMANDS, ROUTING} from '../../constants.js';
 
@@ -67,8 +65,6 @@ export default {
             isLimitedWidth: 'chat/isLimitedChatWidth',
             accessToken: 'auth/token',
             hubConnection: 'connection/connection',
-            modalComponent: 'chat/modalComponent',
-            isShowModal: 'chat/showModal',
             userId: 'auth/userId',
             isDataLoaded: 'connection/isDataLoaded',
             reverseDirection: 'chat/isReversedDirection',
@@ -93,8 +89,6 @@ export default {
             removeUser: 'users/removeUserFromOnlineList',
             registerCommand: 'commands/registerCommand',
             deleteCommand: 'commands/deleteCommand',
-            showModal: 'chat/showModal',
-            hideModal: 'chat/hideModal',
             changeAsideBlockMode: 'chat/changeAsideBlockMode',
             setCurrentUserId: 'users/setCurrentUserId',
         }),
@@ -256,22 +250,9 @@ export default {
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_EXIT, command: () => {
             this.$router.push(ROUTING.OUT_PAGE);
         }});
-        // команда отображает настройки профиля
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SETTINGS, command: () => this.showModal(userSettingsComponent)});
-        // команда открывает окно настройки смайликов
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SMILES_SETTINGS, command: () => this.showModal(smileSelector)});
-        // команда закрывает любое всплывающее окно (настройки/профиль/etc)
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CLOSE_MODAL, command: () => {
-            this.hideModal();
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_FOCUS_INPUT_FIELD});
-        } });
-        // добавление и удаление юзера из списка онлайн
-        // this.registerCommand({commandName: CHAT_COMMANDS.USER_ENTER, command: (data) => this.addUser(data)});
-        // this.registerCommand({commandName: CHAT_COMMANDS.USER_EXIT, command: (id) => this.removeUser(id)});
         
-        // команда показывает или скрывает боковую панель
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CHANGE_SIDEBAR, command: this.changeAsideBlockMode});
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SWIPE_PANELS, command: this.swipePanels});
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_CHANGE_SIDEBAR, command: this.changeAsideBlockMode});                   // команда показывает или скрывает боковую панель
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_SWIPE_PANELS, command: this.swipePanels});                              // команда переключает панели свайпом (в мобильном режиме)
 
         
         // Подключаемся к серверу
@@ -292,12 +273,7 @@ export default {
         this.closeConnection();
         this.setDataLoadedState(false);
         this.deleteCommand(CHAT_COMMANDS.ACTION_EXIT);
-        this.deleteCommand(CHAT_COMMANDS.ACTION_SHOW_SETTINGS);
-        this.deleteCommand(CHAT_COMMANDS.ACTION_CLOSE_MODAL);
-        this.deleteCommand(CHAT_COMMANDS.ACTION_SHOW_SMILES_SETTINGS);
         this.deleteCommand(CHAT_COMMANDS.ACTION_CHANGE_SIDEBAR);
-        // this.deleteCommand(CHAT_COMMANDS.USER_ENTER);
-        // this.deleteCommand(CHAT_COMMANDS.USER_EXIT);
     }
 }
 </script>

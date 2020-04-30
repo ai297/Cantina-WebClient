@@ -17,11 +17,16 @@ export default new Vuex.Store({
             text: '',
             showIcon: false,
         },
+        modal: {
+            component: "div",
+            show: false,
+        },
         windowFocused: true,
         minCssWidth: 700,
     },
     getters: {
         loader: state => state.loader,
+        modal: state => state.modal,
         isWindowFocused: state => state.windowFocused,
         minWidth: state => state.minCssWidth,
         isMinWidth: state => () => {
@@ -41,6 +46,14 @@ export default new Vuex.Store({
         },
         hideLoader: state => {
             state.loader.show = false;
+        },
+        showModal: (state, component) => {
+            state.modal.component = component;
+            state.modal.show = true;
+        },
+        closeModal: state => {
+            state.modal.component = "div";
+            state.modal.show = false;
         },
         setFocusWindow: (state, isFocused) => {
             state.windowFocused = isFocused;

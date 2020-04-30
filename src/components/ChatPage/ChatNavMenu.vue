@@ -4,12 +4,15 @@
         <li><a @click.prevent="showArchive">Архив</a></li>
         <li><a @click.prevent="showSettings">Профиль</a></li>
         <li><a @click.prevent="exit" class="exitLink">Выход</a></li>
+        <li><a @click.prevent="changeStatus">{{(currentUser.status==2 || currentUser.status==3)? 'Вернуться' : 'Отойти'}}</a></li>
     </ul>
 </template>
 
 <script>
-import {mapActions} from 'vuex';
-import {ROLES, CHAT_COMMANDS} from '../../constants.js';
+import {mapActions, mapMutations, mapGetters} from 'vuex';
+import {ROLES, CHAT_COMMANDS, STATUS} from '../../constants.js';
+import profileSettings from './ChatUserSettings.vue';
+import archiveDateSelector from '../ArchivePage/ArchiveDatesPanel.vue';
 
 const adminConsole = () => ({
   // Загружаемый компонент. Значение должно быть Promise
@@ -28,27 +31,39 @@ const adminConsole = () => ({
 export default {
     name: "ChatNavMenu",
     computed: {
+        ...mapGetters({
+            currentUser: 'users/currentUser',
+        }),
         isAdmin: function(){
             return this.$store.getters['auth/role'] == ROLES.ADMIN;
         },
     },
     methods: {
+        ...mapMutations({
+            showInteractive: 'chat/showInteractive',
+            showModal: 'showModal',
+        }),
         ...mapActions({
             runCommand: 'commands/run',
+            sendToServer: 'connection/send',
         }),
         showConsole: function() {
             if(this.isAdmin) {
-                this.$store.commit('chat/showInteractive', adminConsole);
+                this.showInteractive(adminConsole);
             }
         },
         showSettings: function() {
-            this.runCommand({commandName: CHAT_COMMANDS.ACTION_SHOW_SETTINGS});
+            this.showModal(profileSettings);
         },
         exit: function() {
             this.runCommand({commandName: CHAT_COMMANDS.ACTION_EXIT});
         },
         showArchive: function() {
-            window.open();
+            this.showModal(archiveDateSelector);
+        },
+        changeStatus: function() {
+            if(this.currentUser.status == STATUS.NOT_AVAILABLE || this.currentUser.status == STATUS.NOT_ACTIVE) this.sendToServer({command: CHAT_COMMANDS.SET_STATUS, data: STATUS.ONLINE});
+            else if(this.currentUser.status == STATUS.ONLINE) this.sendToServer({command: CHAT_COMMANDS.SET_STATUS, data: STATUS.NOT_AVAILABLE});
         }
     },
 }
@@ -80,6 +95,7 @@ export default {
             padding: 0 @base-padding;
             text-decoration: none;
             color: @base-font-color;
+            font-weight: normal;
             &:hover {
                 color: @gold;
                 text-decoration: underline;
@@ -89,10 +105,9 @@ export default {
                 color: @blue;
             }
             &.exitLink {
-                color: @red;
-                font-weight: bold;
+                color: @gold;
                 &:hover {
-                    color: @gold;
+                    color: @blue;
                 }
             }
         }
