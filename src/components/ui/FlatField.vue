@@ -116,6 +116,7 @@ export default {
             color: @blue;
         }
         &.errorField {
+            border-width: 0;
             border-left-width: @base-padding*2;
             border-color: @red;
             border-radius: 0;
@@ -123,7 +124,7 @@ export default {
             background-color: @dark-red;
         }
         &.selected {
-            border-color: @green;
+            border-color: @blue;
         }
     }
 </style>

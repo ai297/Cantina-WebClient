@@ -1,13 +1,13 @@
-import {HTTP} from '../../http-common';
-import {API_URL} from '../../constants.js';
+import axios from 'axios';
+import { API_URL } from '../../constants';
 
 export default {
     namespaced: true,
     state: {
         onlineUsers: [],
         currentUser: {
-            userId: 0,
-            name,
+            userId: -1,
+            name: null,
             enterTime: null,
             status: 1,
         }
@@ -39,15 +39,19 @@ export default {
         },
         clearUserList: state => state.onlineUsers = [],
         setCurrentUserId: (state, id) => state.currentUser.userId = id,
+        updateCurrentUser: (state, user) => state.currentUser = user,
     },
     actions: {
-        loadOnlineUsers: async context => {
-            context.commit('clearUserList');
-            await HTTP.get(API_URL.ONLINE_USERS)
+        loadOnlineUsers: ({commit, state}) => {
+            commit('clearUserList');
+            return new Promise((resolve, reject) => {
+                axios.get(API_URL.ONLINE_USERS)
                 .then(response => {
-                    for(let key in response.data) context.commit('addUserToOnlineList', response.data[key]);
-                });
-            return context.state.onlineUsers.length;
+                    for(let userData of response.data) commit('addUserToOnlineList', userData);
+                    resolve(state.onlineUsers.length > 0);
+                })
+                .catch(reject);
+            });
         }
     }
 }

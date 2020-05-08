@@ -1,10 +1,12 @@
+import onlineUsers from '../../components/_Main/_Chat/UserList/OnlineUsersList.vue';
+
 export default {
     namespaced: true,
     state: {
         limitedChatWidth: localStorage.getItem("limitedWidth"),
         showSidebar: localStorage.getItem("showSidebar"),
         reversDirection: localStorage.getItem("reversDirection"),
-        currentAsideComponent: undefined,
+        currentAsideComponent: onlineUsers,
         interactiveComponent: "div",
         showSmiles: false,
         autoScroll: true,
@@ -22,7 +24,7 @@ export default {
             if(state.reversDirection === null) return false;
             else return state.reversDirection === "true";
         },
-        getCurrentAsideComponent: state => state.currentAsideComponent,
+        currentAsideComponent: state => state.currentAsideComponent,
         interactiveComponent: state => state.interactiveComponent,
         showSmiles: state => state.showSmiles,
         autoScroll: state => state.autoScroll,

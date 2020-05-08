@@ -1,8 +1,6 @@
 <template functional>
     <svg version="1.1" viewBox="0 0 300 15" xmlns="http://www.w3.org/2000/svg" :class="{turn: props.turned}" fill="currentColor">
-        <path d="m2 2s2 4.5 6.9 4.5h121s3.1 2.8 6.9 2.8h26c3.7 0 6.9-2.8 6.9-2.8h121c4.9 0 6.9-4.5 6.9-4.5h-88l-3.8 2.6h-113l-3.8-2.6z"/>
-        <path d="m63 0 13 8.5h-25s0.75 2.4 4.8 2.4h24l4.8 3.1 6-1.8h24c2.3 0 4.3-2.8 4.3-2.8h-31l-15-9.4z" />
-        <path d="m237 0-13 8.5h25s-0.75 2.4-4.8 2.4h-24l-4.8 3.1-6-1.8h-24c-2.3 0-4.3-2.8-4.3-2.8h31l15-9.4z" />
+        <path d="m63 1 3.1 1.9h-64s2 4.2 6.9 4.2h64l3.1 1.9h-25s0.75 2.2 4.8 2.2h24l4.8 2.9 6-1.7h24c2.3 0 4.3-2.6 4.3-2.6h-31l-4.6-2.7h47s3.1 2.6 6.9 2.6h26c3.7 0 6.9-2.6 6.9-2.6h47l-4.6 2.7h-31s2 2.6 4.3 2.6h24l6 1.7 4.8-2.9h24c4 0 4.8-2.2 4.8-2.2h-25l3.1-1.9h64c4.9 0 6.9-4.2 6.9-4.2h-64l3.1-1.9h-9.9l-3.2 1.9h-14l-3.8 2.4h-113l-3.8-2.4h-13l-3.2-1.9z"/>
     </svg>
 </template>
 
@@ -18,8 +16,8 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-    .turn {
+<style lang="less">
+    svg.turn {
         transform: scale(1,-1);
     }
 </style>

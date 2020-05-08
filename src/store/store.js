@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+
 import auth from './modules/auth.js';
 import chat from './modules/chat.js';
 import connection from './modules/connection.js';
@@ -21,12 +22,18 @@ export default new Vuex.Store({
             component: "div",
             show: false,
         },
+        popUp: {
+            component: "div",
+            show: false,
+            props: {},
+        },
         windowFocused: true,
         minCssWidth: 700,
     },
     getters: {
         loader: state => state.loader,
         modal: state => state.modal,
+        popUp: state => state.popUp,
         isWindowFocused: state => state.windowFocused,
         minWidth: state => state.minCssWidth,
         isMinWidth: state => () => {
@@ -58,6 +65,12 @@ export default new Vuex.Store({
         setFocusWindow: (state, isFocused) => {
             state.windowFocused = isFocused;
         },
+        openPopUp: (state, {component, props}) => {
+            state.popUp.component = component;
+            if(props !== undefined) state.popUp.props = props;
+            state.popUp.show = true;
+        },
+        closePopUp: state => state.popUp.show = false,
     },
     modules: {
         auth,
