@@ -8,9 +8,12 @@
             <transition name="aside-main" mode="out-in" :duration="{ enter: 800, leave: 500 }">
                 <component :is="asideComponent" class="chat-aside__top-section" />
             </transition>
-            <div><volume-button @click="showSettings"><cantina-icons iconName="gear" /> Настройки</volume-button></div>
-            тыц <br />
-            
+
+            <div>
+                <volume-button @click="showSettings"><cantina-icons iconName="gear" /> Настройки</volume-button>
+                <!-- <volume-button ><cantina-icons iconName="radio" /> Радио</volume-button> -->
+            </div>
+            <!-- <simple-radio :element="$parent.$el" /> -->
             <template v-slot:bottom>
                 <settings-panel />
                 <div class="online-time">
@@ -30,6 +33,7 @@ import chatMessages from './ChatMessages.vue';
 import mainAside from '../Aside.vue';
 import settingsPanel from '../Components/SettingsPanel.vue';
 import userSettings from './ChatUserSettings.vue';
+// import simpleRadio from '../_Radio/SimpleRadioPlayer.vue';
 
 export default {
     name: "LiveChat",
@@ -37,6 +41,7 @@ export default {
         chatMessages,
         mainAside,
         settingsPanel,
+        // simpleRadio,
     },
     data: function() {
         return {
@@ -83,9 +88,6 @@ export default {
         showSettings: function() {
             this.showModal(userSettings);
         },
-        test: function(e) {
-            alert(e);
-        }
     },
     created: function() {
         this.isAutoShow = !this.isShowSidebar;

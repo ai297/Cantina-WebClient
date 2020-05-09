@@ -17,7 +17,8 @@ export default {
             on: context.listeners,
         }, [createElement("div", context.children)]);
         return createElement("div", {
-            class: {volumeButton: true, actv: context.props.active, bright: context.props.bright},
+            class: { actv: context.props.active, bright: context.props.bright },
+            staticClass: 'volumeButton ' + context.data.staticClass,
             attrs: context.data.attrs,
         }, [button]);
     }

@@ -3,7 +3,6 @@ export default {
     namespaced: true,
     state: {
         player: null,
-        analyser: null,
         streams: {
             mp3: "http://136.243.156.30:1701/stream/2/"
         },

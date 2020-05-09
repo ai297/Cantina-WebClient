@@ -4,7 +4,7 @@ export default {
     name: 'HoloButton',
     functional: true,
     render: function(createElement, ctx) {
-        return createElement("button", Object.assign(ctx.data, { class: Object.assign({'holo-button': true }, ctx.data.class) }), [
+        return createElement("button", Object.assign(ctx.data, { class: Object.assign({'holo-button': true }, ctx.data.class !== undefined ? ctx.data.class : {}) }), [
             createElement("div", ctx.children)
         ])
     }
