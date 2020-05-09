@@ -1,6 +1,6 @@
 <template>
     <ul class="popUpUsersList">
-        <li v-for="(user, index) in list" :key="index" :class="{selected: (index == selected)}"><message-to-user-link :nickname="user" /></li>
+        <li v-for="(user, index) in list()" :key="index" :class="{selected: (index == selected())}"><message-to-user-link :nickname="user" /></li>
     </ul>
 </template>
 <script>

@@ -237,10 +237,10 @@ export default {
         openUserList: function(open = true) {
             if(open) {
                 this.openPopUp({component: popUpUsers, props: {
-                    list: this.sortedUsersList,
+                    list: () => this.sortedUsersList,
                     top: this.popUpUsersCoord.y,
                     left: this.popUpUsersCoord.x,
-                    selected: this.popUpSelectedIndex
+                    selected: () => this.popUpSelectedIndex
                 }});
             }
             else this.closePopUp();

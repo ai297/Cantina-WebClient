@@ -171,7 +171,9 @@ export default {
             this.userProfile = result.data;
             delete this.userProfile['onlineTime'];
             delete this.userProfile['user'];
-            
+            if(this.userProfile.location === undefined) this.userProfile.location = '';
+            if(this.userProfile.description === undefined) this.userProfile.description = '';
+
             // Устанавливаем настройки юзера
             let getFontIndex = function(fontName) {
                 if(fontName === null) return 0;

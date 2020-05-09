@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import {API_URL} from '../../constants.js';
 import baseEnterForm from './BaseFormView.vue';
 
 export default {
@@ -45,30 +46,30 @@ export default {
 
             this.$store.commit('showLoader', 'Активация аккаунта');
 
-            // HTTP({
-            //     method: "put",
-            //     url: API_URL.ACTIVATION,
-            //     headers: {
-            //         "Authorization": "Bearer " + this.token,
-            //     }
-            // })
-            // .then(response => {
-            //     this.responseMessage = response.data;
-            //     this.isActivationSuccess = true;
-            // })
-            // .catch((error) => {
-            //     if(error.response !== undefined) {
-            //         if(error.response.status == 401) {
-            //             this.responseMessage = "Неверный токен.";
-            //         }
-            //         else this.responseMessage = error.response.data;
-            //     } else this.responseMessage = 'Не удалось подключиться к серверу.';
-            //     this.isRequestError = true;
-            //     this.isActivationSuccess = false;
-            // })
-            // .finally(() => {
-            //     this.$store.commit('hideLoader');
-            // });
+            this.$http({
+                method: "put",
+                url: API_URL.ACTIVATION,
+                headers: {
+                    "Authorization": "Bearer " + this.token,
+                }
+            })
+            .then(response => {
+                this.responseMessage = response.data;
+                this.isActivationSuccess = true;
+            })
+            .catch((error) => {
+                if(error.response !== undefined) {
+                    if(error.response.status == 401) {
+                        this.responseMessage = "Неверный токен.";
+                    }
+                    else this.responseMessage = error.response.data;
+                } else this.responseMessage = 'Не удалось подключиться к серверу.';
+                this.isRequestError = true;
+                this.isActivationSuccess = false;
+            })
+            .finally(() => {
+                this.$store.commit('hideLoader');
+            });
         }
     },
     mounted: function() {

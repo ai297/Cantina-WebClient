@@ -71,6 +71,9 @@ export default new Vuex.Store({
             state.popUp.show = true;
         },
         closePopUp: state => state.popUp.show = false,
+        updateProps: (state, props) => {
+            state.popUp.props = props;
+        }
     },
     modules: {
         auth,
