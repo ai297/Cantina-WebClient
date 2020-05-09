@@ -21,7 +21,7 @@
 
 <script>
 import baseEnterForm from './BaseFormView.vue';
-import {VALIDATION_PATTERNS} from '../../constants.js';
+import {VALIDATION_PATTERNS, API_URL} from '../../constants.js';
 
 export default {
     name: "RegisterForm",
@@ -58,23 +58,23 @@ export default {
             if(this.isEmailInvalid || this.isPasswordInvalid || this.isNameInvalid || this.isLocationInvalid) return;
             
             // Запрос на регистрацию
-            // this.$store.commit('showLoader', 'Регистрация...');
-            // HTTP.post(API_URL.REGISTER, this.request)
-            // .then(() => {
-            //     // успешная регистрация
-            //     this.$router.push("/activation");
-            // })
-            // .catch((error) => {
-            //     // ошибка запроса
-            //     if(error.response !== undefined) {
-            //         this.errorMessage = error.response.data;
-            //     }
-            //     else this.errorMessage = 'Не удалось соединиться с сервером.';
-            //     this.isError = true;
-            // })
-            // .finally(()=>{
-            //     this.$store.commit('hideLoader');
-            // });
+            this.$store.commit('showLoader', 'Регистрация...');
+            this.$http.post(API_URL.REGISTER, this.request)
+            .then(() => {
+                // успешная регистрация
+                this.$router.push("/activation");
+            })
+            .catch((error) => {
+                // ошибка запроса
+                if(error.response !== undefined) {
+                    this.errorMessage = error.response.data;
+                }
+                else this.errorMessage = 'Не удалось соединиться с сервером.';
+                this.isError = true;
+            })
+            .finally(()=>{
+                this.$store.commit('hideLoader');
+            });
         },
     }
 }

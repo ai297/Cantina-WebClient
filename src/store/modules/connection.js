@@ -24,7 +24,7 @@ export default {
             // TODO: отключить логи LogLevel.None
             const hubConnection = new HubConnectionBuilder()
                 .withUrl(API_URL.ROOT + API_URL.HUB, { accessTokenFactory: (typeof(tokenFactory) === 'function') ? tokenFactory : () => '' })
-                .configureLogging(LogLevel.Information)
+                .configureLogging(LogLevel.Warning)
                 .build();
             
             hubConnection.serverTimeoutInMilliseconds = 2 * 60000;          // время таймаута (минут * 60000)
