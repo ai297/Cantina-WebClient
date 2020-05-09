@@ -1,68 +1,110 @@
-import { HubConnectionState } from '@microsoft/signalr';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import {API_URL, CHAT_COMMANDS} from '../../constants.js';
+
 export default {
     namespaced: true,
     state: {
-        hubConnection: undefined,
-        dataLoaded: false,
+        connection: undefined,
+        connected: false,
+        connectionOnClose: undefined,
+        actions: {
+            [CHAT_COMMANDS.USER_ENTER]: [],
+            [CHAT_COMMANDS.USER_EXIT]: [],
+            [CHAT_COMMANDS.RECEIVE_MESSAGE]: [],
+            [CHAT_COMMANDS.MESSAGES_LOADED]: [],
+            [CHAT_COMMANDS.RUN_CONNAND]: [],
+        }
     },
     getters: {
-        connection: state => state.hubConnection,
-        isConnected: state => {
-            if(state.hubConnection !== undefined) return state.hubConnection.state === HubConnectionState.Connected;
-            else return false;
-        },
-        isDataLoaded: state => state.dataLoaded,
+        isConnected: state => state.connected,
     },
     mutations: {
-        // создаём экземпляр signalR
-        setConnection: (state, connection) => {
-            if(state.hubConnection === undefined) state.hubConnection = connection;
+        init_connection: (state, tokenFactory) => {
+            state.connected = false;
+            // TODO: отключить логи LogLevel.None
+            const hubConnection = new HubConnectionBuilder()
+                .withUrl(API_URL.ROOT + API_URL.HUB, { accessTokenFactory: (typeof(tokenFactory) === 'function') ? tokenFactory : () => '' })
+                .configureLogging(LogLevel.Information)
+                .build();
+            
+            hubConnection.serverTimeoutInMilliseconds = 2 * 60000;          // время таймаута (минут * 60000)
+            hubConnection.onclose(() => {
+                if(typeof(state.connectionOnClose) === 'function' && state.connected == true) state.connectionOnClose();
+                state.connected = false;
+            });
+
+            for(let type in state.actions) {                              // Регистрируем обработчики команд от сервера
+                hubConnection.on(type, (data) => {
+                    for(let action of state.actions[type]) action(data);
+                });
+            }
+            state.connection = hubConnection;
         },
-        registerAction: (state, action) => {
-            if(state.hubConnection !== undefined) state.hubConnection.on(action.name, action.command);
+
+        register_action: (state, {type, action}) => {
+            if(typeof(action) === 'function'
+            && state.actions.hasOwnProperty(type)
+            && state.actions[type].indexOf(action) < 0) state.actions[type].push(action);
         },
-        removeAction: (state, action) => {
-            if(state.hubConnection !== undefined) state.hubConnection.off(action.name, action.command);
+
+        remove_action: (state, action) => {
+            for(let type in state.actions) {
+                let index = state.actions[type].indexOf(action);
+                if(index != -1) {
+                    state.actions[type].splice(index, 1);
+                    return;
+                }
+            }
         },
-        clearConnection: state => {
-            state.hubConnection = undefined;
+
+        onCloseConnection: (state, hook) => {
+            if(typeof(hook) === 'function') state.connectionOnClose = hook;
         },
-        setDataLoaded: (state, isLoaded = true) => {
-            state.dataLoaded = isLoaded;
-        },
+
+        connected: state => state.connected = true,
+        disconnected: state => state.connected = false,
     },
     actions: {
         // запуск соединения с хабом
-        connect: ({state, rootGetters}) => {
-            // если не авторизован - ничего не  делаем
-            if(!rootGetters['auth/isAuth']) return;
-            // если хабконнекшн создан и соединение ещё не установлено - возвращаем промис, стартующий соединение
-            if(state.hubConnection !== undefined && !state.hubConnection.connectionStarted) return state.hubConnection.start();
-            // иначе возвращаем промис, разрешающийся ошибкой
-            else return new Promise(function(resolve, reject) {
-                reject(false)
+        connect: ({state, commit, rootState}) => {
+            return new Promise((resolve, reject) => {
+                if(state.connection === undefined) commit('init_connection', () => rootState.auth.token);
+                if(!state.connected) state.connection.start().then(() => {
+                    commit('connected');
+                    resolve();
+                })
+                .catch(reject);
+                else resolve();
             });
         },
-        disconnect: ({getters, commit}) => {
-            // очищаем хук закрытия соединения
-            //getters.connection.closedCallbacks = [];
-            if(getters.isConnected) getters.connection.stop()
-            .finally(() => {
-                commit('clearConnection');
+
+        disconnect: ({state, commit}) => {
+            return new Promise((resolve, reject) => {
+                if(state.connected) {
+                    state.connection.send(CHAT_COMMANDS.CHAT_DISCONNECT)
+                    .then(() => {
+                        commit('disconnected');
+                        state.connection.stop().then(resolve);
+                    });
+                } else reject();
             });
         },
+
         // invoke - ждёт ответа от сервера
         // send - просто отправляет сообщение, не ожидая ответа
-        invoke: ({state, getters}, payload) => {
-            if(payload === undefined || !payload.command || !getters.isConnected) return false;
-            if(!payload.data) return state.hubConnection.invoke(payload.command);
-            else return state.hubConnection.invoke(payload.command, payload.data);
+        invoke: ({state}, {command, data}) => {
+            return new Promise((resolve, reject) => {
+                if(state.сonnected == false || command === undefined) reject();
+                else if(data !== undefined) state.connection.invoke(command, data).then(resolve).catch(resolve);
+                else state.connection.invoke(command).then(resolve).catch(reject);
+            });
         },
-        send: ({state, getters}, payload) => {
-            if(payload === undefined || !payload.command || !getters.isConnected) return false;
-            if(!payload.data) state.hubConnection.send(payload.command);
-            else state.hubConnection.send(payload.command, payload.data);
-            return true;
+        send: ({state}, {command, data}) => {
+            return new Promise((resolve, reject) => {
+                if(state.сonnected == false || command === undefined) reject();
+                else if(data !== undefined) state.connection.send(command, data).then(resolve).catch(resolve);
+                else state.connection.send(command).then(resolve).catch(reject);
+            });
         }
     }
 }

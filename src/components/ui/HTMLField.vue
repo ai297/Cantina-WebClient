@@ -47,10 +47,10 @@ export default {
                         vm.$emit('input', vm.$refs["html-field"].innerHTML);
                     },
                     keydown: function(event) {
+                        vm.$emit('keydown', event.key);
                         // обработка клавиши enter
                         if(event.which == ENTER_KEY && !vm.multiline) {
                             event.preventDefault();
-                            vm.$emit('submit');
                         }
                         // обработка клавиши backspace
                         //else if(window.getSelection && event.which == BACKSPACE_KEY) vm.fixNotEditableBlocks(event);
@@ -117,43 +117,45 @@ export default {
             this.$refs['html-field'].focus();
         },
 
-        fixNotEditableBlocks: function(event) {
-            let selection = window.getSelection();
-            if (!selection.isCollapsed || !selection.rangeCount) {
-                return;
-            }
-            let curRange = selection.getRangeAt(selection.rangeCount - 1);
-            if (curRange.commonAncestorContainer.nodeType == 3 && curRange.startOffset > 0) {
-                // we are in child selection. The characters of the text node is being deleted
-                return;
-            }
-            let range = document.createRange();
-            if (selection.anchorNode != this.$refs['html-field']) {
-                // selection is in character mode. expand it to the whole editable field
-                range.selectNodeContents(this.$refs['html-field']);
-                range.setEndBefore(selection.anchorNode);
-            } else if (selection.anchorOffset > 0) {
-                range.setEnd(this.$refs['html-field'], selection.anchorOffset);
-            } else {
-                // reached the beginning of editable field
-                return;
-            }
-            range.setStart(this.$refs['html-field'], range.endOffset - 1);
-            let previousNode = range.cloneContents().lastChild;
-            if (previousNode && previousNode.contentEditable == false) {
-                // this is some rich content, e.g. smile. We should help the user to delete it
-                range.deleteContents();
-                event.preventDefault();
-                this.$emit('input', this.$refs['html-field'].innerHTML);
-            }
-        }
+        // fixNotEditableBlocks: function(event) {
+        //     let selection = window.getSelection();
+        //     if (!selection.isCollapsed || !selection.rangeCount) {
+        //         return;
+        //     }
+        //     let curRange = selection.getRangeAt(selection.rangeCount - 1);
+        //     if (curRange.commonAncestorContainer.nodeType == 3 && curRange.startOffset > 0) {
+        //         // we are in child selection. The characters of the text node is being deleted
+        //         return;
+        //     }
+        //     let range = document.createRange();
+        //     if (selection.anchorNode != this.$refs['html-field']) {
+        //         // selection is in character mode. expand it to the whole editable field
+        //         range.selectNodeContents(this.$refs['html-field']);
+        //         range.setEndBefore(selection.anchorNode);
+        //     } else if (selection.anchorOffset > 0) {
+        //         range.setEnd(this.$refs['html-field'], selection.anchorOffset);
+        //     } else {
+        //         // reached the beginning of editable field
+        //         return;
+        //     }
+        //     range.setStart(this.$refs['html-field'], range.endOffset - 1);
+        //     let previousNode = range.cloneContents().lastChild;
+        //     if (previousNode && previousNode.contentEditable == false) {
+        //         // this is some rich content, e.g. smile. We should help the user to delete it
+        //         range.deleteContents();
+        //         event.preventDefault();
+        //         this.$emit('input', this.$refs['html-field'].innerHTML);
+        //     }
+        // }
 
     },
-    // watch: {
-    //     value: function(val) {
-    //         if(val != this.$refs['html-field'].innerHTML) this.update(val);
-    //     }
-    // },
+    watch: {
+        value: function() {
+            if(!this.multiline) {
+                this.$refs["html-field"].scrollLeft = this.$refs["html-field"].scrollWidth - this.$refs["html-field"].clientWidth;
+            }
+        }
+    },
     mounted: function() {
         this.$refs["html-field"].innerHTML = this.value;
     }

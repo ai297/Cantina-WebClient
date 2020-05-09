@@ -12,8 +12,7 @@ export default {
     @import "../../less/vars.less";
     .flatButton {
         background-color: inherit;
-        padding: .3em 1em;
-        margin: .4em;
+        padding: @base-padding 1em;
         border: @ui-border-width solid @gold;
         border-radius: 1em;
         color: @gold;
@@ -21,7 +20,7 @@ export default {
         transition: color .5s;
         &:hover, &:focus {
             color: @blue;
-            border-color: @green;
+            border-color: @blue;
         }
     }
 </style>

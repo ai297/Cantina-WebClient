@@ -1,23 +1,18 @@
-import {HTTP} from '../../http-common.js';
-import {API_URL, ROLES, CLAIMS} from '../../constants.js';
+import axios from 'axios';
+import {ROLES, CLAIMS, API_URL} from '../../constants.js';
 
 export default {
     namespaced: true,
     state: {
-        token: sessionStorage.getItem('auth-token') || '',
-        auth: {
-            isAuth: false,
-            type: '',
-            text: '',
-        },
+        token: localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token') || '',
+        status: '',
     },
     getters: {
-        isAuth: state => state.auth.isAuth,
-        token: (state, getters) => {
-            if(state.token != '' && getters.tokenExpire > Date.now()) return state.token;
-            else return false;
+        isAuth: (state, getters) => {
+            return state.token != '' && getters.tokenExpire > Date.now();
         },
-        tokenInfo: state => {
+        status: state => state.status,
+        tokenInfo: (state) => {
             return JSON.parse(atob(state.token.split('.',3)[1]));
         },
         tokenExpire: (state, getters) => {
@@ -25,74 +20,63 @@ export default {
             else return 0;
         },
         role: (state, getters) => {
-            if(!getters.token) return ROLES.USER;
+            if(!getters.isAuth) return ROLES.USER;
             else {
                 let role = getters.tokenInfo[CLAIMS.ROLE];
                 return role ? role : ROLES.USER;
             }
         },
         userId: (state, getters) => {
-            if(!getters.token) return -1;
-            else return getters.tokenInfo[CLAIMS.ID] * 1;
-        },
+            if(!getters.isAuth) return -1;
+            else {
+                return getters.tokenInfo[CLAIMS.ID] * 1;
+            }
+        }
     },
     mutations: {
-        setToken: (state, token) => {
+        auth_request: state => state.status = "Loading",
+        auth_unconfirm: state => state.status = "Unconfirmed",
+        auth_success: (state, token) => {
+            state.status = "Authorized";
             state.token = token;
-            sessionStorage.setItem('auth-token', token);
-            HTTP.defaults.headers.common['Authorization'] = 'Bearer ' + token;
         },
-        removeToken: state => {
+        auth_error: state => state.status = "Error",
+        logout: state => {
+            state.status = "Unauthorized";
             state.token = '';
-            sessionStorage.removeItem('auth-token');
-            delete HTTP.defaults.headers.common['Authorization'];
-        },
-        authResult: (state, payload) => {
-            state.auth = payload;
         },
     },
     actions: {
-        auth: (context, data) => {
-            return HTTP({
-                method: data.method,
-                url: API_URL.LOGIN,
-                data: data.payload,
-                headers: {
-                    "Authorization": context.getters.token ? "Bearer " + context.getters.token : '',
-                }
-            })
-            .then(response => {
-                let res = response.data;
-                if(res.success) {
-                    context.commit("setToken", res.token);
-                    context.commit("authResult", {isAuth: true});
-                }
-                else {
-                    if(res.type == "activation") context.commit("authResult", {isAuth: false, type: "activation"});
-                    else context.commit("authResult", {isAuth: false, type: 'error', text: 'Что-то сломалось'});
-                    context.commit("removeToken");
-                }
-            })
-            .catch(error => {
-                let errorMessage = '';
-                if(error.response !== undefined) {
-                    switch(error.response.status){
-                        case 403:
-                            errorMessage = "Доступ запрещён";
-                            break;
-                        default:
-                            errorMessage = error.response.data;
+        // запрос авторизации
+        login: ({commit}, request) => {
+            return new Promise((resolve, reject) => {
+                commit('auth_request');
+                axios.post(API_URL.LOGIN, request)
+                .then(response => {
+                    // если аккаунт не активирован
+                    if(response.data.result == "Unconfirmed") commit('auth_unconfirm');
+                    // если получен токен
+                    else {
+                        if(request.longLife) localStorage.setItem('auth-token', response.data.result);
+                        else sessionStorage.setItem('auth-token', response.data.result);
+                        axios.defaults.headers.common['Authorization'] = "Bearer " + response.data.result;
+                        commit('auth_success', response.data.result);
                     }
-                } else errorMessage = 'Не удалось подключиться к серверу';
-                context.commit("authResult", {isAuth: false, type: 'error', text: errorMessage});
-                context.commit("removeToken");
+                    resolve(response);
+                })
+                .catch(err => {
+                    commit('auth_error');
+                    localStorage.removeItem('auth-token');
+                    sessionStorage.removeItem('auth-token');
+                    reject(err);
+                });
             });
         },
-        login: async (context, payload) => {
-            await context.dispatch('auth', {method: 'post', payload: payload});
-        },
-        relogin: async context => {
-            await context.dispatch('auth', {method: 'get', payload: {}});
+
+        logout: ({commit}) => {
+            commit('logout');
+            localStorage.removeItem('auth-token');
+            sessionStorage.removeItem('auth-token');
         }
     }
 

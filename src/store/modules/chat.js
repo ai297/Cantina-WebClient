@@ -1,15 +1,13 @@
+import onlineUsers from '../../components/_Main/_Chat/UserList/OnlineUsersList.vue';
+
 export default {
     namespaced: true,
     state: {
         limitedChatWidth: localStorage.getItem("limitedWidth"),
         showSidebar: localStorage.getItem("showSidebar"),
         reversDirection: localStorage.getItem("reversDirection"),
-        currentAsideComponent: undefined,
-        showExtendPanel: false,
-        extendPanelComponent: "div",
+        currentAsideComponent: onlineUsers,
         interactiveComponent: "div",
-        modalComponent: "div",
-        showModal: false,
         showSmiles: false,
         autoScroll: true,
     },
@@ -26,12 +24,8 @@ export default {
             if(state.reversDirection === null) return false;
             else return state.reversDirection === "true";
         },
-        isShowExtendPanel: state => state.showExtendPanel,
-        getCurrentAsideComponent: state => state.currentAsideComponent,
-        getExtendPanelComponent: state => state.extendPanelComponent,
+        currentAsideComponent: state => state.currentAsideComponent,
         interactiveComponent: state => state.interactiveComponent,
-        modalComponent: state => state.modalComponent,
-        showModal: state => state.showModal,
         showSmiles: state => state.showSmiles,
         autoScroll: state => state.autoScroll,
     },
@@ -39,23 +33,10 @@ export default {
         changeAsideBlock: (state, component) => {
             state.currentAsideComponent = component;
         },
-        showExtendPanel: (state, component) => {
-            if (!state.extendPanelComponent.hasOwnProperty("name") || state.extendPanelComponent.name != component.name) {
-                state.extendPanelComponent = component;
-                state.showExtendPanel = true;
-            } else state.showExtendPanel = !state.showExtendPanel;
-        },
         showInteractive: (state, component) => {
             if(!state.interactiveComponent.hasOwnProperty("name") || state.interactiveComponent.name != component.name) state.interactiveComponent = component;
             else state.interactiveComponent = "div";
         },
-        showModal: (state, component) => {
-            if(!state.modalComponent != component) {
-                state.modalComponent = component;
-                state.showModal = true;
-            } else state.showModal = !state.showModal;
-        },
-        hideModal: state => state.showModal = false,
         changeWidth: (state) => {
             localStorage.setItem("limitedWidth", !(state.limitedChatWidth === "true"));
             state.limitedChatWidth = localStorage.getItem("limitedWidth");

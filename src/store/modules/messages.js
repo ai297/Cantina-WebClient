@@ -5,9 +5,12 @@ export default {
     state: {
         messages: new Queue(),
         maxCount: 100,
+        oldMessageLoaded: false,
         showTimeAlways: localStorage.getItem("showTimeAlways"),
         soundNotice: localStorage.getItem("soundNotice"),
         lastMessageDate: undefined,
+
+        unreadMessages: 0,
     },
     getters: {
         getMessages: state => {
@@ -23,7 +26,10 @@ export default {
         soundNotice: state => {
             if(state.soundNotice === null) return true;
             else return state.soundNotice === "true";
-        }
+        },
+        oldMessageLoaded: state => state.oldMessageLoaded,
+        unreadMessages: state => state.unreadMessages,
+        lastMessageDate: state => state.lastMessageDate,
     },
     mutations: {
         addMessage: (state, message) => {
@@ -34,7 +40,10 @@ export default {
             // добавляем сообщение в очередь
             state.messages.enqueue(message);
         },
-        clearMessages: state => state.messages = new Queue(),
+        clearMessages: state => {
+            state.messages = new Queue();
+            state.oldMessageLoaded = false;
+        },
         switchTimeMode: state => {
             localStorage.setItem("showTimeAlways", !(state.showTimeAlways === "true"));
             state.showTimeAlways = localStorage.getItem("showTimeAlways");
@@ -43,10 +52,11 @@ export default {
             localStorage.setItem("soundNotice", !(state.soundNotice === "true"));
             state.soundNotice = localStorage.getItem("soundNotice");
         },
-    },
-    actions: {
-        clearMessagesList: (context) => {
-            context.commit('clearMessages');
+        oldMessageLoaded: (state, val = true) => {
+            state.oldMessageLoaded = val;
         },
+        setUnreadMessages: (state, val) => {
+            state.unreadMessages = val;
+        }
     }
 }

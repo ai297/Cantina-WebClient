@@ -15,12 +15,11 @@ export default {
     render: function(createElement, context){
         let button = createElement("button", {
             on: context.listeners,
-            attrs: context.data.attrs,
-            class: context.data.class,
-            style: context.data.style
         }, [createElement("div", context.children)]);
         return createElement("div", {
-            class: {volumeButton: true, actv: context.props.active, bright: context.props.bright}
+            class: { actv: context.props.active, bright: context.props.bright },
+            staticClass: 'volumeButton ' + context.data.staticClass,
+            attrs: context.data.attrs,
         }, [button]);
     }
 }
@@ -59,9 +58,10 @@ export default {
             }
         }
         &:hover {
-            background: linear-gradient(to bottom, @blue, mix(@blue, @btn-base-bgcolor, 50%));
+            background: linear-gradient(to bottom, @light-blue, @blue);
+            color: @light-blue;
             button {
-                background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
+                background: radial-gradient(@dark-red, @btn-base-bgcolor);
                 svg {
                     color: @gold;
                 }
@@ -79,9 +79,20 @@ export default {
             }
         }
 
+        &.actv {
+            background: linear-gradient(to bottom, @blue, mix(@blue, @body-background-color, 50%));
+            color: @light-blue;
+            button {
+                background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
+                svg {
+                    color: @gold;
+                }
+            }
+        }
 
         &.bright {
             background: linear-gradient(to bottom, @gold, @dark-gold);
+            color: @light-blue;
             &:hover {
                 background: @gold;
                 color: white;
@@ -89,16 +100,8 @@ export default {
             svg {
                 color: @gold;
             }
-        }
-
-        &.actv {
-            background: linear-gradient(to bottom, @blue, mix(@blue, @btn-base-bgcolor, 50%));
-            color: @blue;
-            button {
-                background: radial-gradient(mix(@red, @btn-base-bgcolor, 50%), @btn-base-bgcolor);
-                svg {
-                    color: @gold;
-                }
+            &.actv {
+                color: @gold;
             }
         }
     }

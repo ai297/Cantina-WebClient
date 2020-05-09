@@ -15,7 +15,7 @@ export const MESSAGE_TYPES = {
     Error: 102,
     TYPES: {
         0: { name: 'Base', command: '', shortCommand: ''},
-        10: { name: 'Privat', command: 'pm', shortCommand: '@'},
+        10: { name: 'Privat', command: 'pm', shortCommand: '/'},
         20: { name: 'ThirdPerson', command: 'me', shortCommand: '*'},
         100: { name: 'System', command: 'system', shortCommand: '~'},
         101: {name: 'Information', command: 'info', shortCommand: null},
@@ -24,8 +24,8 @@ export const MESSAGE_TYPES = {
 }
 
 export const ROUTING = {
-    IN_PAGE: '/chat',
-    OUT_PAGE: '/'
+    IN_PAGE: {name: 'chat'},
+    OUT_PAGE: {name: 'intro'},
 } 
 
 export const API_URL = {
@@ -36,10 +36,12 @@ export const API_URL = {
     USERINFO: 'userinfo',
     HUB: 'hub',
     ONLINE_USERS: 'onlineusers',
+    ARCHIVE: 'archive',
+    LIFE_CHECK: 'status'
 };
 
 export const ROLES = {
-    ADMIN: "Admin",
+    DEVELOPER: "Developer",
     USER: "User",
 }
 
@@ -49,43 +51,57 @@ export const CLAIMS = {
     ROLE: "ut",
 }
 
+export const STATUS = {
+    HIDDEN: 0,
+    ONLINE: 1,
+    NOT_ACTIVE: 2,
+    NOT_AVAILABLE: 3,
+    _TITLES: [
+        "Невидимый",
+        "В сети",
+        "Не активен",
+        "Отошёл",
+    ]
+}
+
 export const CHAT_COMMANDS = {
     // методы клиента
     RECEIVE_MESSAGE: 'ReceiveMessage',
+    MESSAGES_LOADED: 'MessagesLoaded',
     RUN_CONNAND: 'RunCommand',
     USER_ENTER: 'AddUserToOnlineList',
     USER_EXIT: 'RemoveUserFromOnlineList',
+    
     // управление клиентом
     ACTION_ADD_MESSAGE: 'AddMessage',
     ACTION_EXIT: 'Exit',
-    ACTION_SHOW_SETTINGS: 'ShowUserSettings',
-    ACTION_SHOW_SMILES: "ShowSmiles",
-    ACTION_SHOW_SMILES_SETTINGS: 'ShowSmilesSettings',
-    ACTION_CLOSE_MODAL: 'HideModalView',
+    ACTION_ENTER: 'Enter',
+    ACTION_LOGOUT: 'Logout',
     ACTION_CHANGE_SIDEBAR: "ChangeSideBarMode",
     ACTION_FOCUS_INPUT_FIELD: "FocusInputField",
     ACTION_ADD_NAME_TO_MESSAGE: 'AddNameToMessage',
     ACTION_INSERT_SMILE_TO_MESSAGE: 'InsertSmileToMessage',
-    ACTION_INSERT_TEXT_TO_MESSAGE: "InsertTextToMessage",
-    ACTION_PLAY_NEW_MESSAGE_SOUND: "PlayNewMessageSound",
     ACTION_SCROLL_TO_LAST_MESSAGE: "ScrollToLastMessage",
+
     // методы сервера
     SEND_MESSAGE: 'SendMessage',
+    SET_STATUS: 'SetStatus',
+    CHAT_DISCONNECT: 'Exit',
 }
 
-export const MOUNTHS = [
-    "января",
-    "февраля",
-    "марта",
-    "апреля",
-    "мая",
-    "июня",
-    "июля",
-    "августа",
-    "сентября",
-    "октября",
-    "ноября",
-    "декабря"
+export const MONTHS = [
+    "Январь",
+    "Февраль",
+    "Март",
+    "Апрель",
+    "Май",
+    "Июнь",
+    "Июль",
+    "Август",
+    "Сентябрь",
+    "Октябрь",
+    "Ноябрь",
+    "Декабрь"
 ]
 
 export const GENDER = [

@@ -1,14 +1,15 @@
-import {HTTP} from '../../http-common';
-import {API_URL} from '../../constants.js';
+import axios from 'axios';
+import { API_URL } from '../../constants';
 
 export default {
     namespaced: true,
     state: {
         onlineUsers: [],
         currentUser: {
-            id: 0,
-            name,
+            userId: -1,
+            name: null,
             enterTime: null,
+            status: 1,
         }
     },
     getters: {
@@ -19,9 +20,8 @@ export default {
         // мутация добавляет нового юзера в список онлайна
         addUserToOnlineList: (state, userData) => {
             // обновление данных текущего юзера
-            if(userData.userId == state.currentUser.id) {
-                state.currentUser.name = userData.name;
-                state.currentUser.enterTime = userData.enterTime;                
+            if(userData.userId == state.currentUser.userId) {
+                state.currentUser = userData;              
             }
             for(let i in state.onlineUsers) {
                 // перебираем всех посетителей в чате и если находим такого же - заменяем данные в списке на новые данные посетителя
@@ -38,16 +38,20 @@ export default {
             }
         },
         clearUserList: state => state.onlineUsers = [],
-        setCurrentUserId: (state, id) => state.currentUser.id = id,
+        setCurrentUserId: (state, id) => state.currentUser.userId = id,
+        updateCurrentUser: (state, user) => state.currentUser = user,
     },
     actions: {
-        loadOnlineUsers: async context => {
-            context.commit('clearUserList');
-            await HTTP.get(API_URL.ONLINE_USERS)
+        loadOnlineUsers: ({commit, state}) => {
+            commit('clearUserList');
+            return new Promise((resolve, reject) => {
+                axios.get(API_URL.ONLINE_USERS)
                 .then(response => {
-                    for(let key in response.data) context.commit('addUserToOnlineList', response.data[key]);
-                });
-            return context.state.onlineUsers.length;
+                    for(let userData of response.data) commit('addUserToOnlineList', userData);
+                    resolve(state.onlineUsers.length > 0);
+                })
+                .catch(reject);
+            });
         }
     }
 }

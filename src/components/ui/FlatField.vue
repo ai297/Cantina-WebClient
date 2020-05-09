@@ -1,6 +1,6 @@
 <template>
     <div class="flat-field" :class="{withvalue:(value != ''), selected: isSelected}">
-        <input :type="type" :maxlength="maxlength" :value="value" v-on="inputListener" @focus="isSelected = true" @blur="isSelected = false" />
+        <input :type="type" :maxlength="maxlength" :value="value" v-on="inputListener" @focus="isSelected = true" @blur="isSelected = false" ref="input" />
         <div class="extender"><slot /></div>
         <div class="placeholder" v-show="isShowPlaceholder" v-html="placeholder"></div>
     </div>
@@ -26,6 +26,10 @@ export default {
             type: String,
             default: '',
         },
+        autofocus: {
+            type: Boolean,
+            default: false,
+        }
     },
     data: function() {
         return {
@@ -47,6 +51,9 @@ export default {
         isShowPlaceholder: function() {
             return this.value == '' && !this.isSelected;
         }
+    },
+    mounted: function() {
+        if(this.autofocus) this.$refs['input'].focus();
     }
 }
 </script>
@@ -109,6 +116,7 @@ export default {
             color: @blue;
         }
         &.errorField {
+            border-width: 0;
             border-left-width: @base-padding*2;
             border-color: @red;
             border-radius: 0;
@@ -116,7 +124,7 @@ export default {
             background-color: @dark-red;
         }
         &.selected {
-            border-color: @green;
+            border-color: @blue;
         }
     }
 </style>
