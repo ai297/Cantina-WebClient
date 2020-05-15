@@ -137,7 +137,7 @@ export default {
             }
             img.smile {
                 padding: 0 @base-padding/2;
-                vertical-align: bottom;
+                vertical-align: baseline;
             }
         }
         &::before {
