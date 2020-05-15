@@ -93,7 +93,7 @@ export default {
             closeModal: 'closeModal',
         }),
         validation: function(field, pattern = field) {
-            if(this.userProfile[field].match(VALIDATION_PATTERNS[pattern]) === null) return true;
+            if(this.userProfile[field] !== undefined && this.userProfile[field].match(VALIDATION_PATTERNS[pattern]) === null) return true;
             else return false;
         },
         updateSettings: function() {
@@ -171,8 +171,6 @@ export default {
             this.userProfile = result.data;
             delete this.userProfile['onlineTime'];
             delete this.userProfile['user'];
-            if(this.userProfile.location === undefined) this.userProfile.location = '';
-            if(this.userProfile.description === undefined) this.userProfile.description = '';
 
             // Устанавливаем настройки юзера
             let getFontIndex = function(fontName) {

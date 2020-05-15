@@ -1,14 +1,19 @@
 <script>
 import { MESSAGE_TYPES } from '../../../../constants.js';
 import messageToUserLink from './MessageUserLink.vue';
-import smile from '../Smile.vue';
+import smile from '../Smiles/Smile.vue';
 
 export default {
     name: "MessageText",
-    //functional: true,
-    render: function(createElement) {
-        //let message = context.props.message;
-        let message = this.message;
+    functional: true,
+    props: {
+        message: {
+            type: Object,
+            default: undefined
+        }
+    },
+    render: function(createElement, ctx) {
+        let message = ctx.props.message;
         if(message === undefined || !message.hasOwnProperty('text')) return false;
         let text = message.text;
         let VNodes = [];                // массив всех дочерних узлов в сообщении
@@ -66,13 +71,7 @@ export default {
             }
         }));
         
-        return createElement('span', VNodes);
-    },
-    props: {
-        message: {
-            type: Object,
-            default: undefined
-        }
+        return createElement('span', ctx.data, VNodes);
     }
 }
 </script>

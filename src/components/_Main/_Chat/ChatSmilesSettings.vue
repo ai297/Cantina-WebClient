@@ -23,7 +23,7 @@ import {mapActions, mapMutations, mapGetters} from 'vuex';
 import {CHAT_COMMANDS, MESSAGE_TYPES} from '../../../constants.js';
 import {OLD_SMILES, OLD_SMILES_DEFAULT} from '../../../old-smiles.js';
 import baseModal from './ChatModalBase.vue';
-import Smile from '../Components/Smile.vue';
+import Smile from '../Components/Smiles/Smile.vue';
 
 export default {
     name: "SmileSettings",

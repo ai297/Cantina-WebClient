@@ -1,53 +1,57 @@
 <template>
     <div class="simple-radio">
-        <div></div>
+        <radio-vizualizer :size="32" />
+        <div class="simple-radio__controls">
+            <holo-button @click="play">{{isPlaying ? 'Выключить' : 'Радио'}}</holo-button>
+        </div>
+        <div>В эфире: <b>{{dj}}</b></div>
+        <div>Играет: <i>{{track}}</i></div>
     </div>
 </template>
 
 <script>
-import {mapGetters, mapMutations} from 'vuex';
+import {mapGetters, mapMutations, mapActions} from 'vuex';
+import radioVizualizer from './RadioVisualizer.vue';
 
 export default {
     name: "SimpleRadioPlayer",
-    props: {
-        element: null,
+    components: {
+        radioVizualizer,
     },
     computed: {
         ...mapGetters({
             audio: 'radio/audio',
             volume: 'radio/volume',
             isPlaying: 'radio/isPlaying',
-            duration: 'radio/duration'
+            dj: 'radio/dj',
+            track: 'radio/track',
         })
     },
     methods: {
         ...mapMutations({
             create: 'radio/createElement',
             delete: 'radio/deleteElement',
-            play: 'radio/playPause',
             changeVolume: 'radio/changeVolume',
         }),
-        // startPlay: function() {
-        //     this.play();
-        //     if(this.dancer){
-        //         if(this.isPlaying) {
-        //             this.$refs['dancer'].play();
-        //         } else this.$refs['dancer'].pause();
-        //     }
-        // },
+        ...mapActions({
+            play: 'radio/playPause',
+        }),
     },
     mounted: function() {
-        this.create(this.$parent.$el);
-    }
+        this.create();
+    },
 }
 </script>
 
 <style lang="less">
     @import "../../../less/vars.less";
     .simple-radio {
-        .simple-radio__play-button {
-            font-size: 1.5em;
-            border-radius: 1em;
+        position: relative;
+        margin: 1em 0;
+        .simple-radio__controls {
+            z-index: 1;
+            padding: @base-padding;
+            margin-top: -7%;
         }
     }
 </style>

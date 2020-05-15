@@ -182,7 +182,7 @@ export default {
 
 
         // вставить смайл в поле ввода сообщения
-        isertOldSmileToMessageString: function(filename) {
+        isertSmileToMessageString: function(filename) {
             if(this.mfRange == null) this.focusMessageField();
             else {
                 let selection = document.getSelection();
@@ -333,7 +333,7 @@ export default {
         this.registerCommand({commandName: CHAT_COMMANDS.ACTION_ADD_NAME_TO_MESSAGE, command: (data) => {
             if(this.$route.name == 'chat') this.addNicknameToMessageString(data)
         }});
-        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_INSERT_SMILE_TO_MESSAGE, command: this.isertOldSmileToMessageString});
+        this.registerCommand({commandName: CHAT_COMMANDS.ACTION_INSERT_SMILE_TO_MESSAGE, command: this.isertSmileToMessageString});
     },
     beforeDestroy: function() {
         this.deleteCommand(CHAT_COMMANDS.ACTION_FOCUS_INPUT_FIELD);

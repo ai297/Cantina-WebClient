@@ -11,7 +11,7 @@
 import { mapActions, mapMutations } from 'vuex';
 import {CHAT_COMMANDS} from '../../../../constants.js';
 import {OLD_SMILES_DEFAULT} from '../../../../old-smiles.js';
-import Smile from '../../Components/Smile.vue';
+import Smile from '../../Components/Smiles/Smile.vue';
 import smileSettings from '../ChatSmilesSettings.vue'
 
 export default {

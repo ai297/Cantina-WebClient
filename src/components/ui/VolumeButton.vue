@@ -18,7 +18,7 @@ export default {
         }, [createElement("div", context.children)]);
         return createElement("div", {
             class: { actv: context.props.active, bright: context.props.bright },
-            staticClass: 'volumeButton ' + context.data.staticClass,
+            staticClass: context.data.staticClass !== undefined ? 'volumeButton ' + context.data.staticClass : 'volumeButton',
             attrs: context.data.attrs,
         }, [button]);
     }

@@ -8,13 +8,13 @@
             <transition name="aside-main" mode="out-in" :duration="{ enter: 800, leave: 500 }">
                 <component :is="asideComponent" class="chat-aside__top-section" />
             </transition>
-
             <div>
                 <volume-button @click="showSettings"><cantina-icons iconName="gear" /> Настройки</volume-button>
                 <!-- <volume-button ><cantina-icons iconName="radio" /> Радио</volume-button> -->
             </div>
-            <!-- <simple-radio :element="$parent.$el" /> -->
+
             <template v-slot:bottom>
+                <simple-radio />
                 <settings-panel />
                 <div class="online-time">
                     <p v-if="isConnected" title="Учитывается только время активного нахождения в чате">Вы в Кантине: <span>{{onlineTime}}</span> мин.</p>
@@ -33,7 +33,7 @@ import chatMessages from './ChatMessages.vue';
 import mainAside from '../Aside.vue';
 import settingsPanel from '../Components/SettingsPanel.vue';
 import userSettings from './ChatUserSettings.vue';
-// import simpleRadio from '../_Radio/SimpleRadioPlayer.vue';
+import simpleRadio from '../_Radio/SimpleRadioPlayer.vue';
 
 export default {
     name: "LiveChat",
@@ -41,7 +41,7 @@ export default {
         chatMessages,
         mainAside,
         settingsPanel,
-        // simpleRadio,
+        simpleRadio,
     },
     data: function() {
         return {
@@ -89,7 +89,7 @@ export default {
             this.showModal(userSettings);
         },
     },
-    created: function() {
+    created: async function() {
         this.isAutoShow = !this.isShowSidebar;
     },
     mounted: function() {

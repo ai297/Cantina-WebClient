@@ -68,7 +68,7 @@ export default {
         scrollMessages: function() {
             if(this.$refs['messages'].scrollTop >= (this.$refs['messages'].scrollHeight - this.$refs['messages'].clientHeight - 10) && !this.autoScroll) this.switchScrollMode(true);
             else if(this.$refs['messages'].scrollTop < this.scrollTop && this.autoScroll) this.switchScrollMode(false);
-            //this.scrollTop = this.$refs['messages'].scrollTop;
+            this.scrollTop = this.$refs['messages'].scrollTop;
         },
 
         selectInputField: function() {

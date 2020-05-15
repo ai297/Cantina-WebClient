@@ -80,7 +80,10 @@ export default {
             return msgHours + ":" + msgMinutes;
         },
         getMessageDate: function() {
-            return `${this.messageDate.getDate()} ${MONTHS[this.messageDate.getMonth()]} ${this.messageDate.getFullYear()}г.`;
+            let month = MONTHS[this.messageDate.getMonth()].toLowerCase();
+            if(month[month.length-1] == 'ь' || month[month.length-1] == 'й' ) month = month.substr(0, month.length-1) + 'я';
+            else month += 'а';
+            return `${this.messageDate.getDate()} ${month} ${this.messageDate.getFullYear()}г.`;
         },
     },
 }
